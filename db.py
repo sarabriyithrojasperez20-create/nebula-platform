@@ -33,7 +33,8 @@ def configure_app(app) -> None:
     except ImportError:
         pass
 
-    app.config.setdefault("SQLALCHEMY_DATABASE_URI", database_url())
+    if not app.config.get("SQLALCHEMY_DATABASE_URI"):
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url()
     app.config.setdefault("SQLALCHEMY_TRACK_MODIFICATIONS", False)
     app.config.setdefault(
         "SQLALCHEMY_ENGINE_OPTIONS",

@@ -39,6 +39,9 @@ from racha_diaria_service import (
 app = Flask(__name__)
 app.secret_key = "clave_secreta_nebula"
 
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 from nebula_data import cargar_datos, guardar_datos, generar_id, init_data_layer
 
 init_data_layer(app)
