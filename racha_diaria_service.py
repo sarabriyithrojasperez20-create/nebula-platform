@@ -106,24 +106,42 @@ def _parse_fecha(s: str) -> date:
     return datetime.strptime(s, "%Y-%m-%d").date()
 
 
-def _coleccion_racha(nombre_archivo: str) -> str:
-    if nombre_archivo == "racha_diaria.json":
-        return "racha_diaria"
-    if nombre_archivo == "racha_logs.json":
-        return "racha_logs"
-    raise ValueError(f"Archivo de racha desconocido: {nombre_archivo}")
+# Mapeo nombre de archivo JSON legacy → colección PostgreSQL (nebula_data)
+_ARCHIVO_A_COLECCION: dict[str, str] = {
+    "racha_diaria.json": "racha_diaria",
+    "racha_logs.json": "racha_logs",
+    "resultados_quiz.json": "resultados_quiz",
+    "actividad_sistema.json": "actividad_sistema",
+    "progreso_catalogo.json": "progreso_catalogo",
+    "diagnosticos_catalogo.json": "diagnosticos_catalogo",
+    "progreso.json": "progreso",
+    "actividades.json": "actividades",
+}
+
+
+def _coleccion_desde_nombre(nombre: str) -> str:
+    """Acepta 'resultados_quiz.json' o 'resultados_quiz'."""
+    if nombre in _ARCHIVO_A_COLECCION:
+        return _ARCHIVO_A_COLECCION[nombre]
+    if nombre.endswith(".json"):
+        base = nombre[:-5]
+        return _ARCHIVO_A_COLECCION.get(nombre, base)
+    return nombre
 
 
 def _cargar_json(nombre: str) -> list:
     from nebula_data import cargar_datos
 
-    return cargar_datos(_coleccion_racha(nombre))
+    return cargar_datos(_coleccion_desde_nombre(nombre))
 
 
 def _guardar_json(nombre: str, datos: list) -> None:
     from nebula_data import guardar_datos
 
-    guardar_datos(_coleccion_racha(nombre), datos)
+    coleccion = _coleccion_desde_nombre(nombre)
+    if coleccion not in ("racha_diaria", "racha_logs"):
+        raise ValueError(f"Solo se puede guardar racha vía _guardar_json, no: {nombre}")
+    guardar_datos(coleccion, datos)
 
 
 def _generar_id(lista: list, campo: str) -> int:

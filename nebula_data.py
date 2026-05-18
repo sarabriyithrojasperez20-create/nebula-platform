@@ -245,6 +245,90 @@ def generar_id(lista: list, campo_id: str) -> int:
     return max(int(item.get(campo_id, 0) or 0) for item in lista) + 1
 
 
+# Colecciones sin FK directa (datos en JSONB / payload)
+_COLECCIONES_PAYLOAD_USUARIO: tuple[tuple[str, str], ...] = (
+    ("tutor_logs", "id_usuario"),
+    ("actividades", "id_usuario"),
+    ("comentarios", "id_usuario"),
+    ("progreso", "id_usuario"),
+    ("recursos_descargas", "id_usuario"),
+)
+
+
+def _filtrar_coleccion_usuario(nombre: str, id_usuario: int, campo: str = "id_usuario") -> None:
+    datos = cargar_datos(nombre)
+    if not isinstance(datos, list):
+        return
+    uid = int(id_usuario)
+    restantes = []
+    for reg in datos:
+        valor = reg.get(campo)
+        if valor is None:
+            restantes.append(reg)
+            continue
+        try:
+            if int(valor) != uid:
+                restantes.append(reg)
+        except (TypeError, ValueError):
+            restantes.append(reg)
+    guardar_datos(nombre, restantes)
+
+
+def eliminar_usuario_completo(id_usuario: int) -> None:
+    """
+    Elimina un usuario y sus datos relacionados.
+    Primero registros hijos (FK), luego la fila en usuarios.
+    """
+    from sqlalchemy import delete
+
+    import models  # noqa: F401
+    from models import (
+        AdminNotification,
+        CatalogProgress,
+        CourseAssignment,
+        DiagnosticRecord,
+        QuizResult,
+        StreakLog,
+        StreakRecord,
+        SystemActivity,
+        TutorDailyUsage,
+        TutorSession,
+        User,
+    )
+
+    uid = int(id_usuario)
+    session = get_db()
+
+    with _WRITE_LOCK:
+        try:
+            for model in (
+                StreakLog,
+                StreakRecord,
+                TutorSession,
+                TutorDailyUsage,
+                CourseAssignment,
+                CatalogProgress,
+                DiagnosticRecord,
+                QuizResult,
+                SystemActivity,
+            ):
+                session.execute(delete(model).where(model.id_usuario == uid))
+
+            session.execute(delete(AdminNotification).where(AdminNotification.user_id == uid))
+
+            for nombre, campo in _COLECCIONES_PAYLOAD_USUARIO:
+                _filtrar_coleccion_usuario(nombre, uid, campo)
+
+            usuario = session.get(User, uid)
+            if usuario is None:
+                raise ValueError("Estudiante no encontrado.")
+            session.delete(usuario)
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            raise
+
+
 def ensure_schema(app) -> list[str]:
     """Crea tablas si no existen (requiere contexto de aplicación Flask)."""
     import models  # noqa: F401

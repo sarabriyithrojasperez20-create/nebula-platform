@@ -834,8 +834,12 @@ def dashboard():
         return redirect(url_for("login"))
 
     id_usuario = session["id_usuario"]
-    datos_dashboard = obtener_datos_dashboard(id_usuario)
-    resumen_racha = obtener_resumen_racha(id_usuario)
+    try:
+        datos_dashboard = obtener_datos_dashboard(id_usuario)
+        resumen_racha = obtener_resumen_racha(id_usuario)
+    except Exception:
+        app.logger.exception("Error en /dashboard (id_usuario=%s)", id_usuario)
+        raise
 
     return render_template(
         "dashboard.html",
@@ -2010,6 +2014,14 @@ def api_admin_eliminar_estudiante(id_usuario):
         return jsonify({"ok": True, "mensaje": "Estudiante eliminado correctamente."})
     except ValueError as exc:
         return jsonify({"ok": False, "mensaje": str(exc)}), 400
+    except Exception as exc:
+        app.logger.exception("api_admin_eliminar_estudiante id=%s", id_usuario)
+        return jsonify(
+            {
+                "ok": False,
+                "mensaje": "No se pudo eliminar. Intenta de nuevo o revisa los logs del servidor.",
+            }
+        ), 500
 
 
 @app.route("/api/admin/notificaciones", methods=["GET"])
@@ -2277,6 +2289,17 @@ def api_racha_registrar_legacy():
     if "id_usuario" not in session:
         return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
     return jsonify(sincronizar_y_validar_hoy(session["id_usuario"]))
+
+
+@app.errorhandler(500)
+def manejar_error_interno(error):
+    app.logger.exception("Error 500: %s", error)
+    if request.path.startswith("/api/"):
+        return jsonify({"ok": False, "mensaje": "Error interno del servidor."}), 500
+    return (
+        "Error interno. Revisa los logs en Render o contacta al administrador.",
+        500,
+    )
 
 
 if __name__ == "__main__":

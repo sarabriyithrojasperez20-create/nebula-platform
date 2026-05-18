@@ -1254,7 +1254,7 @@ def obtener_reporte_estudiante(
 
 
 def eliminar_estudiante(id_usuario: int, id_admin: int) -> None:
-    """Elimina un estudiante y datos asociados en JSON locales."""
+    """Elimina un estudiante y todos sus datos (PostgreSQL / capa nebula_data)."""
     if id_usuario == id_admin:
         raise ValueError("No puedes eliminar tu propia cuenta.")
     usuarios = cargar_datos("usuarios")
@@ -1264,21 +1264,9 @@ def eliminar_estudiante(id_usuario: int, id_admin: int) -> None:
     if usuario.get("id_rol") != 2:
         raise ValueError("Solo se pueden eliminar cuentas de estudiante.")
 
-    usuarios = [u for u in usuarios if u.get("id_usuario") != id_usuario]
-    n = _nebula()
-    n.guardar_datos("usuarios", usuarios)
+    from nebula_data import eliminar_usuario_completo
 
-    for clave, filtro in (
-        ("cursos_asignados", lambda x: x.get("id_usuario") != id_usuario),
-        ("progreso_catalogo", lambda x: x.get("id_usuario") != id_usuario),
-        ("progreso", lambda x: x.get("id_usuario") != id_usuario),
-        ("actividades", lambda x: x.get("id_usuario") != id_usuario),
-        ("diagnosticos_catalogo", lambda x: x.get("id_usuario") != id_usuario),
-        ("resultados_quiz", lambda x: x.get("id_usuario") != id_usuario),
-    ):
-        datos = cargar_datos(clave)
-        if isinstance(datos, list):
-            n.guardar_datos(clave, [x for x in datos if filtro(x)])
+    eliminar_usuario_completo(id_usuario)
 
 
 def suspender_estudiante(id_usuario: int, id_admin: int, activo: bool) -> dict:
