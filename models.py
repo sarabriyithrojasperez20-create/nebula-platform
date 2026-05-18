@@ -133,7 +133,7 @@ class LegacyCourse(db.Model):
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> LegacyCourse:
         pk = int(data.get("id_curso", 0))
-        payload = {k: v for k, v in data.items()}
+        payload = {k: v for k, v in data.items() if k != "id_curso"}
         return cls(id_curso=pk, payload=payload)
 
 
@@ -151,7 +151,8 @@ class LegacyLesson(db.Model):
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> LegacyLesson:
         pk = int(data.get("id_leccion", 0))
-        return cls(id_leccion=pk, payload={k: v for k, v in data.items()})
+        payload = {k: v for k, v in data.items() if k != "id_leccion"}
+        return cls(id_leccion=pk, payload=payload)
 
 
 class LegacyProgress(db.Model):
@@ -168,7 +169,8 @@ class LegacyProgress(db.Model):
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> LegacyProgress:
         pk = int(data.get("id_progreso", 0))
-        return cls(id_progreso=pk, payload={k: v for k, v in data.items()})
+        payload = {k: v for k, v in data.items() if k != "id_progreso"}
+        return cls(id_progreso=pk, payload=payload)
 
 
 class CourseAssignment(db.Model):

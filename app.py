@@ -39,8 +39,10 @@ from racha_diaria_service import (
 app = Flask(__name__)
 app.secret_key = "clave_secreta_nebula"
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# PostgreSQL — DATABASE_URL en .env; si falta o está vacía → fallback Render (db.py)
+from db import RENDER_DATABASE_DEFAULT, apply_sqlalchemy_config
+
+apply_sqlalchemy_config(app, default_url=RENDER_DATABASE_DEFAULT)
 
 from nebula_data import cargar_datos, guardar_datos, generar_id, init_data_layer
 

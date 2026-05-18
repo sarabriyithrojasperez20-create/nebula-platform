@@ -70,6 +70,20 @@ SATELLITE_COLLECTIONS: dict[str, tuple[Type, Callable[[Any], dict]]] = {
     "recursos_descargas": (ResourceDownload, lambda m: m.to_dict()),
 }
 
+# JSON legacy sin PK explícito (p. ej. progreso.json) → asignar IDs al guardar
+COLLECTION_PK_FIELD: dict[str, str] = {
+    "cursos": "id_curso",
+    "lecciones": "id_leccion",
+    "progreso": "id_progreso",
+    "actividades": "id_actividad",
+    "comentarios": "id_comentario",
+    "actividad_sistema": "id_actividad",
+    "diagnosticos_catalogo": "id_diagnostico",
+    "recursos_descargas": "id",
+    "tutor_logs": "id_log",
+    "racha_logs": "id_log",
+}
+
 _FROM_DICT = {
     Role: Role.from_dict,
     User: User.from_dict,
@@ -116,14 +130,79 @@ def _load_all(model: Type) -> list[dict]:
     return [serializer(row) for row in rows]
 
 
-def _replace_all(model: Type, datos: list[dict]) -> None:
+def _ensure_primary_keys(datos: list[dict], campo_id: str) -> list[dict]:
+    """Asigna IDs únicos si faltan o hay duplicados (común en JSON legacy)."""
+    if not datos:
+        return datos
+    max_id = 0
+    for item in datos:
+        raw = item.get(campo_id)
+        if raw in (None, "", 0, "0"):
+            continue
+        try:
+            max_id = max(max_id, int(raw))
+        except (TypeError, ValueError):
+            continue
+    siguiente = max(max_id, 0) + 1
+    resultado: list[dict] = []
+    usados: set[int] = set()
+    for item in datos:
+        copia = dict(item)
+        raw = copia.get(campo_id)
+        try:
+            pk = int(raw) if raw not in (None, "", 0, "0") else 0
+        except (TypeError, ValueError):
+            pk = 0
+        if pk <= 0 or pk in usados:
+            pk = siguiente
+            siguiente += 1
+        usados.add(pk)
+        copia[campo_id] = pk
+        resultado.append(copia)
+    return resultado
+
+
+def truncate_all_tables() -> None:
+    """Vacía todas las tablas (PostgreSQL). Usar antes de reimportar con --force."""
+    import models  # noqa: F401
+    from sqlalchemy import text
+
+    nombres = [t.name for t in db.metadata.sorted_tables]
+    if not nombres:
+        return
+    lista = ", ".join(f'"{n}"' for n in nombres)
+    session = get_db()
+    session.execute(text(f"TRUNCATE {lista} RESTART IDENTITY CASCADE"))
+    session.commit()
+    logger.info("TRUNCATE CASCADE: %d tablas vaciadas", len(nombres))
+
+
+def _replace_all(model: Type, datos: list[dict], coleccion: str | None = None) -> None:
     session = get_db()
     factory = _FROM_DICT[model]
+    campo_pk = COLLECTION_PK_FIELD.get(coleccion or "")
+    if campo_pk:
+        datos = _ensure_primary_keys(datos, campo_pk)
+    etiqueta = coleccion or getattr(model, "__tablename__", "colección")
     with _WRITE_LOCK:
-        session.execute(delete(model))
-        for item in datos:
-            session.add(factory(item))
-        session.commit()
+        try:
+            session.execute(delete(model))
+            session.flush()
+            total = len(datos)
+            for indice, item in enumerate(datos):
+                try:
+                    session.add(factory(item))
+                    session.flush()
+                except SQLAlchemyError as exc:
+                    session.rollback()
+                    raise RuntimeError(
+                        f"«{etiqueta}» registro {indice + 1}/{total} rechazado por PostgreSQL: {exc}\n"
+                        f"  Claves del registro: {list(item.keys())}"
+                    ) from exc
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            raise
 
 
 def cargar_datos(nombre: str) -> list:
@@ -143,11 +222,12 @@ def guardar_datos(nombre: str, datos: list) -> None:
         raise TypeError("datos debe ser una lista")
     try:
         model, _ = _resolve_collection(nombre)
-        _replace_all(model, datos)
+        _replace_all(model, datos, coleccion=nombre)
     except SQLAlchemyError as exc:
-        logger.exception("Error guardando %s: %s", nombre, exc)
         db.session.rollback()
-        raise
+        raise RuntimeError(
+            f"Error al guardar la colección «{nombre}» ({len(datos)} registros): {exc}"
+        ) from exc
 
 
 def cargar_satellite(nombre: str) -> list:
@@ -165,18 +245,66 @@ def generar_id(lista: list, campo_id: str) -> int:
     return max(int(item.get(campo_id, 0) or 0) for item in lista) + 1
 
 
+def ensure_schema(app) -> list[str]:
+    """Crea tablas si no existen (requiere contexto de aplicación Flask)."""
+    import models  # noqa: F401
+
+    with app.app_context():
+        db.create_all()
+        from sqlalchemy import inspect
+
+        tablas = inspect(db.engine).get_table_names()
+        logger.info("Esquema PostgreSQL: %d tablas (%s)", len(tablas), ", ".join(tablas[:8]))
+        if len(tablas) > 8:
+            logger.info("... y %d más", len(tablas) - 8)
+        return tablas
+
+
+def bootstrap_postgres(app) -> list[str]:
+    """Conexión + creación de tablas (sin semillas de config)."""
+    from db import verify_database_connection
+
+    init_database(app)
+    verify_database_connection(app)
+    tablas = ensure_schema(app)
+    if "config_sistema" not in tablas:
+        raise RuntimeError(
+            "No se pudo crear la tabla config_sistema. "
+            "Revisa permisos del usuario en Render o ejecuta: "
+            "python scripts/setup_database.py"
+        )
+    return tablas
+
+
 def init_data_layer(app) -> None:
     """Inicializa PostgreSQL y la capa de persistencia."""
-    init_database(app)
-    from nebula_db import init_app as init_nebula_db
-
-    init_nebula_db(app)
-    logger.info(
-        "Capa de datos PostgreSQL configurada. Ejecuta scripts/migrate_json_to_postgres.py "
-        "o `flask --app manage.py db upgrade` tras crear el esquema."
+    from db import (
+        describe_database_target,
+        report_database_startup_error,
     )
+    from sqlalchemy.exc import OperationalError, ProgrammingError, SQLAlchemyError
 
+    try:
+        bootstrap_postgres(app)
+        from nebula_db import init_app as init_nebula_db
 
-def ensure_schema() -> None:
-    """Crea tablas si no existen (desarrollo / post-migración)."""
-    db.create_all()
+        init_nebula_db(app)
+        target = describe_database_target(app.config.get("SQLALCHEMY_DATABASE_URI", ""))
+        logger.info(
+            "PostgreSQL conectado (host=%s db=%s). "
+            "Si faltan tablas: python scripts/migrate_json_to_postgres.py",
+            target["host"],
+            target["database"],
+        )
+    except OperationalError as exc:
+        report_database_startup_error(app, exc)
+        raise SystemExit(1) from None
+    except ProgrammingError as exc:
+        report_database_startup_error(app, exc)
+        raise SystemExit(1) from None
+    except SQLAlchemyError as exc:
+        report_database_startup_error(app, exc)
+        raise SystemExit(1) from None
+    except Exception as exc:
+        report_database_startup_error(app, exc)
+        raise SystemExit(1) from None
