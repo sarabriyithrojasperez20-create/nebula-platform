@@ -1,0 +1,176 @@
+/**
+ * Plan de estudios — calendario semanal, eventos, filtros, favoritos, menú contextual
+ */
+
+.plan-estudios-page .plan-estudios-calendar {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+}
+
+.plan-estudios-page .plan-estudios-day-labels {
+    background: #f8fafc;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.plan-estudios-page .plan-estudios-day-col {
+    border-right: 1px solid #eef2f7;
+    background: var(--card-bg);
+}
+
+.plan-estudios-page .plan-estudios-day-col--today {
+    background: #f5f3ff;
+}
+
+.plan-estudios-page .plan-estudios-day-col--weekend {
+    background: #f8fafc;
+}
+
+.plan-estudios-page .plan-estudios-time-marker {
+    position: absolute;
+    left: 0.5rem;
+    right: 0.5rem;
+    height: 2px;
+    background: var(--primary-color-35);
+    border-radius: 9999px;
+    z-index: 10;
+}
+
+.calendar-event-card {
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, outline-color 0.2s ease, opacity 0.25s ease;
+    cursor: pointer;
+    border: none;
+    font: inherit;
+    width: 100%;
+    text-align: left;
+}
+
+.calendar-event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.calendar-event-card:active {
+    transform: translateY(0);
+}
+
+.calendar-event-card.is-selected {
+    outline: 2px solid var(--primary-color-45-outline);
+    outline-offset: 2px;
+    box-shadow: 0 6px 16px var(--primary-color-12);
+}
+
+.calendar-event-card.is-removing {
+    animation: nebula-fade-out 0.28s ease-out forwards;
+    pointer-events: none;
+}
+
+.cal-event-delete-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    opacity: 0;
+    padding: 0;
+    line-height: 1;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    color: inherit;
+}
+
+.calendar-event-card:hover .cal-event-delete-btn,
+.calendar-event-card:focus-within .cal-event-delete-btn {
+    opacity: 0.5;
+}
+
+.cal-event-delete-btn:hover {
+    opacity: 0.85 !important;
+}
+
+#cal-event-context-menu.cal-context-visible {
+    display: block;
+}
+
+.cal-list-item-link {
+    cursor: pointer;
+    transition: background-color 0.2s ease, padding-left 0.2s ease;
+    border-radius: 0.5rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.cal-list-item-link:hover {
+    background-color: #f8fafc;
+    padding-left: 0.5rem;
+}
+
+/* Filtros calendario y metas */
+.plan-estudios-page .nebula-filter-btn {
+    background-color: var(--primary-color-42);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px var(--primary-color-15);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plan-estudios-page .nebula-filter-btn:hover {
+    background-color: var(--primary-color-62);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--primary-color-22);
+}
+
+.plan-estudios-page .nebula-filter-btn--active {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    box-shadow: 0 6px 14px var(--primary-color-32);
+    transform: translateY(-1px);
+}
+
+.plan-estudios-page .nebula-filter-btn--active:hover {
+    background-color: var(--primary-color-hover);
+}
+
+/* Favorito: toggle en nuevo evento */
+.evento-favorito-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.evento-favorito-toggle:hover {
+    background-color: var(--primary-color-10);
+    transform: scale(1.1);
+}
+
+.evento-favorito-toggle .favorito-star-icon {
+    font-size: 1.75rem;
+    color: #94a3b8;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.evento-favorito-toggle.is-favorite .favorito-star-icon {
+    color: var(--favorite-gold);
+    font-variation-settings: 'FILL' 1;
+    transform: scale(1.12);
+    filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.45));
+}
+
+.calendar-event-card.is-favorito {
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.55), 0 6px 16px rgba(106, 77, 216, 0.14);
+}
+
+.calendar-event-card .evento-favorito-badge {
+    color: var(--favorite-gold);
+    font-variation-settings: 'FILL' 1;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}

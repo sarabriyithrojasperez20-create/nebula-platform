@@ -1,0 +1,37 @@
+/**
+ * Plan de estudios — layout principal, header, shell, navegación superior
+ */
+
+.plan-estudios-page {
+    background-color: var(--background-light);
+    color: var(--text-primary);
+}
+
+.plan-estudios-shell {
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2f9 100%);
+    min-height: 100vh;
+}
+
+.plan-estudios-page .plan-estudios-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.plan-estudios-page .nav-modulo-link {
+    color: var(--text-muted);
+}
+
+.plan-estudios-page .nav-modulo-link--active {
+    color: var(--primary-color);
+    background-color: var(--primary-color-10);
+}
+
+.plan-estudios-page .notificaciones-panel {
+    background: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+.plan-estudios-page h5 {
+    color: var(--text-secondary);
+}

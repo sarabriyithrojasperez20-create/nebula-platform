@@ -1,0 +1,175 @@
+.mis-cursos-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.mis-cursos-modal.hidden {
+    display: none;
+}
+
+.mis-cursos-modal__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 18, 32, 0.72);
+    backdrop-filter: blur(4px);
+}
+
+.mis-cursos-modal__panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 52rem;
+    max-height: min(85vh, 720px);
+    display: flex;
+    flex-direction: column;
+    border-radius: 1rem;
+    border: 1px solid rgba(106, 75, 216, 0.25);
+    background: #fff;
+    box-shadow: 0 25px 50px -12px rgba(106, 75, 216, 0.35);
+    overflow: hidden;
+}
+
+.dark .mis-cursos-modal__panel,
+html.dark .mis-cursos-modal__panel {
+    background: #151220;
+    border-color: rgba(106, 75, 216, 0.35);
+}
+
+.mis-cursos-modal__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(106, 75, 216, 0.15);
+}
+
+.mis-cursos-modal__cerrar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    color: #64748b;
+    transition: background 0.2s, color 0.2s;
+}
+
+.mis-cursos-modal__cerrar:hover {
+    background: rgba(106, 75, 216, 0.12);
+    color: #6a4bd8;
+}
+
+.mis-cursos-modal__estado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+}
+
+.mis-cursos-modal__estado.hidden {
+    display: none;
+}
+
+.mis-cursos-modal__lista {
+    overflow-y: auto;
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.mis-cursos-modal__item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(106, 75, 216, 0.12);
+    background: rgba(106, 75, 216, 0.04);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.mis-cursos-modal__item:hover {
+    border-color: rgba(106, 75, 216, 0.35);
+    box-shadow: 0 4px 14px rgba(106, 75, 216, 0.12);
+}
+
+.mis-cursos-modal__item-img {
+    width: 4.5rem;
+    height: 3rem;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+}
+
+.mis-cursos-modal__item-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.mis-cursos-modal__item-titulo {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.dark .mis-cursos-modal__item-titulo,
+html.dark .mis-cursos-modal__item-titulo {
+    color: #f8fafc;
+}
+
+.mis-cursos-modal__item-meta {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.125rem;
+}
+
+.mis-cursos-modal__item-desc {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.mis-cursos-modal__btn-anadir {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #6a4bd8;
+    color: #fff;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.mis-cursos-modal__btn-anadir:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+.mis-cursos-modal__btn-anadir:disabled,
+.mis-cursos-modal__btn-asignado {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    cursor: default;
+}
+
+.mis-cursos-card-anadir {
+    cursor: pointer;
+}

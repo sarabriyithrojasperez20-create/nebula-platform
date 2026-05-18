@@ -1,0 +1,110 @@
+<div id="perfil-modal" class="perfil-modal hidden" aria-hidden="true" role="dialog" aria-labelledby="perfil-modal-title">
+    <div class="perfil-modal__backdrop" data-perfil-cerrar aria-hidden="true"></div>
+    <div class="perfil-modal__panel" role="document">
+        <header class="perfil-modal__header">
+            <h2 id="perfil-modal-title">Editar perfil</h2>
+            <button type="button" class="perfil-modal__close" data-perfil-cerrar aria-label="Cerrar">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </header>
+        <div class="perfil-modal__scroll">
+            <form id="perfil-form-editar" class="perfil-modal__form" novalidate>
+                <div id="perfil-toast" class="perfil-toast hidden" role="status"></div>
+                <div class="perfil-edit-layout">
+                    <aside class="perfil-edit-aside" aria-label="Resumen del perfil">
+                        <div class="perfil-edit-aside__avatar-wrap group">
+                            <img id="perfil-modal-avatar" class="perfil-edit-aside__avatar" data-nebula-avatar
+                                src="{{ avatar_src }}" alt="Vista previa del avatar">
+                            <label for="perfil-form-foto" class="perfil-avatar-edit" title="Cambiar foto">
+                                <span class="material-symbols-outlined">photo_camera</span>
+                            </label>
+                        </div>
+                        <input type="file" id="perfil-form-foto" name="foto" class="perfil-sr-only"
+                            accept="image/jpeg,image/png,image/webp" />
+                        <button type="button" class="perfil-edit-aside__upload" id="perfil-btn-subir-foto">
+                            <span class="material-symbols-outlined text-lg">upload</span>
+                            Cambiar foto
+                        </button>
+                        <p class="perfil-edit-aside__hint">JPG, PNG o WEBP · máx. 5 MB</p>
+                        <h3 id="perfil-aside-nombre" class="perfil-edit-aside__name">{{ nombre }}</h3>
+                        <p id="perfil-aside-username" class="perfil-edit-aside__handle">{% if usuario.username %}@{{ usuario.username }}{% else %}&nbsp;{% endif %}</p>
+                        <dl class="perfil-edit-meta">
+                            <div class="perfil-edit-meta__row">
+                                <dt>Correo</dt>
+                                <dd id="perfil-aside-correo">{{ usuario.correo or '—' }}</dd>
+                            </div>
+                            <div class="perfil-edit-meta__row">
+                                <dt>Rol</dt>
+                                <dd>Estudiante</dd>
+                            </div>
+                            <div class="perfil-edit-meta__row">
+                                <dt>Estado</dt>
+                                <dd>{% if usuario.activo != false %}<span class="perfil-status perfil-status--ok">Activo</span>{% else %}<span class="perfil-status">Inactivo</span>{% endif %}</dd>
+                            </div>
+                            <div class="perfil-edit-meta__row">
+                                <dt>Nivel académico</dt>
+                                <dd id="perfil-aside-nivel">{{ usuario.nivel_academico or '—' }}</dd>
+                            </div>
+                        </dl>
+                    </aside>
+                    <section class="perfil-edit-form-card" aria-label="Formulario de edición">
+                        <h3 class="perfil-edit-form-card__title">
+                            <span class="material-symbols-outlined">edit</span>
+                            Información personal
+                        </h3>
+                        <div class="perfil-form-grid">
+                            <label class="perfil-field">
+                                <span class="perfil-field__label">Nombre completo</span>
+                                <input type="text" name="nombre_completo" required minlength="2" maxlength="80"
+                                    value="{{ usuario.nombre_completo or nombre }}" autocomplete="name" />
+                            </label>
+                            <label class="perfil-field">
+                                <span class="perfil-field__label">Usuario</span>
+                                <input type="text" name="username" required minlength="3" maxlength="32"
+                                    pattern="[a-zA-Z0-9._-]+" value="{{ usuario.username or '' }}" autocomplete="username" />
+                            </label>
+                            <label class="perfil-field perfil-field--full">
+                                <span class="perfil-field__label">Correo electrónico</span>
+                                <input type="email" name="correo" required value="{{ usuario.correo or '' }}" autocomplete="email" />
+                            </label>
+                            <label class="perfil-field perfil-field--full">
+                                <span class="perfil-field__label">Sobre mí</span>
+                                <textarea name="sobre_mi" rows="4" maxlength="800"
+                                    placeholder="Cuéntanos sobre tus metas de aprendizaje...">{{ usuario.sobre_mi or '' }}</textarea>
+                            </label>
+                            <label class="perfil-field perfil-field--full">
+                                <span class="perfil-field__label">Nivel académico</span>
+                                <input type="text" name="nivel_academico" maxlength="120"
+                                    value="{{ usuario.nivel_academico or '' }}" placeholder="Ej. Once · Bachillerato" />
+                            </label>
+                            <fieldset class="perfil-field perfil-field--full perfil-field--fieldset">
+                                <legend class="perfil-field__label">Preferencia de aprendizaje</legend>
+                                <div class="perfil-prefs-radios">
+                                    <label class="perfil-radio">
+                                        <input type="radio" name="preferencia_dominante" value="visual"{% if pref_dom == 'visual' %} checked{% endif %}>
+                                        <span>Visual</span>
+                                    </label>
+                                    <label class="perfil-radio">
+                                        <input type="radio" name="preferencia_dominante" value="auditivo"{% if pref_dom == 'auditivo' %} checked{% endif %}>
+                                        <span>Auditivo</span>
+                                    </label>
+                                    <label class="perfil-radio">
+                                        <input type="radio" name="preferencia_dominante" value="kinestesico"{% if pref_dom == 'kinestesico' %} checked{% endif %}>
+                                        <span>Kinestésico</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <footer class="perfil-modal__footer">
+                            <button type="button" class="perfil-btn-secondary" data-perfil-cerrar>Cancelar</button>
+                            <button type="submit" id="perfil-btn-guardar" class="perfil-btn-primary">
+                                <span class="material-symbols-outlined text-lg">save</span>
+                                Guardar cambios
+                            </button>
+                        </footer>
+                    </section>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

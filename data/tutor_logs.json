@@ -1,0 +1,65 @@
+[
+  {
+    "id": "7a8358ce-e776-4b19-9131-d424ca7bc6a0",
+    "id_usuario": 2,
+    "tipo": "error",
+    "detalle": "Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",
+    "fecha": "2026-05-17T13:43:29.818830"
+  },
+  {
+    "id": "20e87fbb-050c-42c5-b43d-e9a62bc914b8",
+    "id_usuario": 2,
+    "tipo": "error",
+    "detalle": "Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",
+    "fecha": "2026-05-17T18:38:18.448173"
+  },
+  {
+    "id": "5b12b187-1036-48ef-9d02-d9dfd4b161e4",
+    "id_usuario": 2,
+    "tipo": "error",
+    "detalle": "Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",
+    "fecha": "2026-05-17T19:14:20.407498"
+  },
+  {
+    "id": "e4432e7f-8b98-4866-9f32-0018b6ece5e6",
+    "id_usuario": 2,
+    "tipo": "error",
+    "detalle": "Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",
+    "fecha": "2026-05-17T19:14:34.490153"
+  },
+  {
+    "id": "708c9136-3406-4c1f-8655-aff9160e6567",
+    "id_usuario": 2,
+    "tipo": "error",
+    "detalle": "Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",
+    "fecha": "2026-05-17T19:15:04.528254"
+  },
+  {
+    "id": "23ef74f1-3267-4f95-b9db-494648c2e1fb",
+    "id_usuario": 2,
+    "tipo": "error",
+    "detalle": "Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",
+    "fecha": "2026-05-17T19:15:35.441192"
+  },
+  {
+    "id": "f9bfffab-64a1-488c-a4f9-19226cd07334",
+    "id_usuario": 2,
+    "tipo": "error",
+    "detalle": "Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",
+    "fecha": "2026-05-17T19:15:38.283178"
+  },
+  {
+    "id": "965d73a6-e4b6-4901-b95f-93f7f1d9b6cb",
+    "id_usuario": 2,
+    "tipo": "error",
+    "detalle": "Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}",
+    "fecha": "2026-05-17T19:20:53.719954"
+  },
+  {
+    "id": "c5bf92eb-6569-499e-981b-b77208e977f6",
+    "id_usuario": 2,
+    "tipo": "openai_stream_error",
+    "detalle": "quota: RateLimitError(\"Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platfor",
+    "fecha": "2026-05-17T19:46:21.527187"
+  }
+]

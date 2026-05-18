@@ -1,0 +1,54 @@
+/**
+ * Plan de estudios — tarjetas compartidas (plan-estudios-card, metas, materias)
+ */
+
+.plan-estudios-page .plan-estudios-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 4px 14px var(--card-shadow);
+}
+
+.meta-card {
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.meta-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary-color-35);
+}
+
+.plan-estudios-page .plan-estudios-class--math {
+    background: #f3e8ff;
+    border-left: 4px solid #a78bfa;
+}
+
+.plan-estudios-page .plan-estudios-class--science {
+    background: #ecfdf5;
+    border-left: 4px solid #4ade80;
+}
+
+.plan-estudios-page .plan-estudios-class--history {
+    background: #fffbeb;
+    border-left: 4px solid #fbbf24;
+}
+
+.plan-estudios-page .plan-estudios-class--lang {
+    background: #fdf2f8;
+    border-left: 4px solid #f472b6;
+}
+
+.plan-estudios-page .plan-estudios-class--math p:first-child {
+    color: #7c3aed;
+}
+
+.plan-estudios-page .plan-estudios-class--science p:first-child {
+    color: #16a34a;
+}
+
+.plan-estudios-page .plan-estudios-class--history p:first-child {
+    color: #d97706;
+}
+
+.plan-estudios-page .plan-estudios-class--lang p:first-child {
+    color: #db2777;
+}

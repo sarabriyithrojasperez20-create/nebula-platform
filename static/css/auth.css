@@ -1,0 +1,51 @@
+/* Auth — login y registro */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.bg-gradient-radial {
+  background: radial-gradient(circle at 60% 40%, #ece8ff 0%, #f6f6f8 60%, #e8e4ff 100%);
+}
+.purple-gradient-btn {
+  background: linear-gradient(135deg, #5d34ef 0%, #a855f7 100%);
+}
+#toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+#toast.show { opacity: 1; }
+#toast.error { background: #ef4444; color: #fff; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4); }
+#toast.ok { background: #22c55e; color: #fff; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4); }
+#toast.info { background: #5d34ef; color: #fff; box-shadow: 0 4px 20px rgba(93, 52, 239, 0.4); }
+.field-error { border-color: #ef4444 !important; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); }
+.field-msg { font-size: 0.72rem; color: #ef4444; margin-top: 0.2rem; display: none; }
+.field-msg.visible { display: block; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.shake { animation: shake 0.4s ease; }
+.spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

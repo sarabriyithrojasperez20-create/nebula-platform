@@ -1,0 +1,7 @@
+{% if session.get('rol') == 1 %}
+<script src="{{ url_for('static', filename='js/nebula-admin-notifications.js') }}"></script>
+{% endif %}
+{% if session.get('rol') == 1 and nebula_profile_boot %}
+<script type="application/json" id="nebula-user-boot">{{ nebula_profile_boot | tojson }}</script>
+<script src="{{ url_for('static', filename='js/nebula-user-profile.js') }}"></script>
+{% endif %}

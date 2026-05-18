@@ -1,0 +1,50 @@
+/**
+ * Nébula — Plan de estudios: tokens de color (valores actuales, sin cambios visuales)
+ * Compatible con Tailwind extend (primary #6a4bd8) y tema claro.
+ */
+.plan-estudios-page,
+.plan-estudios-shell {
+    --primary-color: #6a4bd8;
+    --primary-color-hover: #5a3fc4;
+    --primary-color-active: #4c3599;
+    --primary-color-90: rgba(106, 77, 216, 0.9);
+    --primary-color-62: rgba(106, 77, 216, 0.62);
+    --primary-color-42: rgba(106, 77, 216, 0.42);
+    --primary-color-35: rgba(106, 77, 216, 0.35);
+    --primary-color-32: rgba(106, 77, 216, 0.32);
+    --primary-color-28: rgba(106, 77, 216, 0.28);
+    --primary-color-25: rgba(106, 77, 216, 0.25);
+    --primary-color-22: rgba(106, 77, 216, 0.22);
+    --primary-color-15: rgba(106, 77, 216, 0.15);
+    --primary-color-12: rgba(106, 77, 216, 0.12);
+    --primary-color-10: rgba(106, 77, 216, 0.1);
+    --primary-color-45-outline: rgba(106, 77, 216, 0.45);
+
+    --secondary-color: #8b7cf7;
+    --accent-color: #60a5fa;
+
+    --background-light: #f4f6fb;
+    --card-bg: #ffffff;
+    --card-border: #e8edf5;
+    --card-shadow: rgba(15, 23, 42, 0.05);
+
+    --text-primary: #1e293b;
+    --text-secondary: #334155;
+    --text-muted: #475569;
+
+    --nebula-math: #8b5cf6;
+    --nebula-science: #22c55e;
+    --nebula-history: #f59e0b;
+    --nebula-lang: #ec4899;
+
+    --streak-orange-start: #f97316;
+    --streak-orange-end: #ea580c;
+    --favorite-gold: #f59e0b;
+
+    --modal-backdrop: rgba(15, 23, 42, 0.58);
+    --cancel-bg: #f1f5f9;
+    --cancel-border: #e2e8f0;
+    --cancel-hover-bg: #ede9fe;
+    --cancel-hover-text: #5b21b6;
+    --cancel-hover-border: #ddd6fe;
+}

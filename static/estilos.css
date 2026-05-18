@@ -1,0 +1,3 @@
+/** Compatibilidad: use css/global.css + css/auth.css en plantillas nuevas */
+@import url('css/global.css');
+@import url('css/auth.css');

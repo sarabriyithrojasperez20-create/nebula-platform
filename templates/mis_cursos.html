@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Nébula - Mis cursos</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mis-cursos-modal.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+       
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Top Navigation Bar -->
+        <header
+            class="border-b border-slate-200 dark:border-primary/20 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+            <div class="flex items-center justify-between gap-4 px-6 lg:px-20 py-3">
+            <div class="flex items-center gap-4 lg:gap-8 min-w-0">
+                <div class="flex items-center gap-4 text-primary">
+                    <div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg">
+                        <span class="material-symbols-outlined text-3xl" >auto_awesome</span>
+                    </div>
+                    <h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight" >
+                        Nébula</h2>
+                </div>
+                <label class="hidden md:flex flex-col min-w-64 h-11 max-w-xs lg:max-w-sm" >
+                    <div
+                        class="flex w-full flex-1 items-stretch rounded-full h-full bg-slate-100 dark:bg-primary/10 border border-transparent focus-within:border-primary/50 transition-all">
+                        <div class="text-slate-500 dark:text-primary/60 flex items-center justify-center pl-4">
+                            <span class="material-symbols-outlined" >search</span>
+                        </div>
+                        <input
+                            class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 placeholder:text-slate-400 dark:placeholder:text-primary/40 px-3 text-sm font-normal"
+                            placeholder="Buscar cursos, temas o recursos..." value="">
+                    </div>
+                </label>
+            </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    {% with clase_boton='flex items-center justify-center rounded-full size-10 bg-slate-100 dark:bg-primary/20 text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition-all', icono_clase='text-[20px]', avatar_link_class='block shrink-0 rounded-full bg-primary/20 p-0.5 border-2 border-primary', avatar_img_class='aspect-square rounded-full size-9 object-cover' %}
+                    {% include 'partials/estudiante_header_actions.html' %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="px-6 lg:px-20 pb-3 nav-modulos-estudiante--bar">
+                {% include 'partials/nav_estudiante.html' %}
+            </div>
+        </header>
+        <main class="flex-1 max-w-[1400px] mx-auto w-full min-w-0 px-6 lg:px-20 py-10">
+            <!-- Header Section with soft gradient background effect -->
+            <div
+                class="relative mb-10 overflow-hidden rounded-xl p-8 bg-gradient-to-br from-primary/5 to-transparent border border-primary/10">
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-tight"
+                            >Mis cursos</h1>
+                        <p class="text-slate-500 dark:text-slate-400 text-lg font-normal max-w-xl" >Continúa tu
+                            recorrido académico y domina nuevas habilidades con tu plan de estudios personalizado.</p>
+                    </div>
+                    <div
+                        class="flex items-center gap-2 bg-white/50 dark:bg-white/5 p-2 rounded-lg backdrop-blur-sm border border-white/20">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 px-2" >Meta
+                            semanal</span>
+                        <div class="flex items-center gap-2 bg-primary text-white px-3 py-1 rounded-full text-sm font-bold"
+                          >
+                            <span class="material-symbols-outlined text-sm" >bolt</span>
+                            4/5 cursos
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Filter Controls -->
+            <div class="flex flex-wrap gap-4 mb-8 items-center justify-between w-full">
+                <div class="flex gap-3 flex-wrap items-center">
+                    <button type="button" data-filtro-materia="todas"
+                        class="mis-cursos-filtro-materia mis-cursos-filtro--active flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-5 text-white shadow-lg shadow-primary/20">
+                        <span class="material-symbols-outlined text-[20px]">grid_view</span>
+                        <span class="text-sm font-semibold">Todas las materias</span>
+                    </button>
+                    <button type="button" data-filtro-materia="matematicas"
+                        class="mis-cursos-filtro-materia flex h-10 items-center justify-center gap-2 rounded-full bg-slate-100 dark:bg-primary/10 border border-slate-200 dark:border-primary/20 px-5 text-slate-600 dark:text-slate-300 hover:border-primary/50 transition-all">
+                        <span class="material-symbols-outlined text-[20px]">function</span>
+                        <span class="text-sm font-semibold">Matemáticas</span>
+                    </button>
+                    <button type="button" data-filtro-materia="ciencias"
+                        class="mis-cursos-filtro-materia flex h-10 items-center justify-center gap-2 rounded-full bg-slate-100 dark:bg-primary/10 border border-slate-200 dark:border-primary/20 px-5 text-slate-600 dark:text-slate-300 hover:border-primary/50 transition-all">
+                        <span class="material-symbols-outlined text-[20px]">science</span>
+                        <span class="text-sm font-semibold">Ciencias</span>
+                    </button>
+                    <div class="relative" id="filtro-dificultad-wrap">
+                        <button type="button" id="btn-filtro-dificultad"
+                            class="flex h-10 items-center justify-center gap-2 rounded-full bg-slate-100 dark:bg-primary/10 border border-slate-200 dark:border-primary/20 px-5 text-slate-600 dark:text-slate-300 hover:border-primary/50 transition-all">
+                            <span class="material-symbols-outlined text-[20px]">signal_cellular_alt</span>
+                            <span class="text-sm font-semibold" id="filtro-dificultad-label">Dificultad</span>
+                            <span class="material-symbols-outlined text-[18px]">expand_more</span>
+                        </button>
+                        <div id="filtro-dificultad-menu" class="hidden absolute left-0 top-full mt-2 z-20 min-w-[11rem] rounded-lg border border-slate-200 dark:border-primary/20 bg-white dark:bg-background-dark shadow-xl py-1">
+                            <button type="button" data-filtro-nivel="todas" class="mis-cursos-filtro-nivel w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-primary/10">Todas</button>
+                            <button type="button" data-filtro-nivel="Principiante" class="mis-cursos-filtro-nivel w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-primary/10">Principiante</button>
+                            <button type="button" data-filtro-nivel="Intermedio" class="mis-cursos-filtro-nivel w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-primary/10">Intermedio</button>
+                            <button type="button" data-filtro-nivel="Avanzado" class="mis-cursos-filtro-nivel w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-primary/10">Avanzado</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="mis-cursos-contador" class="text-slate-500 dark:text-slate-400 text-sm font-medium shrink-0">
+                    Mostrando {{ cursos_catalogo|length }} cursos activos
+                </div>
+            </div>
+            <div id="mis-cursos-empty" class="hidden mb-8 rounded-lg border border-primary/20 bg-primary/5 px-6 py-10 text-center">
+                <span class="material-symbols-outlined text-4xl text-primary mb-3">search_off</span>
+                <p class="text-slate-600 dark:text-slate-300 font-semibold">No hay cursos disponibles para esta selección</p>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Prueba con otro filtro de materia o dificultad.</p>
+            </div>
+            <div id="mis-cursos-grid" class="mis-cursos-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
+                {% for curso in cursos_catalogo %}
+                {% include 'partials/mis_cursos_tarjeta.html' %}
+                {% endfor %}
+                {% include 'partials/mis_cursos_tarjeta_anadir.html' %}
+            </div>
+
+            <div id="mis-cursos-modal" class="mis-cursos-modal hidden" role="dialog" aria-modal="true"
+                aria-labelledby="mis-cursos-modal-titulo" aria-hidden="true">
+                <div class="mis-cursos-modal__overlay" data-cerrar-modal></div>
+                <div class="mis-cursos-modal__panel">
+                    <div class="mis-cursos-modal__header">
+                        <div>
+                            <h2 id="mis-cursos-modal-titulo" class="text-2xl font-bold text-slate-900 dark:text-white">Añadir cursos</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Selecciona cursos del catálogo para tu plan de aprendizaje</p>
+                        </div>
+                        <button type="button" class="mis-cursos-modal__cerrar" data-cerrar-modal aria-label="Cerrar">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div id="mis-cursos-modal-cargando" class="mis-cursos-modal__estado hidden">
+                        <span class="material-symbols-outlined animate-spin text-primary text-4xl">progress_activity</span>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-3">Cargando catálogo...</p>
+                    </div>
+                    <div id="mis-cursos-modal-lista" class="mis-cursos-modal__lista"></div>
+                </div>
+            </div>
+            <!-- Gamification/Engagement Footer -->
+            <div
+                class="mt-16 p-8 rounded-lg bg-gradient-to-r from-primary to-[#4d3267] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/30">
+                <div class="flex items-center gap-6">
+                    <div class="size-16 rounded-full bg-white/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-4xl" >workspace_premium</span>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold" >¿Listo para un reto?</h4>
+                        <p class="text-white/80" >Completa 2 cursos este mes para obtener la insignia «Navegante
+                            Nébula».</p>
+                    </div>
+                </div>
+                <button
+                    class="bg-white text-primary px-8 py-3 rounded-full font-bold hover:bg-slate-100 transition-colors whitespace-nowrap"
+                    >
+                    Ver mis insignias
+                </button>
+            </div>
+        </main>
+        <!-- Footer -->
+        <footer
+            class="border-t border-slate-200 dark:border-primary/20 px-20 py-10 bg-white/30 dark:bg-background-dark/30 backdrop-blur-sm text-slate-500 dark:text-primary/40 text-sm text-center">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg" >auto_awesome</span>
+                    <span class="font-bold" >Nébula AI Academy</span>
+                </div>
+                <div class="flex gap-6">
+                    <a class="hover:text-primary transition-colors" href="#">Política de privacidad</a>
+                    <a class="hover:text-primary transition-colors" href="#">Términos de servicio</a>
+                    <a class="hover:text-primary transition-colors" href="#">Soporte</a>
+                </div>
+                <div class="">© 2024 Nébula Platforms Inc.</div>
+            </div>
+        </footer>
+    </div>
+    <script>
+        window.MIS_CURSOS_META = { userId: {{ id_usuario | tojson }} };
+    </script>
+    <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='mis-cursos.js') }}"></script>
+    {% include 'partials/nebula_user_boot.html' %}
+</body>
+
+</html>

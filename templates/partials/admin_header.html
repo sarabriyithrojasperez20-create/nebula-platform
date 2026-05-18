@@ -1,0 +1,53 @@
+<header class="nb-topbar admin-header">
+  <button type="button" class="nb-mobile-toggle" id="nb-sidebar-toggle" aria-label="Abrir menú">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+
+  <div class="nb-search">
+    <span class="material-symbols-outlined text-[20px]" style="color:var(--nb-text-muted)">search</span>
+    <input type="search" placeholder="{{ header_buscar|default('Buscar usuarios, cursos, lecciones...') }}" aria-label="Buscar"/>
+    <kbd class="hidden sm:inline text-[10px] font-semibold text-[var(--nb-text-muted)] px-1.5 py-0.5 rounded border border-[var(--nb-border)] bg-white">⌘K</kbd>
+  </div>
+
+  <div class="nb-topbar-actions">
+    <button type="button" class="nb-quick-action" onclick="window.location.href='{{ url_for('analytics') }}'">
+      <span class="material-symbols-outlined text-[18px]">add_chart</span>
+      Ver analytics
+    </button>
+    {% include 'partials/admin_notificaciones_dropdown.html' %}
+    <button type="button" class="nb-icon-btn" aria-label="Acciones rápidas" onclick="window.location.href='{{ url_for('admin') }}'">
+      <span class="material-symbols-outlined">bolt</span>
+    </button>
+
+    <div class="relative" id="admin-profile-menu-root">
+      <button type="button" id="admin-profile-trigger" class="nb-profile-trigger" aria-expanded="false" aria-haspopup="true">
+        <div class="nb-profile-meta">
+          <p class="name">{{ admin_usuario.nombre_completo if admin_usuario else 'Administrador' }}</p>
+          <p class="role">Administrador</p>
+        </div>
+        {% with avatar_url=nebula_avatar_url, avatar_class='nb-avatar', avatar_alt='Avatar de administrador', avatar_default=nebula_avatar_default if nebula_avatar_default is defined else 'https://lh3.googleusercontent.com/aida-public/AB6AXuAD6gE4jiVX_QOu_PJnl4RoiCuFtEVvl9zCo9MjQ-6uWcAni9hqFLMcI20-1qtdN9Q_xdVtZe05nF7Tlb6ausQOLPV6C1ehxI3Juo6jIIyt19DjM33_aq6eO5-l35Kz2AFteSqdTMTR3Zmp7iAYn60YTj-cA3gb1nSVquColSTkQmpq19qftiFfA2gTl1Z188WVEIvsp4Eo0t0ugfLEL9wZg7-Gdmo_49YAbnCDVSHyiBwV4CnWdJFFpZhHm_Y6WsxL54wboT6QzAU' %}
+        <img class="nb-avatar" data-nebula-avatar alt="{{ avatar_alt }}"
+          src="{{ avatar_url or avatar_default }}"
+          data-avatar-fallback="{{ avatar_default }}"
+          onerror="if(this.dataset.avatarFallback){this.onerror=null;this.src=this.dataset.avatarFallback;}"/>
+        {% endwith %}
+        <span class="material-symbols-outlined text-[20px]" style="color:var(--nb-text-muted)">expand_more</span>
+      </button>
+      <div id="admin-profile-dropdown" class="nb-dropdown hidden">
+        <a href="{{ url_for('admin_profile') }}">
+          <span class="material-symbols-outlined text-[20px]">person</span>
+          Ver perfil
+        </a>
+        <a href="{{ url_for('admin_profile') }}#editar">
+          <span class="material-symbols-outlined text-[20px]">edit</span>
+          Editar perfil
+        </a>
+        <hr/>
+        <a href="{{ url_for('logout') }}" style="color:#dc2626">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+          Cerrar sesión
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,15 @@
+/**
+ * Nébula — Plan de estudios: hoja de estilos modular
+ * Orden de carga: tokens → animaciones → layout → componentes
+ * Equivalente a importar CSS Modules en Next.js (un entry por módulo).
+ */
+
+@import url('tokens.css');
+@import url('animations.css');
+@import url('dashboard.css');
+@import url('cards.css');
+@import url('sidebar.css');
+@import url('calendar.css');
+@import url('streak.css');
+@import url('resources.css');
+@import url('buttons.css');

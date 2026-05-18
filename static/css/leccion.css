@@ -1,0 +1,203 @@
+.leccion-page {
+    background: linear-gradient(180deg, #151220 0%, #1a1628 50%, #151220 100%);
+}
+
+.leccion-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(106, 75, 216, 0.2);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.leccion-breadcrumb a {
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+
+.leccion-breadcrumb a:hover {
+    color: #6a4bd8;
+}
+
+.leccion-breadcrumb span.sep {
+    color: rgba(148, 163, 184, 0.5);
+    margin: 0 0.35rem;
+}
+
+.leccion-video-wrap {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #0d0b14;
+    aspect-ratio: 16 / 9;
+}
+
+.leccion-video-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+}
+
+.leccion-video-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(21, 18, 32, 0.9) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.leccion-play-btn {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    background: #6a4bd8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(106, 75, 216, 0.5);
+    transition: transform 0.2s, background 0.2s;
+    cursor: pointer;
+    border: none;
+}
+
+.leccion-play-btn:hover {
+    transform: scale(1.06);
+    background: #7a5cf0;
+}
+
+.leccion-video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+}
+
+.leccion-video-progress {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+}
+
+.leccion-video-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6a4bd8, #9f7aea);
+    border-radius: 9999px;
+}
+
+.leccion-tabs {
+    display: flex;
+    gap: 0.25rem;
+    border-bottom: 1px solid rgba(106, 75, 216, 0.2);
+    margin-bottom: 0;
+}
+
+.leccion-tab {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #94a3b8;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.leccion-tab:hover {
+    color: #e2e8f0;
+}
+
+.leccion-tab.is-active {
+    color: #6a4bd8;
+    border-bottom-color: #6a4bd8;
+}
+
+.leccion-tab-panel {
+    display: none;
+    padding: 1.25rem 0;
+}
+
+.leccion-tab-panel.is-active {
+    display: block;
+}
+
+.leccion-definicion {
+    padding: 0.75rem 1rem;
+    border-left: 3px solid #6a4bd8;
+    background: rgba(106, 75, 216, 0.08);
+    border-radius: 0 0.5rem 0.5rem 0;
+    margin-bottom: 0.75rem;
+}
+
+.leccion-formula {
+    font-family: ui-monospace, monospace;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #c4b5fd;
+}
+
+.leccion-ejemplo,
+.leccion-practica {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(106, 75, 216, 0.25);
+}
+
+.leccion-ejemplo {
+    background: rgba(106, 75, 216, 0.06);
+}
+
+.leccion-practica {
+    background: rgba(34, 197, 94, 0.06);
+    border-color: rgba(34, 197, 94, 0.25);
+}
+
+.leccion-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    font-size: 0.8125rem;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leccion-sidebar-item:last-child {
+    border-bottom: none;
+}
+
+.leccion-progress-track {
+    height: 0.5rem;
+    background: rgba(106, 75, 216, 0.15);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.leccion-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6a4bd8, #7a5cf0);
+    border-radius: 9999px;
+}
+
+.leccion-accion-continuar.is-locked {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+#leccion-quiz-gate-msg.is-warning {
+    color: #fbbf24;
+}
+
+#leccion-quiz-gate-msg.is-success {
+    color: #4ade80;
+}

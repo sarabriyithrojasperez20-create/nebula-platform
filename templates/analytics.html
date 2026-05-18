@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<title>Nébula — Analytics</title>
+{% include 'partials/admin_head.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
+</head>
+<body class="nb-admin nb-page-enter">
+{% include 'partials/admin_sidebar.html' %}
+<main class="nb-main">
+{% include 'partials/admin_header.html' %}
+{% include 'partials/admin_analytics_content.html' %}
+</main>
+<button type="button" id="analytics-fab" class="fixed bottom-8 right-8 w-14 h-14 rounded-full text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 shadow-lg" style="background:var(--nb-primary)" data-href="{{ url_for('admin') }}" aria-label="Ir a gestión">
+<span class="material-symbols-outlined text-3xl">dashboard</span>
+</button>
+{% include 'partials/admin_export_modal.html' %}
+{% include 'partials/admin_foot_scripts.html' %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/admin-nav.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin-export-pdf.js') }}"></script>
+<script src="{{ url_for('static', filename='js/analytics-admin.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin-shell.js') }}"></script>
+</body>
+</html>

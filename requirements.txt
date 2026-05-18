@@ -1,0 +1,15 @@
+# Nébula AI — dependencias de producción
+flask>=3.0,<4
+
+# Obligatorio en Windows: zoneinfo carga zonas IANA vía importlib.resources → paquete tzdata
+tzdata>=2024.1
+
+# Tutor IA — OpenAI + variables de entorno
+python-dotenv>=1.0,<2
+openai>=1.40,<2
+
+# PostgreSQL + ORM + migraciones
+flask-sqlalchemy>=3.1,<4
+flask-migrate>=4.0,<5
+SQLAlchemy>=2.0,<3
+psycopg2-binary>=2.9,<3

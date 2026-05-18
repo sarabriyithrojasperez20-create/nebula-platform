@@ -1,0 +1,109 @@
+/**
+ * Plan de estudios — botones primarios, modales y confirmaciones
+ */
+
+/* Nuevo evento + Editar plan (FAB) */
+.plan-estudios-page .nebula-btn-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 10px 15px -3px var(--primary-color-25), 0 4px 6px -4px var(--primary-color-25);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plan-estudios-page .nebula-btn-primary:hover {
+    background-color: var(--primary-color-90);
+    transform: scale(1.02);
+    box-shadow: 0 12px 20px -3px rgba(106, 77, 216, 0.3), 0 6px 8px -4px rgba(106, 77, 216, 0.28);
+}
+
+.plan-estudios-page .nebula-btn-primary:active {
+    transform: scale(1);
+}
+
+.plan-estudios-page .nebula-btn-primary:focus-visible {
+    outline: 2px solid var(--primary-color-45-outline);
+    outline-offset: 2px;
+}
+
+/* Modal confirmar eliminación */
+#modal-confirm-eliminar {
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+#modal-confirm-eliminar::backdrop {
+    background-color: var(--modal-backdrop);
+    backdrop-filter: blur(2px);
+}
+
+#modal-confirm-eliminar .modal-confirm-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+}
+
+.plan-estudios-page .nebula-btn-confirm-delete {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 8px 18px var(--primary-color-28);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plan-estudios-page .nebula-btn-confirm-delete:hover {
+    background-color: var(--primary-color-hover);
+    transform: scale(1.02);
+    box-shadow: 0 10px 22px var(--primary-color-35);
+}
+
+.plan-estudios-page .nebula-btn-confirm-cancel {
+    background-color: var(--cancel-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--cancel-border);
+    font-weight: 600;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.plan-estudios-page .nebula-btn-confirm-cancel:hover {
+    background-color: var(--cancel-hover-bg);
+    color: var(--cancel-hover-text);
+    border-color: var(--cancel-hover-border);
+    transform: scale(1.01);
+}
+
+/* Modales: Agregar / Cancelar (Nuevo evento, Nueva meta) */
+.plan-estudios-page .nebula-btn-modal-submit {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 18px var(--primary-color-28);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plan-estudios-page .nebula-btn-modal-submit:hover {
+    background-color: var(--primary-color-hover) !important;
+    transform: scale(1.02);
+    box-shadow: 0 10px 22px var(--primary-color-35);
+}
+
+.plan-estudios-page .nebula-btn-modal-cancel {
+    background-color: var(--cancel-bg) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--cancel-border) !important;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.plan-estudios-page .nebula-btn-modal-cancel:hover {
+    background-color: var(--cancel-hover-bg) !important;
+    color: var(--cancel-hover-text) !important;
+    border-color: var(--cancel-hover-border) !important;
+    transform: scale(1.01);
+}

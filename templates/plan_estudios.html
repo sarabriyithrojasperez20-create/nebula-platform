@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Nébula - Plan de estudios</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <!-- Plan de estudios: estilos modulares (static/styles/plan-estudios/) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/plan-estudios.css') }}">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6a4bd8",
+                        "background-light": "#f4f6fb",
+                        "nebula-math": "#8b5cf6",
+                        "nebula-science": "#22c55e",
+                        "nebula-history": "#f59e0b",
+                        "nebula-lang": "#ec4899",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+
+<body class="plan-estudios-page bg-[#f4f6fb] text-slate-800 min-h-screen">
+    <!-- Loader global -->
+    <div id="nebula-loader" class="fixed inset-0 z-[200] flex items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300" aria-hidden="false" aria-label="Cargando">
+        <div class="flex flex-col items-center gap-4">
+            <div class="size-12 rounded-full border-4 border-primary/20 border-t-primary nebula-loader-spin"></div>
+            <p class="text-sm font-medium text-slate-600">Cargando tu plan de estudios...</p>
+        </div>
+    </div>
+
+    <!-- Contenedor de toasts -->
+    <div id="nebula-toast-container" class="fixed top-24 right-6 z-[150] flex flex-col gap-2 max-w-sm w-full pointer-events-none" aria-live="polite"></div>
+
+    <div class="plan-estudios-shell relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Top Navigation Bar -->
+        <header
+            class="plan-estudios-header border-b border-slate-200 bg-white sticky top-0 z-50">
+            <div class="flex items-center justify-between gap-4 px-6 lg:px-10 py-3">
+            <div class="flex items-center gap-4 lg:gap-8 min-w-0">
+                <div class="flex items-center gap-4 text-primary">
+                    <div class="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary" >cloud</span>
+                    </div>
+                    <h2 class="text-slate-900 text-xl font-bold leading-tight tracking-tight" >
+                        Nébula</h2>
+                </div>
+                <label class="flex flex-col min-w-40 h-10 max-w-64 hidden sm:flex" >
+                    <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                        <div
+                            class="text-slate-400 flex bg-slate-100 items-center justify-center pl-4 rounded-l-xl border-none">
+                            <span class="material-symbols-outlined text-xl" >search</span>
+                        </div>
+                        <input
+                            id="header-search"
+                            class="form-input flex w-full min-w-0 flex-1 rounded-xl text-slate-900 focus:outline-0 focus:ring-0 border-none bg-slate-100 placeholder:text-slate-400 px-4 rounded-l-none pl-2 text-sm font-normal"
+                            placeholder="Buscar temas..." value="">
+                    </div>
+                </label>
+            </div>
+                <div class="flex items-center gap-3 shrink-0 ml-4">
+                    {% with clase_boton='flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors', avatar_link_class='block shrink-0 rounded-full border-2 border-white shadow-sm p-0.5', avatar_img_class='size-10 rounded-full object-cover' %}
+                    {% include 'partials/estudiante_header_actions.html' %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="px-6 lg:px-10 pb-3 nav-modulos-estudiante--bar">
+                {% include 'partials/nav_estudiante.html' %}
+            </div>
+        </header>
+        <main class="flex flex-1 flex-col lg:flex-row px-4 sm:px-6 lg:px-10 py-6 lg:py-8 gap-6 lg:gap-8 max-w-[1600px] mx-auto w-full">
+            <!-- Sidebar -->
+            <aside class="flex flex-col w-full lg:w-72 shrink-0 gap-6">
+                <!-- User AI Profile + navegación de secciones -->
+                <div class="plan-estudios-card p-5 rounded-xl">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="size-10 bg-primary/20 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary" >psychology</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-900" >Nébula AI</h3>
+                            <p class="text-xs text-slate-500" >Refuerzo académico</p>
+                        </div>
+                    </div>
+                    <nav class="plan-estudios-sidebar-nav flex flex-col gap-1" id="sidebar-nav" aria-label="Secciones del plan de estudios">
+                        <button type="button" data-panel="calendario"
+                            class="sidebar-nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg sidebar-nav-active w-full text-left transition-colors">
+                            <span class="material-symbols-outlined" >calendar_month</span>
+                            <span class="text-sm" >Calendario</span>
+                        </button>
+                        <button type="button" data-panel="metas"
+                            class="sidebar-nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 w-full text-left transition-colors">
+                            <span class="material-symbols-outlined" >target</span>
+                            <span class="text-sm" >Metas personalizadas</span>
+                        </button>
+                        <button type="button" data-panel="racha"
+                            class="sidebar-nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 w-full text-left transition-colors">
+                            <span class="material-symbols-outlined" >local_fire_department</span>
+                            <span class="text-sm" >Racha diaria</span>
+                        </button>
+                        <button type="button" data-panel="recursos"
+                            class="sidebar-nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 w-full text-left transition-colors">
+                            <span class="material-symbols-outlined" >menu_book</span>
+                            <span class="text-sm" >Recursos</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Goals Widget (sincronizado con metas) -->
+                <div class="plan-estudios-card p-5 rounded-xl" id="widget-progreso">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-semibold text-sm text-slate-900 uppercase tracking-wider"
+                            >Progreso semanal</h4>
+                        <span class="text-xs font-bold text-primary" id="widget-progreso-pct">65%</span>
+                    </div>
+                    <div class="h-2 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
+                        <div class="h-full bg-primary rounded-full transition-all duration-500" id="widget-progreso-bar" style="width: 65%;"></div>
+                    </div>
+                    <p class="text-xs text-slate-500" id="widget-progreso-text">13 de 20 horas de estudio completadas</p>
+                </div>
+
+                <!-- Streak Widget (sincronizado con racha) -->
+                <div class="plan-estudios-streak p-5 rounded-xl text-white cursor-pointer hover:scale-[1.02] transition-transform" id="widget-racha" role="button" tabindex="0" aria-label="Ver racha diaria">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl nebula-flame-animate" >local_fire_department</span>
+                        <div class="px-2 py-1 bg-white/20 rounded-lg text-[10px] font-bold uppercase" id="widget-racha-badge">Increible</div>
+                    </div>
+                    <p class="text-3xl font-bold mb-1" ><span id="widget-racha-dias">12</span> Días</p>
+                    <p class="text-xs text-white/80" id="widget-racha-msg">Sigue así! Tu racha mas larga es de 12 días</p>
+                </div>
+                <button
+                    class="w-full py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-violet-50 transition-colors mt-auto shadow-sm"
+                    type="button" onclick="NebulaPlan.showToast('Próximamente: planes Premium', 'info')">
+                    Mejorar a Premium
+                </button>
+            </aside>
+
+            <!-- Contenido principal: paneles intercambiables -->
+            <section class="flex flex-col flex-1 min-w-0" id="main-panels">
+
+                <!-- ===================== PANEL: CALENDARIO ===================== -->
+                <div id="panel-calendario" class="plan-panel flex flex-col flex-1 nebula-panel-enter" data-panel="calendario">
+                    <div class="flex flex-col gap-4 mb-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                            <div>
+                                <h1 class="text-2xl font-bold text-slate-900">Calendario académico</h1>
+                                <p class="text-slate-500 text-sm" id="calendario-rango">—</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <div class="flex items-center gap-2 bg-white p-1.5 rounded-xl shadow-sm border border-slate-200">
+                                    <button type="button" id="cal-prev-week" class="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600" aria-label="Semana anterior">
+                                        <span class="material-symbols-outlined">chevron_left</span>
+                                    </button>
+                                    <button type="button" id="cal-today" class="px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/5 rounded-lg transition-colors">Hoy</button>
+                                    <button type="button" id="cal-next-week" class="p-2 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Semana siguiente">
+                                        <span class="material-symbols-outlined">chevron_right</span>
+                                    </button>
+                                </div>
+                                <button type="button" id="btn-add-evento"
+                                    class="nebula-btn-primary flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold">
+                                    <span class="material-symbols-outlined text-lg">add</span>
+                                    Nuevo evento
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Leyenda de materias -->
+                        <div class="flex flex-wrap gap-4">
+                            <div class="flex items-center gap-2"><div class="size-3 rounded-full bg-nebula-math"></div><span class="text-xs text-slate-500 font-medium">Matemáticas</span></div>
+                            <div class="flex items-center gap-2"><div class="size-3 rounded-full bg-nebula-science"></div><span class="text-xs text-slate-500 font-medium">Ciencia</span></div>
+                            <div class="flex items-center gap-2"><div class="size-3 rounded-full bg-nebula-history"></div><span class="text-xs text-slate-500 font-medium">Historia</span></div>
+                            <div class="flex items-center gap-2"><div class="size-3 rounded-full bg-nebula-lang"></div><span class="text-xs text-slate-500 font-medium">Lenguaje</span></div>
+                        </div>
+                        <!-- Filtros rápidos del calendario -->
+                        <div class="flex flex-wrap gap-2" id="cal-filtros">
+                            <button type="button" data-cal-filter="all" class="cal-filter-btn nebula-filter-btn nebula-filter-btn--active px-3 py-1.5 rounded-lg text-xs font-semibold">Todos</button>
+                            <button type="button" data-cal-filter="quiz" class="cal-filter-btn nebula-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold">Quizzes</button>
+                            <button type="button" data-cal-filter="tarea" class="cal-filter-btn nebula-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold">Tareas</button>
+                            <button type="button" data-cal-filter="importante" class="cal-filter-btn nebula-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold">Importantes</button>
+                            <button type="button" data-cal-filter="favorito" class="cal-filter-btn nebula-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold">Favoritos</button>
+                        </div>
+                    </div>
+
+                    <!-- Vista semanal responsive -->
+                    <div class="plan-estudios-calendar flex flex-col flex-1 rounded-2xl overflow-hidden mb-6">
+                        <div class="plan-estudios-day-labels grid grid-cols-7 gap-px text-center py-3 px-2" id="cal-day-headers"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-7 gap-3 sm:gap-px p-3 sm:p-0 min-h-[320px]" id="cal-week-grid"></div>
+                    </div>
+
+                    <!-- Resumen lateral: pendientes e importantes -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="plan-estudios-card p-5 rounded-xl">
+                            <h3 class="font-bold text-slate-900 flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-primary text-xl">assignment</span>
+                                Tareas pendientes
+                            </h3>
+                            <ul id="lista-tareas-pendientes" class="space-y-2 text-sm"></ul>
+                        </div>
+                        <div class="plan-estudios-card p-5 rounded-xl">
+                            <h3 class="font-bold text-slate-900 flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-amber-500 text-xl">star</span>
+                                Fechas importantes
+                            </h3>
+                            <ul id="lista-fechas-importantes" class="space-y-2 text-sm"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== PANEL: METAS ===================== -->
+                <div id="panel-metas" class="plan-panel plan-panel-hidden flex flex-col flex-1" data-panel="metas">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900">Metas personalizadas</h1>
+                            <p class="text-slate-500 text-sm">Define objetivos académicos y sigue tu avance</p>
+                        </div>
+                        <button type="button" id="btn-add-meta"
+                            class="nebula-btn-primary flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer">
+                            <span class="material-symbols-outlined text-lg">add</span>
+                            Nueva meta
+                        </button>
+                    </div>
+                    <!-- Filtro por estado -->
+                    <div class="flex flex-wrap gap-2 mb-6" id="metas-filtros">
+                        <button type="button" data-meta-filter="all" class="meta-filter-btn nebula-filter-btn nebula-filter-btn--active px-3 py-1.5 rounded-lg text-xs font-semibold">Todas</button>
+                        <button type="button" data-meta-filter="pendiente" class="meta-filter-btn nebula-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold">Pendiente</button>
+                        <button type="button" data-meta-filter="en_progreso" class="meta-filter-btn nebula-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold">En progreso</button>
+                        <button type="button" data-meta-filter="completada" class="meta-filter-btn nebula-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold">Completada</button>
+                    </div>
+                    <div id="metas-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                    <div id="metas-empty" class="plan-estudios-card hidden flex-col p-12 text-center items-center rounded-2xl">
+                        <span class="material-symbols-outlined text-5xl text-primary mb-4">flag</span>
+                        <p class="text-lg font-semibold text-slate-900">Aún no tienes metas</p>
+                        <p class="text-sm text-slate-500 mt-2">Crea tu primera meta académica para empezar a medir tu progreso.</p>
+                    </div>
+                </div>
+
+                <!-- ===================== PANEL: RACHA ===================== -->
+                <div id="panel-racha" class="plan-panel plan-panel-hidden flex flex-col flex-1" data-panel="racha">
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-slate-900">Racha diaria</h1>
+                        <p class="text-slate-500 text-sm">Mantén el hábito de estudio día a día</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <!-- Tarjeta principal de racha -->
+                        <div class="lg:col-span-2 plan-estudios-streak p-8 rounded-2xl text-white relative overflow-hidden">
+                            <div class="absolute -right-8 -top-8 size-40 bg-white/10 rounded-full blur-2xl"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <span class="material-symbols-outlined text-6xl nebula-flame-animate fill-1">local_fire_department</span>
+                                    <div>
+                                        <p class="text-white/80 text-sm font-medium uppercase tracking-wider">Racha actual</p>
+                                        <p class="text-5xl font-bold"><span id="racha-dias-grande" class="inline-block">0</span> <span class="text-2xl font-semibold">días</span></p>
+                                    </div>
+                                </div>
+                                <p class="text-white/90 text-sm mb-2" id="racha-mensaje-motivacional">Tu racha se actualiza sola cuando estudias, completas evaluaciones o avanzas en tus cursos.</p>
+                                <p class="text-white/70 text-xs flex items-center gap-1.5" id="racha-estado-auto" aria-live="polite">
+                                    <span class="material-symbols-outlined text-base">sync</span>
+                                    Sincronización automática activa
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Estadísticas -->
+                        <div class="plan-estudios-card p-6 rounded-2xl flex flex-col gap-4">
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-violet-50">
+                                <span class="material-symbols-outlined text-primary text-2xl">emoji_events</span>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase font-semibold">Récord personal</p>
+                                    <p class="text-2xl font-bold text-slate-900"><span id="racha-record">0</span> días</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-emerald-50">
+                                <span class="material-symbols-outlined text-emerald-600 text-2xl">calendar_month</span>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase font-semibold">Este mes</p>
+                                    <p class="text-2xl font-bold text-slate-900"><span id="racha-mes">0</span> días activos</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-amber-50">
+                                <span class="material-symbols-outlined text-amber-600 text-2xl">military_tech</span>
+                                <div>
+                                    <p class="text-xs text-slate-500 uppercase font-semibold">Nivel</p>
+                                    <p class="text-lg font-bold text-slate-900" id="racha-nivel">Explorador</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mapa de calor últimos 30 días -->
+                    <div class="plan-estudios-card p-6 rounded-2xl">
+                        <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">grid_view</span>
+                            Actividad de los últimos 30 días
+                        </h3>
+                        <div id="racha-heatmap" class="grid grid-cols-7 sm:grid-cols-10 gap-2"></div>
+                        <div class="flex items-center gap-4 mt-4 text-xs text-slate-500">
+                            <span>Menos</span>
+                            <div class="flex gap-1">
+                                <span class="size-4 rounded bg-slate-100"></span>
+                                <span class="size-4 rounded bg-primary/20"></span>
+                                <span class="size-4 rounded bg-primary/50"></span>
+                                <span class="size-4 rounded bg-primary"></span>
+                            </div>
+                            <span>Más</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== PANEL: RECURSOS ===================== -->
+                <div id="panel-recursos" class="plan-panel plan-panel-hidden flex flex-col flex-1" data-panel="recursos">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900">Recursos académicos</h1>
+                            <p class="text-slate-500 text-sm">Material de apoyo organizado por materia</p>
+                        </div>
+                    </div>
+                    <!-- Buscador y filtro por materia -->
+                    <div class="plan-estudios-card p-4 rounded-xl mb-6 flex flex-col sm:flex-row gap-3">
+                        <label class="flex flex-1 items-center gap-2 bg-slate-50 rounded-xl px-4 py-2.5 border border-slate-100">
+                            <span class="material-symbols-outlined text-slate-400">search</span>
+                            <input type="search" id="recursos-busqueda" placeholder="Buscar recursos..."
+                                class="flex-1 bg-transparent border-none focus:ring-0 text-sm text-slate-800 placeholder:text-slate-400">
+                        </label>
+                        <select id="recursos-materia" class="rounded-xl border-slate-200 text-sm font-medium text-slate-700 bg-white px-4 py-2.5 focus:ring-primary focus:border-primary">
+                            <option value="all">Todas las materias</option>
+                            <option value="math">Matemáticas</option>
+                            <option value="science">Ciencia</option>
+                            <option value="history">Historia</option>
+                            <option value="lang">Lenguaje</option>
+                        </select>
+                    </div>
+                    <div id="recursos-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                    <div id="recursos-empty" class="hidden plan-estudios-card p-12 text-center rounded-2xl">
+                        <span class="material-symbols-outlined text-5xl text-slate-300 mb-3">search_off</span>
+                        <p class="font-semibold text-slate-700">No se encontraron recursos</p>
+                        <p class="text-sm text-slate-500 mt-1">Prueba con otro término o materia.</p>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+
+        <!-- FAB: abre modal de evento en calendario -->
+        <button type="button" id="fab-editar-plan"
+            class="nebula-btn-primary fixed bottom-10 right-10 z-40 flex items-center gap-2 px-6 py-4 rounded-xl text-sm font-bold">
+            <span class="material-symbols-outlined text-lg">edit</span>
+            <span>Editar plan</span>
+        </button>
+    </div>
+
+    <!-- ========== MODAL: Nuevo evento ========== -->
+    <dialog id="modal-evento" class="backdrop:bg-slate-900/50 rounded-2xl border border-slate-200 shadow-2xl p-0 w-full max-w-md open:animate-none">
+        <form id="form-evento" class="p-6">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-lg font-bold text-slate-900">Nuevo evento</h2>
+                <button type="button" class="modal-close p-2 hover:bg-slate-100 rounded-lg text-slate-500" data-modal="modal-evento" aria-label="Cerrar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Título</span>
+                    <input name="titulo" required class="mt-1 w-full rounded-xl border-slate-200 text-sm" placeholder="Ej. Quiz de álgebra">
+                </label>
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Fecha</span>
+                    <input name="fecha" type="date" required class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                </label>
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Horario (opcional)</span>
+                    <input name="horario" type="time" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                </label>
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Tipo</span>
+                    <select name="tipo" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                        <option value="quiz">Quiz</option>
+                        <option value="tarea">Tarea</option>
+                        <option value="importante">Evento importante</option>
+                        <option value="tutoria">Tutoría</option>
+                    </select>
+                </label>
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Materia</span>
+                    <select name="materia" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                        <option value="math">Matemáticas</option>
+                        <option value="science">Ciencia</option>
+                        <option value="history">Historia</option>
+                        <option value="lang">Lenguaje</option>
+                    </select>
+                </label>
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Descripción</span>
+                    <textarea name="descripcion" rows="3" class="mt-1 w-full rounded-xl border-slate-200 text-sm" placeholder="Detalles, instrucciones o notas del evento"></textarea>
+                </label>
+                <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50">
+                    <span class="text-sm font-medium text-slate-700">Marcar como favorito</span>
+                    <button type="button" id="btn-toggle-favorito" class="evento-favorito-toggle"
+                        title="Marcar como favorito" aria-label="Marcar como favorito" aria-pressed="false">
+                        <span class="material-symbols-outlined favorito-star-icon">star</span>
+                    </button>
+                    <input type="hidden" name="favorito" id="input-evento-favorito" value="0">
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button type="button" class="nebula-btn-modal-cancel modal-close flex-1 py-3 px-4 rounded-xl text-sm" data-modal="modal-evento">Cancelar</button>
+                <button type="submit" class="nebula-btn-modal-submit flex-1 py-3 px-4 rounded-xl text-sm">Agregar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- ========== MODAL: Detalle de evento ========== -->
+    <dialog id="modal-evento-detalle" class="backdrop:bg-slate-900/50 rounded-2xl border border-slate-200 shadow-2xl p-0 w-full max-w-md">
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <span id="detalle-evento-badge" class="text-[10px] font-bold uppercase px-2 py-1 rounded-lg bg-primary/10 text-primary">Evento</span>
+                <button type="button" class="modal-close p-2 hover:bg-slate-100 rounded-lg text-slate-500" data-modal="modal-evento-detalle" aria-label="Cerrar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <h2 id="detalle-evento-titulo" class="text-lg font-bold text-slate-900 mb-2">—</h2>
+            <p id="detalle-evento-descripcion" class="text-sm text-slate-500 mb-4">—</p>
+            <ul class="space-y-2 text-sm text-slate-600 mb-6">
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">calendar_today</span><span id="detalle-evento-fecha">—</span></li>
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">schedule</span><span id="detalle-evento-hora">—</span></li>
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">category</span><span id="detalle-evento-materia">—</span></li>
+            </ul>
+            <div class="flex flex-col gap-2">
+                <button type="button" id="btn-detalle-ir-vista"
+                    class="w-full py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">
+                    Abrir actividad
+                </button>
+                <button type="button" id="btn-detalle-editar"
+                    class="w-full py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+                    Editar en el plan
+                </button>
+                <button type="button" id="btn-detalle-eliminar"
+                    class="w-full py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+                    Eliminar evento
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- ========== MODAL: Confirmar eliminación ========== -->
+    <dialog id="modal-confirm-eliminar" class="w-full max-w-sm p-0">
+        <div class="modal-confirm-panel p-6 sm:p-7">
+            <h2 class="text-xl font-bold text-slate-900 mb-2">Eliminar evento</h2>
+            <p class="text-base text-slate-600 mb-1">¿Seguro que deseas eliminar este evento?</p>
+            <p id="confirm-eliminar-titulo" class="text-sm font-semibold text-slate-800 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 mb-6 truncate"></p>
+            <div class="flex flex-col-reverse sm:flex-row gap-3">
+                <button type="button" id="btn-confirm-cancelar"
+                    class="nebula-btn-confirm-cancel modal-close flex-1 py-3 px-4 rounded-xl text-sm"
+                    data-modal="modal-confirm-eliminar">Cancelar</button>
+                <button type="button" id="btn-confirm-eliminar"
+                    class="nebula-btn-confirm-delete flex-1 py-3 px-4 rounded-xl text-sm">Sí, eliminar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Menú contextual (clic derecho en evento) -->
+    <div id="cal-event-context-menu" class="hidden fixed z-[120] plan-estudios-card rounded-xl border border-slate-200 py-1 min-w-[10rem] shadow-lg" role="menu" aria-hidden="true">
+        <button type="button" data-context-action="open" class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors" role="menuitem">Abrir</button>
+        <button type="button" data-context-action="edit" class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors" role="menuitem">Editar</button>
+        <button type="button" data-context-action="delete" class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors" role="menuitem">Eliminar</button>
+    </div>
+
+    <!-- ========== MODAL: Editar plan ========== -->
+    <dialog id="modal-editar-plan" class="backdrop:bg-slate-900/50 rounded-2xl border border-slate-200 shadow-2xl p-0 w-full max-w-lg">
+        <div class="p-6 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 shrink-0">
+                <h2 class="text-lg font-bold text-slate-900">Editar plan</h2>
+                <button type="button" class="modal-close p-2 hover:bg-slate-100 rounded-lg text-slate-500" data-modal="modal-editar-plan" aria-label="Cerrar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4 shrink-0">Modifica, reprograma o elimina eventos de tu calendario académico.</p>
+            <div id="editar-plan-lista" class="space-y-3 overflow-y-auto flex-1 pr-1"></div>
+        </div>
+    </dialog>
+
+    <!-- ========== MODAL: Nueva meta ========== -->
+    <dialog id="modal-meta" class="backdrop:bg-slate-900/50 rounded-2xl border border-slate-200 shadow-2xl p-0 w-full max-w-md">
+        <form id="form-meta" class="p-6">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-lg font-bold text-slate-900">Nueva meta académica</h2>
+                <button type="button" class="modal-close p-2 hover:bg-slate-100 rounded-lg" data-modal="modal-meta" aria-label="Cerrar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Título</span>
+                    <input name="titulo" required class="mt-1 w-full rounded-xl border-slate-200 text-sm" placeholder="Ej. Aprobar examen final">
+                </label>
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Descripción</span>
+                    <textarea name="descripcion" rows="2" class="mt-1 w-full rounded-xl border-slate-200 text-sm" placeholder="Detalle de tu objetivo"></textarea>
+                </label>
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Progreso inicial (%)</span>
+                    <input name="progreso" type="range" min="0" max="100" value="0" class="mt-2 w-full accent-primary" id="meta-range-preview">
+                    <span class="text-sm font-bold text-primary" id="meta-range-value">0%</span>
+                </label>
+                <label class="block">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Estado</span>
+                    <select name="estado" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en_progreso">En progreso</option>
+                        <option value="completada">Completada</option>
+                    </select>
+                </label>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button type="button" class="nebula-btn-modal-cancel modal-close flex-1 py-3 px-4 rounded-xl text-sm" data-modal="modal-meta">Cancelar</button>
+                <button type="submit" class="nebula-btn-modal-submit flex-1 py-3 px-4 rounded-xl text-sm">Agregar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Eventos del servidor (Jinja) para fusionar con datos locales -->
+    <script type="application/json" id="server-eventos">{{ eventos_calendario | tojson }}</script>
+    <!-- Rutas de navegación (Flask) para eventos del calendario -->
+    <script type="application/json" id="nebula-routes">{
+        "quiz": "{{ url_for('mis_cursos') }}",
+        "tarea": "{{ url_for('mis_cursos') }}",
+        "tutoria": "{{ url_for('tutor_ai') }}",
+        "clase": "{{ url_for('tutor_ai') }}",
+        "importante": "{{ url_for('progreso') }}",
+        "detalle": "{{ url_for('dashboard') }}",
+        "leccionPattern": "/curso/__SLUG__/leccion/__ID__",
+        "deleteEvento": "/api/plan_estudios/eventos/__ID__",
+        "registrarRacha": "/api/plan_estudios/racha/registrar",
+        "rachaEstado": "/api/plan_estudios/racha",
+        "rachaSincronizar": "/api/plan_estudios/racha/sincronizar",
+        "rachaActividad": "/api/plan_estudios/racha/actividad",
+        "rachaResumen": "/api/plan_estudios/racha/resumen"
+    }</script>
+    <script type="application/json" id="nebula-session">{"user_id": {{ session.get('id_usuario') | tojson }}}</script>
+    <script type="application/json" id="nebula-racha-inicial">{{ estado_racha | tojson }}</script>
+
+    <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-racha.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-recursos.js') }}"></script>
+    <script>
+    /**
+     * Nébula Plan de Estudios — módulo interactivo
+     * Calendario, metas, racha diaria y recursos académicos
+     */
+    const NebulaPlan = (() => {
+        'use strict';
+
+        const STORAGE_KEY = 'nebula_plan_estudios_v1';
+        const MATERIA_MAP = {
+            math: { label: 'Matemáticas', class: 'plan-estudios-class--math', color: 'bg-nebula-math' },
+            science: { label: 'Ciencia', class: 'plan-estudios-class--science', color: 'bg-nebula-science' },
+            history: { label: 'Historia', class: 'plan-estudios-class--history', color: 'bg-nebula-history' },
+            lang: { label: 'Lenguaje', class: 'plan-estudios-class--lang', color: 'bg-nebula-lang' },
+        };
+
+        const ESTADO_META = {
+            pendiente: { label: 'Pendiente', bg: 'bg-slate-100', text: 'text-slate-600' },
+            en_progreso: { label: 'En progreso', bg: 'bg-blue-100', text: 'text-blue-700' },
+            completada: { label: 'Completada', bg: 'bg-emerald-100', text: 'text-emerald-700' },
+        };
+
+        const TIPO_EVENTO = {
+            quiz: { label: 'Quiz', icon: 'quiz', accion: 'Abrir quiz' },
+            tarea: { label: 'Tarea', icon: 'assignment', accion: 'Abrir tarea' },
+            importante: { label: 'Evento importante', icon: 'star', accion: 'Ver detalles' },
+            tutoria: { label: 'Tutoría', icon: 'school', accion: 'Ir a tutoría' },
+            clase: { label: 'Tutoría', icon: 'school', accion: 'Ir a tutoría' },
+        };
+
+        const APP_ROUTES = (() => {
+            try {
+                return JSON.parse(document.getElementById('nebula-routes')?.textContent || '{}');
+            } catch {
+                return {};
+            }
+        })();
+
+        const SESSION_DATA = (() => {
+            try {
+                return JSON.parse(document.getElementById('nebula-session')?.textContent || '{}');
+            } catch {
+                return {};
+            }
+        })();
+
+        // Estado de la aplicación
+        let state = loadState();
+        let currentWeekStart = getMonday(new Date());
+        let calFilter = 'all';
+        let metaFilter = 'all';
+        let activePanel = 'calendario';
+        let selectedEventId = null;
+        let eventoDetalleActual = null;
+        let pendingDeleteId = null;
+        let contextMenuEventId = null;
+
+        // ——— Persistencia ———
+        function loadState() {
+            const defaults = {
+                eventos: seedEventos(),
+                metas: seedMetas(),
+                racha: { dias: [], record: 0, ultimaActividad: null },
+                horasSemanales: { completadas: 13, meta: 20 },
+            };
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return defaults;
+                return { ...defaults, ...JSON.parse(raw) };
+            } catch {
+                return defaults;
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function mergeServerEventos() {
+            const el = document.getElementById('server-eventos');
+            if (!el) return;
+            try {
+                const server = JSON.parse(el.textContent || '[]');
+                server.forEach((ev, i) => {
+                    const id = 'srv-' + i;
+                    if (state.eventos.some((e) => e.id === id)) return;
+                    const fecha = ev.fecha || new Date().toISOString().slice(0, 10);
+                    state.eventos.push({
+                        id,
+                        titulo: ev.titulo || 'Evento',
+                        fecha,
+                        horario: ev.horario || '',
+                        tipo: normalizeTipo(ev.tipo || 'clase'),
+                        materia: ev.materia || 'math',
+                        descripcion: ev.descripcion || '',
+                        favorito: !!ev.favorito,
+                        fromServer: true,
+                    });
+                });
+                saveState();
+            } catch (_) { /* sin eventos del servidor */ }
+        }
+
+        function normalizeTipo(tipo) {
+            return tipo === 'clase' ? 'tutoria' : tipo;
+        }
+
+        function seedEventos() {
+            const today = new Date();
+            const mon = getMonday(today);
+            const d = (offset) => formatDate(addDays(mon, offset));
+            return [
+                { id: 'e1', titulo: 'Quiz: Ecuaciones lineales', fecha: d(1), horario: '10:00', tipo: 'quiz', materia: 'math', descripcion: 'Evaluación de ecuaciones lineales y sistemas.', favorito: true },
+                { id: 'e2', titulo: 'Entregar informe de laboratorio', fecha: d(2), horario: '23:59', tipo: 'tarea', materia: 'science', descripcion: 'Informe final del experimento de reacciones químicas.' },
+                { id: 'e3', titulo: 'Examen parcial Historia', fecha: d(4), horario: '09:00', tipo: 'importante', materia: 'history', descripcion: 'Evaluación de civilizaciones antiguas y edad media.' },
+                { id: 'e4', titulo: 'Quiz vocabulario inglés', fecha: d(3), horario: '14:00', tipo: 'quiz', materia: 'lang', descripcion: 'Repaso de unidades 4 y 5 del módulo de vocabulario.' },
+                { id: 'e5', titulo: 'Sesión tutoría Nébula AI', fecha: d(0), horario: '16:00', tipo: 'tutoria', materia: 'math', descripcion: 'Sesión de refuerzo personalizado con Nébula AI.' },
+            ];
+        }
+
+        function getEventById(id) {
+            return state.eventos.find((e) => e.id === id);
+        }
+
+        /** URL de destino según tipo de evento (compatible con rutas Flask) */
+        function getEventTargetUrl(ev) {
+            if (ev.targetUrl) return ev.targetUrl;
+            const tipo = normalizeTipo(ev.tipo);
+            if (tipo === 'quiz' && ev.slug && ev.leccionId) {
+                return (APP_ROUTES.leccionPattern || '/curso/__SLUG__/leccion/__ID__')
+                    .replace('__SLUG__', ev.slug)
+                    .replace('__ID__', ev.leccionId);
+            }
+            const base = APP_ROUTES[tipo] || APP_ROUTES.detalle || '/';
+            const params = new URLSearchParams({ evento: ev.id, tipo });
+            if (tipo === 'quiz') return `${base}?${params}#quiz`;
+            if (tipo === 'tarea') return `${base}?${params}#tarea`;
+            return base;
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function seedMetas() {
+            return [
+                { id: 'm1', titulo: 'Completar módulo de álgebra', descripcion: 'Terminar lecciones 5 a 8', progreso: 70, estado: 'en_progreso' },
+                { id: 'm2', titulo: 'Leer capítulo de biología', descripcion: 'Células y metabolismo', progreso: 30, estado: 'en_progreso' },
+                { id: 'm3', titulo: 'Ensayo de literatura', descripcion: 'Borrador final 500 palabras', progreso: 100, estado: 'completada' },
+            ];
+        }
+
+        // Catálogo de recursos (URLs reales) — lógica en NebulaRecursos
+        const RECURSOS_DATA = [
+            { id: 1, category: 'Matemáticas', titulo: 'Guía de ecuaciones', descripcion: 'PDF interactivo con ejercicios resueltos paso a paso.', materia: 'math', type: 'pdf', url: 'https://edwebcontent.ed.ac.uk/sites/default/files/atoms/files/khan_academy_guide.pdf', downloadable: true },
+            { id: 2, category: 'Ciencia', titulo: 'Simulador de reacciones', descripcion: 'Laboratorio virtual para experimentos de química básica.', materia: 'science', type: 'simulator', url: 'https://phet.colorado.edu/es/simulations/reactions-and-rates', downloadable: false },
+            { id: 3, category: 'Historia', titulo: 'Línea de tiempo universal', descripcion: 'Mapa cronológico de civilizaciones antiguas.', materia: 'history', type: 'web', url: 'https://www.britannica.com/browse/Ancient-World', downloadable: false },
+            { id: 4, category: 'Lenguaje', titulo: 'Flashcards de vocabulario', descripcion: 'Tarjetas de estudio para inglés académico.', materia: 'lang', type: 'flashcards', url: 'https://quizlet.com/', downloadable: false },
+            { id: 5, category: 'Matemáticas', titulo: 'Video: Funciones trigonométricas', descripcion: 'Clase en video de 25 min con ejemplos prácticos.', materia: 'math', type: 'video', url: 'https://www.khanacademy.org/math/trigonometry', downloadable: false },
+            { id: 6, category: 'Ciencia', titulo: 'Artículo: Fotosíntesis', descripcion: 'Lectura complementaria con diagramas ilustrados.', materia: 'science', type: 'article', url: 'https://education.nationalgeographic.org/resource/photosynthesis/', downloadable: false },
+            { id: 7, category: 'Historia', titulo: 'Podcast Historia contemporánea', descripcion: 'Episodio sobre la Revolución Industrial.', materia: 'history', type: 'podcast', url: 'https://www.bbc.co.uk/programmes/b00wqdc7', downloadable: false },
+            { id: 8, category: 'Lenguaje', titulo: 'Ejercicios de redacción', descripcion: 'Plantillas para ensayos argumentativos.', materia: 'lang', type: 'pdf', url: 'https://www.khanacademy.org/humanities/grammar', downloadable: false },
+        ];
+
+        // ——— Utilidades de fecha ———
+        function getMonday(d) {
+            const date = new Date(d);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        }
+
+        function addDays(date, days) {
+            const r = new Date(date);
+            r.setDate(r.getDate() + days);
+            return r;
+        }
+
+        function formatDate(d) {
+            return d.toISOString().slice(0, 10);
+        }
+
+        function formatRange(start) {
+            const end = addDays(start, 6);
+            const opts = { day: 'numeric', month: 'short' };
+            const y = start.getFullYear();
+            return `${start.toLocaleDateString('es', opts)} - ${end.toLocaleDateString('es', opts)}, ${y}`;
+        }
+
+        function parseDate(str) {
+            const [y, m, d] = str.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        }
+
+        // ——— Loader ———
+        function showLoader(ms = 600) {
+            const loader = document.getElementById('nebula-loader');
+            if (!loader) return Promise.resolve();
+            loader.style.opacity = '1';
+            loader.style.pointerEvents = 'auto';
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    loader.style.pointerEvents = 'none';
+                    resolve();
+                }, ms);
+            });
+        }
+
+        // ——— Toasts ———
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('nebula-toast-container');
+            if (!container) return;
+            const colors = {
+                success: 'bg-emerald-600',
+                error: 'bg-red-500',
+                info: 'bg-primary',
+                warning: 'bg-amber-500',
+            };
+            const icons = { success: 'check_circle', error: 'error', info: 'info', warning: 'warning' };
+            const toast = document.createElement('div');
+            toast.className = `nebula-toast-enter pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl text-white text-sm font-medium shadow-lg ${colors[type] || colors.info}`;
+            toast.innerHTML = `<span class="material-symbols-outlined text-xl">${icons[type]}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(12px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // ——— Navegación entre paneles ———
+        function switchPanel(panelId) {
+            activePanel = panelId;
+            document.querySelectorAll('.plan-panel').forEach((p) => {
+                p.classList.toggle('plan-panel-hidden', p.dataset.panel !== panelId);
+                if (p.dataset.panel === panelId) {
+                    p.classList.remove('nebula-panel-enter');
+                    void p.offsetWidth;
+                    p.classList.add('nebula-panel-enter');
+                }
+            });
+            document.querySelectorAll('.sidebar-nav-btn').forEach((btn) => {
+                const active = btn.dataset.panel === panelId;
+                btn.classList.toggle('sidebar-nav-active', active);
+                btn.classList.toggle('text-slate-600', !active);
+            });
+            const fab = document.getElementById('fab-editar-plan');
+            if (fab) fab.style.display = panelId === 'calendario' ? '' : 'none';
+        }
+
+        // ——— Calendario ———
+        function getEventosForDay(dateStr) {
+            const list = state.eventos.filter((e) => {
+                if (e.fecha !== dateStr) return false;
+                if (calFilter === 'all') return true;
+                if (calFilter === 'favorito') return !!e.favorito;
+                return normalizeTipo(e.tipo) === calFilter;
+            });
+            return list.sort((a, b) => (b.favorito ? 1 : 0) - (a.favorito ? 1 : 0));
+        }
+
+        function migrateEventosLegacy() {
+            state.eventos.forEach((e) => {
+                e.tipo = normalizeTipo(e.tipo);
+                if (!e.descripcion) e.descripcion = '';
+                e.favorito = !!e.favorito;
+            });
+        }
+
+        /** Actualiza estado visual de filtros morados */
+        function setFilterButtonsActive(selector, activeBtn) {
+            document.querySelectorAll(selector).forEach((b) => {
+                b.classList.toggle('nebula-filter-btn--active', b === activeBtn);
+            });
+        }
+
+        function setEventoFavoritoToggle(isFavorite) {
+            const btn = document.getElementById('btn-toggle-favorito');
+            const input = document.getElementById('input-evento-favorito');
+            if (!btn || !input) return;
+            btn.classList.toggle('is-favorite', isFavorite);
+            btn.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+            btn.title = isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito';
+            input.value = isFavorite ? '1' : '0';
+        }
+
+        function resetEventoFavoritoToggle() {
+            setEventoFavoritoToggle(false);
+        }
+
+        function renderCalendar() {
+            const headers = document.getElementById('cal-day-headers');
+            const grid = document.getElementById('cal-week-grid');
+            const rango = document.getElementById('calendario-rango');
+            if (!grid || !headers) return;
+
+            rango.textContent = formatRange(currentWeekStart);
+            const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+            const todayStr = formatDate(new Date());
+
+            headers.innerHTML = days.map((d, i) => {
+                const date = addDays(currentWeekStart, i);
+                const ds = formatDate(date);
+                const isToday = ds === todayStr;
+                return `<div class="py-1"><p class="text-[10px] uppercase font-bold text-slate-400">${d}</p><p class="text-sm font-bold ${isToday ? 'text-primary' : 'text-slate-700'}">${date.getDate()}</p></div>`;
+            }).join('');
+
+            grid.innerHTML = '';
+            for (let i = 0; i < 7; i++) {
+                const date = addDays(currentWeekStart, i);
+                const ds = formatDate(date);
+                const isToday = ds === todayStr;
+                const isWeekend = i >= 5;
+                const eventos = getEventosForDay(ds);
+
+                const col = document.createElement('div');
+                col.className = `plan-estudios-day-col rounded-xl sm:rounded-none p-3 min-h-[140px] flex flex-col gap-2 ${isToday ? 'plan-estudios-day-col--today' : ''} ${isWeekend ? 'plan-estudios-day-col--weekend' : ''}`;
+
+                if (eventos.length === 0) {
+                    col.innerHTML = `<p class="text-[10px] text-slate-400 text-center mt-4">Sin eventos</p>`;
+                } else {
+                    col.innerHTML = eventos.map((ev) => renderEventCard(ev)).join('');
+                }
+                grid.appendChild(col);
+            }
+
+            renderListasCalendario();
+        }
+
+        function renderEventCard(ev) {
+            const mat = MATERIA_MAP[ev.materia] || MATERIA_MAP.math;
+            const tipo = normalizeTipo(ev.tipo);
+            const meta = TIPO_EVENTO[tipo] || TIPO_EVENTO.quiz;
+            const selected = selectedEventId === ev.id ? ' is-selected' : '';
+            const favorito = ev.favorito ? ' is-favorito' : '';
+            const hora = ev.horario ? `<span class="text-[10px] opacity-70">${escapeHtml(ev.horario)}</span>` : '';
+            const starBadge = ev.favorito
+                ? '<span class="material-symbols-outlined evento-favorito-badge" title="Favorito">star</span>'
+                : '';
+            return `<article role="button" tabindex="0"
+                class="calendar-event-card ${mat.class} p-2.5 rounded-lg${selected}${favorito}"
+                data-id="${escapeHtml(ev.id)}"
+                data-event-id="${escapeHtml(ev.id)}"
+                data-event-tipo="${escapeHtml(tipo)}"
+                data-favorito="${ev.favorito ? '1' : '0'}"
+                aria-label="${escapeHtml(ev.titulo)}">
+                <button type="button" class="cal-event-delete-btn" data-event-id="${escapeHtml(ev.id)}" aria-label="Eliminar evento" title="Eliminar">
+                    <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+                <p class="text-[10px] font-bold flex items-center gap-1 pr-4">
+                    ${starBadge}
+                    <span class="material-symbols-outlined text-sm">${meta.icon}</span>${escapeHtml(ev.titulo)}
+                </p>
+                ${hora}
+            </article>`;
+        }
+
+        function renderListasCalendario() {
+            const tareas = state.eventos.filter((e) => e.tipo === 'tarea').slice(0, 5);
+            const importantes = state.eventos.filter((e) => e.tipo === 'importante').slice(0, 5);
+            const ulT = document.getElementById('lista-tareas-pendientes');
+            const ulI = document.getElementById('lista-fechas-importantes');
+
+            ulT.innerHTML = tareas.length
+                ? tareas.map((e) => `<li class="cal-list-item-link flex justify-between items-center py-2 border-b border-slate-50 last:border-0" data-id="${escapeHtml(e.id)}" data-event-id="${escapeHtml(e.id)}" role="button" tabindex="0"><span>${escapeHtml(e.titulo)}</span><span class="text-xs text-slate-400">${escapeHtml(e.fecha)}</span></li>`).join('')
+                : '<li class="text-slate-400 italic">No hay tareas pendientes</li>';
+
+            ulI.innerHTML = importantes.length
+                ? importantes.map((e) => `<li class="cal-list-item-link flex justify-between items-center py-2 border-b border-slate-50" data-id="${escapeHtml(e.id)}" data-event-id="${escapeHtml(e.id)}" role="button" tabindex="0"><span class="font-medium">${escapeHtml(e.titulo)}</span><span class="text-xs text-amber-600">${escapeHtml(e.fecha)}</span></li>`).join('')
+                : '<li class="text-slate-400 italic">Sin fechas importantes próximas</li>';
+        }
+
+        function highlightSelectedEvent() {
+            document.querySelectorAll('.calendar-event-card').forEach((el) => {
+                el.classList.toggle('is-selected', el.dataset.eventId === selectedEventId);
+            });
+        }
+
+        function openEventDetail(eventId) {
+            const ev = getEventById(eventId);
+            if (!ev) return;
+            selectedEventId = eventId;
+            eventoDetalleActual = ev;
+            highlightSelectedEvent();
+
+            const tipo = normalizeTipo(ev.tipo);
+            const meta = TIPO_EVENTO[tipo] || TIPO_EVENTO.quiz;
+            const mat = MATERIA_MAP[ev.materia] || MATERIA_MAP.math;
+
+            document.getElementById('detalle-evento-badge').textContent = meta.label;
+            document.getElementById('detalle-evento-titulo').textContent = ev.titulo;
+            document.getElementById('detalle-evento-descripcion').textContent =
+                ev.descripcion || 'Sin descripción adicional.';
+            document.getElementById('detalle-evento-fecha').textContent = ev.fecha;
+            document.getElementById('detalle-evento-hora').textContent = ev.horario || 'Sin horario definido';
+            document.getElementById('detalle-evento-materia').textContent = mat.label;
+            document.getElementById('btn-detalle-ir-vista').textContent = meta.accion;
+
+            openModal('modal-evento-detalle');
+        }
+
+        function navigateToEvent(ev) {
+            const url = getEventTargetUrl(ev);
+            showToast(`Redirigiendo: ${ev.titulo}`, 'info');
+            setTimeout(() => { window.location.href = url; }, 350);
+        }
+
+        function addEvento(data) {
+            const esFavorito = data.favorito === '1' || data.favorito === true;
+            state.eventos.push({
+                id: 'ev-' + Date.now(),
+                titulo: data.titulo,
+                fecha: data.fecha,
+                horario: data.horario || '',
+                tipo: normalizeTipo(data.tipo),
+                materia: data.materia,
+                descripcion: data.descripcion || '',
+                favorito: esFavorito,
+            });
+            saveState();
+            renderCalendar();
+            showToast(esFavorito ? 'Evento favorito agregado al calendario' : 'Evento agregado al calendario');
+        }
+
+        function updateEvento(id, patch) {
+            const ev = getEventById(id);
+            if (!ev) return;
+            Object.assign(ev, patch);
+            if (patch.tipo) ev.tipo = normalizeTipo(patch.tipo);
+            saveState();
+            renderCalendar();
+            if (document.getElementById('modal-editar-plan')?.open) renderEditarPlan();
+        }
+
+        /** DELETE hacia Flask (preparado; si no existe el endpoint, sigue con localStorage) */
+        async function deleteEventoApi(id) {
+            const pattern = APP_ROUTES.deleteEvento || '/api/plan_estudios/eventos/__ID__';
+            const url = pattern.replace('__ID__', encodeURIComponent(id));
+            try {
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                return res.ok || res.status === 404;
+            } catch {
+                return false;
+            }
+        }
+
+        function requestDeleteEvento(id) {
+            const ev = getEventById(id);
+            if (!ev) return;
+            pendingDeleteId = id;
+            const tituloEl = document.getElementById('confirm-eliminar-titulo');
+            if (tituloEl) tituloEl.textContent = ev.titulo;
+            hideContextMenu();
+            closeModal('modal-evento-detalle');
+            openModal('modal-confirm-eliminar');
+        }
+
+        async function executeDeleteEvento(id) {
+            const eventId = id || pendingDeleteId;
+            if (!eventId) return;
+
+            const cards = document.querySelectorAll(`[data-event-id="${eventId}"]`);
+            cards.forEach((card) => {
+                if (card.classList.contains('calendar-event-card')) card.classList.add('is-removing');
+            });
+            if (cards.length) await new Promise((r) => setTimeout(r, 280));
+
+            await deleteEventoApi(eventId);
+
+            state.eventos = state.eventos.filter((e) => e.id !== eventId);
+            if (selectedEventId === eventId) {
+                selectedEventId = null;
+                eventoDetalleActual = null;
+            }
+            pendingDeleteId = null;
+            contextMenuEventId = null;
+            saveState();
+            renderCalendar();
+            if (document.getElementById('modal-editar-plan')?.open) renderEditarPlan();
+            closeModal('modal-confirm-eliminar');
+            hideContextMenu();
+            showToast('Evento eliminado correctamente', 'success');
+        }
+
+        function hideContextMenu() {
+            const menu = document.getElementById('cal-event-context-menu');
+            if (!menu) return;
+            menu.classList.remove('cal-context-visible');
+            menu.classList.add('hidden');
+            menu.setAttribute('aria-hidden', 'true');
+            contextMenuEventId = null;
+        }
+
+        function showContextMenu(x, y, eventId) {
+            const menu = document.getElementById('cal-event-context-menu');
+            if (!menu) return;
+            contextMenuEventId = eventId;
+            menu.style.left = `${Math.min(x, window.innerWidth - 160)}px`;
+            menu.style.top = `${Math.min(y, window.innerHeight - 120)}px`;
+            menu.classList.remove('hidden');
+            menu.classList.add('cal-context-visible');
+            menu.setAttribute('aria-hidden', 'false');
+        }
+
+        function handleContextMenuAction(action) {
+            const id = contextMenuEventId;
+            if (!id) return;
+            hideContextMenu();
+            if (action === 'open') openEventDetail(id);
+            else if (action === 'edit') {
+                selectedEventId = id;
+                openEditarPlanModal();
+            } else if (action === 'delete') requestDeleteEvento(id);
+        }
+
+        function renderEditarPlan() {
+            const lista = document.getElementById('editar-plan-lista');
+            if (!lista) return;
+            const weekEnd = formatDate(addDays(currentWeekStart, 6));
+            const weekStart = formatDate(currentWeekStart);
+            const eventos = state.eventos
+                .filter((e) => e.fecha >= weekStart && e.fecha <= weekEnd)
+                .sort((a, b) => (a.fecha + (a.horario || '')).localeCompare(b.fecha + (b.horario || '')));
+
+            if (!eventos.length) {
+                lista.innerHTML = '<p class="text-sm text-slate-400 italic text-center py-6">No hay eventos en esta semana.</p>';
+                return;
+            }
+
+            lista.innerHTML = eventos.map((ev) => {
+                const mat = MATERIA_MAP[ev.materia] || MATERIA_MAP.math;
+                const tipo = normalizeTipo(ev.tipo);
+                return `<article class="plan-estudios-card p-4 rounded-xl border border-slate-100" data-edit-event="${escapeHtml(ev.id)}">
+                    <p class="text-sm font-bold text-slate-900 mb-3">${escapeHtml(ev.titulo)}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                        <label class="block">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase">Fecha</span>
+                            <input type="date" class="edit-ev-fecha mt-0.5 w-full rounded-lg border-slate-200 text-xs" value="${escapeHtml(ev.fecha)}" data-id="${escapeHtml(ev.id)}">
+                        </label>
+                        <label class="block">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase">Hora</span>
+                            <input type="time" class="edit-ev-hora mt-0.5 w-full rounded-lg border-slate-200 text-xs" value="${escapeHtml(ev.horario || '')}" data-id="${escapeHtml(ev.id)}">
+                        </label>
+                        <label class="block sm:col-span-2">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase">Materia</span>
+                            <select class="edit-ev-materia mt-0.5 w-full rounded-lg border-slate-200 text-xs" data-id="${escapeHtml(ev.id)}">
+                                ${Object.entries(MATERIA_MAP).map(([k, v]) => `<option value="${k}" ${ev.materia === k ? 'selected' : ''}>${v.label}</option>`).join('')}
+                            </select>
+                        </label>
+                        <label class="block sm:col-span-2">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase">Tipo</span>
+                            <select class="edit-ev-tipo mt-0.5 w-full rounded-lg border-slate-200 text-xs" data-id="${escapeHtml(ev.id)}">
+                                <option value="quiz" ${tipo === 'quiz' ? 'selected' : ''}>Quiz</option>
+                                <option value="tarea" ${tipo === 'tarea' ? 'selected' : ''}>Tarea</option>
+                                <option value="importante" ${tipo === 'importante' ? 'selected' : ''}>Evento importante</option>
+                                <option value="tutoria" ${tipo === 'tutoria' ? 'selected' : ''}>Tutoría</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" class="edit-ev-guardar flex-1 py-2 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary/90" data-id="${escapeHtml(ev.id)}">Guardar cambios</button>
+                        <button type="button" class="edit-ev-eliminar py-2 px-3 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50" data-id="${escapeHtml(ev.id)}" aria-label="Eliminar">Eliminar</button>
+                    </div>
+                </article>`;
+            }).join('');
+        }
+
+        function openNuevoEventoModal() {
+            const form = document.getElementById('form-evento');
+            form?.reset();
+            const fecha = form?.querySelector('[name="fecha"]');
+            if (fecha) fecha.value = formatDate(new Date());
+            resetEventoFavoritoToggle();
+            openModal('modal-evento');
+        }
+
+        function openEditarPlanModal() {
+            renderEditarPlan();
+            openModal('modal-editar-plan');
+        }
+
+        // ——— Metas ———
+        function renderMetas() {
+            const grid = document.getElementById('metas-grid');
+            const empty = document.getElementById('metas-empty');
+            let metas = state.metas;
+            if (metaFilter !== 'all') metas = metas.filter((m) => m.estado === metaFilter);
+
+            if (metas.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.classList.add('flex');
+            } else {
+                empty.classList.add('hidden');
+                empty.classList.remove('flex');
+                grid.innerHTML = metas.map((m) => {
+                    const st = ESTADO_META[m.estado] || ESTADO_META.pendiente;
+                    return `<article class="meta-card plan-estudios-card p-5 rounded-xl border border-slate-100" data-meta-id="${m.id}">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-bold text-slate-900">${m.titulo}</h3>
+                            <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-lg ${st.bg} ${st.text}">${st.label}</span>
+                        </div>
+                        <p class="text-sm text-slate-500 mb-4">${m.descripcion || ''}</p>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden mb-2">
+                            <div class="h-full bg-primary rounded-full transition-all duration-500" style="width:${m.progreso}%"></div>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-primary">${m.progreso}%</span>
+                            <select class="meta-estado-select text-xs rounded-lg border-slate-200 py-1" data-id="${m.id}">
+                                <option value="pendiente" ${m.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="en_progreso" ${m.estado === 'en_progreso' ? 'selected' : ''}>En progreso</option>
+                                <option value="completada" ${m.estado === 'completada' ? 'selected' : ''}>Completada</option>
+                            </select>
+                        </div>
+                        <input type="range" min="0" max="100" value="${m.progreso}" class="meta-progress-range w-full mt-3 accent-primary" data-id="${m.id}">
+                    </article>`;
+                }).join('');
+            }
+            updateWidgetProgreso();
+        }
+
+        function updateWidgetProgreso() {
+            const avg = state.metas.length
+                ? Math.round(state.metas.reduce((s, m) => s + m.progreso, 0) / state.metas.length)
+                : 65;
+            const horas = state.horasSemanales || { completadas: 13, meta: 20 };
+            document.getElementById('widget-progreso-pct').textContent = avg + '%';
+            document.getElementById('widget-progreso-bar').style.width = avg + '%';
+            document.getElementById('widget-progreso-text').textContent =
+                `${horas.completadas} de ${horas.meta} horas de estudio · ${state.metas.filter((m) => m.estado === 'completada').length} metas completadas`;
+        }
+
+        function addMeta(data) {
+            const progreso = Number(data.progreso) || 0;
+            state.metas.push({
+                id: 'm-' + Date.now(),
+                titulo: data.titulo,
+                descripcion: data.descripcion,
+                progreso,
+                estado: data.estado,
+            });
+            saveState();
+            renderMetas();
+            showToast('Meta académica creada');
+        }
+
+        // ——— Racha ———
+        function mergeRachaEstadoEnState(estado) {
+            if (!estado) return;
+            state.racha.dias = estado.dias_activos || [];
+            state.racha.record = estado.mejor_racha ?? estado.record ?? 0;
+            state.racha.racha_actual = estado.racha_actual ?? 0;
+            state.racha.ultimaActividad = estado.ultima_fecha_actividad;
+            if (estado.horas_semanales) {
+                state.horasSemanales = {
+                    completadas: estado.horas_semanales.completadas,
+                    meta: estado.horas_semanales.meta,
+                };
+            }
+            saveState();
+        }
+
+        function renderRacha() {
+            const estado = window.NebulaRacha?.getEstado?.();
+            if (estado) {
+                mergeRachaEstadoEnState(estado);
+                window.NebulaRacha.aplicarEstadoAlDom(estado, {});
+                return;
+            }
+            window.NebulaRacha?.cargarEstado?.(true).then((e) => {
+                mergeRachaEstadoEnState(e);
+                window.NebulaRacha?.aplicarEstadoAlDom?.(e, {});
+            }).catch(() => {});
+        }
+
+        // ——— Recursos ———
+        function renderRecursos() {
+            const q = (document.getElementById('recursos-busqueda')?.value || '').toLowerCase();
+            const materia = document.getElementById('recursos-materia')?.value || 'all';
+            const grid = document.getElementById('recursos-grid');
+            const empty = document.getElementById('recursos-empty');
+
+            let items = RECURSOS_DATA.filter((r) => {
+                const matchMateria = materia === 'all' || r.materia === materia;
+                const matchQ = !q || r.titulo.toLowerCase().includes(q) || r.descripcion.toLowerCase().includes(q);
+                return matchMateria && matchQ;
+            });
+
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                grid.innerHTML = items.map((r) => {
+                    const mat = MATERIA_MAP[r.materia];
+                    return `<article class="recurso-card plan-estudios-card p-5 rounded-xl flex flex-col">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="size-2 rounded-full ${mat.color}"></span>
+                            <span class="text-[10px] font-bold uppercase text-slate-400">${mat.label}</span>
+                        </div>
+                        <h3 class="font-bold text-slate-900 mb-2">${r.titulo}</h3>
+                        <p class="text-sm text-slate-500 flex-1 mb-4">${r.descripcion}</p>
+                        <button type="button" class="recurso-abrir mt-auto flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary/10 text-primary text-sm font-bold hover:bg-primary hover:text-white transition-all" data-recurso-id="${r.id}" data-url="${r.url}" data-titulo="${r.titulo}">
+                            <span class="material-symbols-outlined text-lg">open_in_new</span>
+                            Abrir recurso
+                        </button>
+                    </article>`;
+                }).join('');
+            }
+        }
+
+        // ——— Modales ———
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal?.showModal) modal.showModal();
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal?.close) modal.close();
+        }
+
+        // ——— Event listeners ———
+        function bindEvents() {
+            // Navegación sidebar
+            document.querySelectorAll('.sidebar-nav-btn').forEach((btn) => {
+                btn.addEventListener('click', () => switchPanel(btn.dataset.panel));
+            });
+            document.getElementById('widget-racha')?.addEventListener('click', () => switchPanel('racha'));
+            document.getElementById('widget-racha')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') switchPanel('racha');
+            });
+
+            // Calendario navegación
+            document.getElementById('cal-prev-week')?.addEventListener('click', () => {
+                currentWeekStart = addDays(currentWeekStart, -7);
+                renderCalendar();
+            });
+            document.getElementById('cal-next-week')?.addEventListener('click', () => {
+                currentWeekStart = addDays(currentWeekStart, 7);
+                renderCalendar();
+            });
+            document.getElementById('cal-today')?.addEventListener('click', () => {
+                currentWeekStart = getMonday(new Date());
+                renderCalendar();
+                showToast('Mostrando la semana actual', 'info');
+            });
+
+            // Filtros calendario (estilo morado Nébula)
+            document.querySelectorAll('.cal-filter-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    calFilter = btn.dataset.calFilter;
+                    setFilterButtonsActive('.cal-filter-btn', btn);
+                    renderCalendar();
+                });
+            });
+
+            // Filtros metas (estilo morado Nébula)
+            document.querySelectorAll('.meta-filter-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    metaFilter = btn.dataset.metaFilter;
+                    setFilterButtonsActive('.meta-filter-btn', btn);
+                    renderMetas();
+                });
+            });
+
+            // Toggle favorito en nuevo evento
+            document.getElementById('btn-toggle-favorito')?.addEventListener('click', () => {
+                const input = document.getElementById('input-evento-favorito');
+                const next = input?.value !== '1';
+                setEventoFavoritoToggle(next);
+            });
+
+            // Modales calendario
+            document.getElementById('btn-add-evento')?.addEventListener('click', openNuevoEventoModal);
+            document.getElementById('fab-editar-plan')?.addEventListener('click', openEditarPlanModal);
+            document.getElementById('btn-add-meta')?.addEventListener('click', () => openModal('modal-meta'));
+
+            document.querySelectorAll('.modal-close').forEach((btn) => {
+                btn.addEventListener('click', () => closeModal(btn.dataset.modal));
+            });
+
+            document.getElementById('form-evento')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                addEvento({
+                    titulo: fd.get('titulo'),
+                    fecha: fd.get('fecha'),
+                    horario: fd.get('horario'),
+                    tipo: fd.get('tipo'),
+                    materia: fd.get('materia'),
+                    descripcion: fd.get('descripcion'),
+                    favorito: fd.get('favorito'),
+                });
+                e.target.reset();
+                closeModal('modal-evento');
+            });
+
+            // Clic en eventos del calendario
+            document.getElementById('cal-week-grid')?.addEventListener('click', (e) => {
+                if (e.target.closest('.cal-event-delete-btn')) {
+                    e.stopPropagation();
+                    requestDeleteEvento(e.target.closest('.cal-event-delete-btn').dataset.eventId);
+                    return;
+                }
+                const card = e.target.closest('.calendar-event-card[data-event-id]');
+                if (!card) return;
+                openEventDetail(card.dataset.eventId);
+            });
+            document.getElementById('cal-week-grid')?.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                const card = e.target.closest('.calendar-event-card[data-event-id]');
+                if (!card) return;
+                e.preventDefault();
+                openEventDetail(card.dataset.eventId);
+            });
+            // Menú contextual (clic derecho)
+            document.getElementById('cal-week-grid')?.addEventListener('contextmenu', (e) => {
+                const card = e.target.closest('.calendar-event-card[data-event-id]');
+                if (!card) return;
+                e.preventDefault();
+                showContextMenu(e.clientX, e.clientY, card.dataset.eventId);
+            });
+            document.getElementById('cal-event-context-menu')?.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-context-action]');
+                if (!btn) return;
+                e.stopPropagation();
+                handleContextMenuAction(btn.dataset.contextAction);
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#cal-event-context-menu')) hideContextMenu();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') hideContextMenu();
+            });
+
+            // Confirmar eliminación
+            document.getElementById('btn-confirm-eliminar')?.addEventListener('click', () => {
+                executeDeleteEvento(pendingDeleteId);
+            });
+            document.getElementById('btn-confirm-cancelar')?.addEventListener('click', () => {
+                pendingDeleteId = null;
+            });
+
+            // Clic en listas de tareas / fechas importantes
+            ['lista-tareas-pendientes', 'lista-fechas-importantes'].forEach((listId) => {
+                const listEl = document.getElementById(listId);
+                listEl?.addEventListener('click', (e) => {
+                    const item = e.target.closest('[data-event-id]');
+                    if (!item) return;
+                    openEventDetail(item.dataset.eventId);
+                });
+                listEl?.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Enter') return;
+                    const item = e.target.closest('[data-event-id]');
+                    if (item) openEventDetail(item.dataset.eventId);
+                });
+                listEl?.addEventListener('contextmenu', (e) => {
+                    const item = e.target.closest('[data-event-id]');
+                    if (!item) return;
+                    e.preventDefault();
+                    showContextMenu(e.clientX, e.clientY, item.dataset.eventId);
+                });
+            });
+
+            // Modal detalle: navegar o editar
+            document.getElementById('btn-detalle-ir-vista')?.addEventListener('click', () => {
+                if (!eventoDetalleActual) return;
+                closeModal('modal-evento-detalle');
+                navigateToEvent(eventoDetalleActual);
+            });
+
+            document.getElementById('btn-detalle-editar')?.addEventListener('click', () => {
+                closeModal('modal-evento-detalle');
+                openEditarPlanModal();
+            });
+
+            document.getElementById('btn-detalle-eliminar')?.addEventListener('click', () => {
+                if (!eventoDetalleActual) return;
+                requestDeleteEvento(eventoDetalleActual.id);
+            });
+
+            // Panel editar plan: guardar / eliminar
+            document.getElementById('editar-plan-lista')?.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                if (!id) return;
+                if (e.target.classList.contains('edit-ev-guardar')) {
+                    const row = e.target.closest('[data-edit-event]');
+                    updateEvento(id, {
+                        fecha: row.querySelector('.edit-ev-fecha')?.value,
+                        horario: row.querySelector('.edit-ev-hora')?.value,
+                        materia: row.querySelector('.edit-ev-materia')?.value,
+                        tipo: row.querySelector('.edit-ev-tipo')?.value,
+                    });
+                    showToast('Evento actualizado', 'success');
+                }
+                if (e.target.classList.contains('edit-ev-eliminar')) {
+                    requestDeleteEvento(id);
+                }
+            });
+
+            document.getElementById('form-meta')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                addMeta({
+                    titulo: fd.get('titulo'),
+                    descripcion: fd.get('descripcion'),
+                    progreso: fd.get('progreso'),
+                    estado: fd.get('estado'),
+                });
+                e.target.reset();
+                document.getElementById('meta-range-value').textContent = '0%';
+                closeModal('modal-meta');
+            });
+
+            const rangePreview = document.getElementById('meta-range-preview');
+            rangePreview?.addEventListener('input', (e) => {
+                document.getElementById('meta-range-value').textContent = e.target.value + '%';
+            });
+
+            // Delegación: metas progreso y estado
+            document.getElementById('metas-grid')?.addEventListener('change', (e) => {
+                const id = e.target.dataset.id;
+                if (!id) return;
+                const meta = state.metas.find((m) => m.id === id);
+                if (!meta) return;
+                if (e.target.classList.contains('meta-estado-select')) {
+                    meta.estado = e.target.value;
+                    if (meta.estado === 'completada') {
+                        meta.progreso = 100;
+                        window.NebulaRacha?.hookMetaCompletada?.(meta);
+                    }
+                    saveState();
+                    renderMetas();
+                    showToast('Estado de meta actualizado', 'info');
+                }
+            });
+            document.getElementById('metas-grid')?.addEventListener('input', (e) => {
+                if (!e.target.classList.contains('meta-progress-range')) return;
+                const meta = state.metas.find((m) => m.id === e.target.dataset.id);
+                if (meta) {
+                    meta.progreso = Number(e.target.value);
+                    if (meta.progreso === 100) {
+                        meta.estado = 'completada';
+                        window.NebulaRacha?.hookMetaCompletada?.(meta);
+                    } else if (meta.progreso > 0 && meta.estado === 'pendiente') meta.estado = 'en_progreso';
+                    saveState();
+                    renderMetas();
+                }
+            });
+
+            // Recursos
+            document.getElementById('recursos-busqueda')?.addEventListener('input', renderRecursos);
+            document.getElementById('recursos-materia')?.addEventListener('change', renderRecursos);
+            document.getElementById('recursos-grid')?.addEventListener('click', (e) => {
+                const btn = e.target.closest('.recurso-abrir');
+                if (!btn) return;
+                if (window.NebulaRecursos?.alClicAbrirRecurso) {
+                    window.NebulaRecursos.alClicAbrirRecurso(btn);
+                }
+            });
+
+            // Búsqueda header → ir a recursos
+            document.getElementById('header-search')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.target.value.trim()) {
+                    switchPanel('recursos');
+                    document.getElementById('recursos-busqueda').value = e.target.value;
+                    renderRecursos();
+                    showToast('Buscando en recursos académicos', 'info');
+                }
+            });
+
+        }
+
+        // ——— Inicialización ———
+        async function init() {
+            migrateEventosLegacy();
+            mergeServerEventos();
+            bindEvents();
+            switchPanel('calendario');
+            await showLoader(700);
+            renderCalendar();
+            renderMetas();
+            if (window.NebulaRacha) {
+                await window.NebulaRacha.init({
+                    showToast,
+                    onRender: mergeRachaEstadoEnState,
+                });
+            }
+            if (window.NebulaRecursos) {
+                window.NebulaRecursos.configurar({ showToast, recursos: RECURSOS_DATA });
+            }
+            renderRacha();
+            renderRecursos();
+            window.addEventListener(window.NebulaRacha?.EVENT_SYNC || 'nebula:racha:actualizada', (ev) => {
+                mergeRachaEstadoEnState(ev.detail);
+                updateWidgetProgreso();
+            });
+        }
+
+        return { init, showToast, switchPanel };
+    })();
+
+    document.addEventListener('DOMContentLoaded', () => NebulaPlan.init());
+    </script>
+    {% include 'partials/nebula_user_boot.html' %}
+</body>
+
+</html>

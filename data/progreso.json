@@ -1,0 +1,12 @@
+[
+    {
+        "id_usuario": 1,
+        "materia": "Matemáticas",
+        "porcentaje": 65
+    },
+    {
+        "id_usuario": 1,
+        "materia": "Ciencias",
+        "porcentaje": 40
+    }
+]

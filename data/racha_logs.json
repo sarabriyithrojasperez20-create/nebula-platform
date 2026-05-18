@@ -1,0 +1,193 @@
+[
+    {
+        "id_log": 7,
+        "id_usuario": 5,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T13:39:30.795107-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 8,
+        "id_usuario": 5,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T13:39:48.596782-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 9,
+        "id_usuario": 6,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T13:41:54.782591-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 15,
+        "id_usuario": 4,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T15:23:42.620316-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 16,
+        "id_usuario": 4,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T15:24:27.645022-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 17,
+        "id_usuario": 4,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T16:37:52.378361-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 1,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T12:39:56.469445-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 2,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T12:42:28.828406-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 3,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T13:27:16.733324-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 4,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T13:30:19.715790-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 5,
+        "id_usuario": 2,
+        "tipo": "curso",
+        "fecha": "2026-05-17T13:30:44.555922-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "slug": "fisica-cuantica-1",
+            "origen": "detalle_curso"
+        }
+    },
+    {
+        "id_log": 6,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T13:33:16.822167-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 10,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T14:25:26.472432-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 11,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T14:34:05.820843-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 12,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T14:37:22.241751-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 13,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T14:49:21.298271-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 14,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T14:51:38.924347-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 18,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T16:56:29.317483-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    },
+    {
+        "id_log": 19,
+        "id_usuario": 2,
+        "tipo": "plan_estudios",
+        "fecha": "2026-05-17T17:59:14.978014-06:00",
+        "fecha_dia": "2026-05-17",
+        "metadata": {
+            "origen": "carga_modulo"
+        }
+    }
+]

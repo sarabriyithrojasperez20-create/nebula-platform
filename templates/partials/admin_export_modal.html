@@ -1,0 +1,66 @@
+<div id="admin-export-modal" class="nb-modal hidden" aria-hidden="true" role="dialog" aria-labelledby="admin-export-title">
+  <div class="nb-modal__backdrop" data-export-close></div>
+  <div class="nb-modal__panel nb-modal__panel--lg">
+    <header class="nb-modal__header">
+      <h2 id="admin-export-title">
+        <span class="material-symbols-outlined text-primary">picture_as_pdf</span>
+        Exportar reporte
+      </h2>
+      <button type="button" class="nb-modal__close" data-export-close aria-label="Cerrar">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+    <div class="nb-modal__body">
+      <div class="admin-export-grid">
+        <label class="nb-field nb-field--full">
+          <span>Buscar estudiante</span>
+          <input type="search" id="export-buscar" placeholder="Nombre o correo..." autocomplete="off" />
+        </label>
+        <label class="nb-field nb-field--full">
+          <span>Estudiante</span>
+          <select id="export-estudiante" required>
+            <option value="">Selecciona un estudiante</option>
+          </select>
+        </label>
+        <label class="nb-field">
+          <span>Tipo de reporte</span>
+          <select id="export-tipo">
+            <option value="completo">Completo</option>
+            <option value="academico">Académico</option>
+            <option value="progreso">Progreso</option>
+            <option value="asistencia">Asistencia</option>
+            <option value="evaluaciones">Evaluaciones</option>
+          </select>
+        </label>
+        <label class="nb-field">
+          <span>Desde</span>
+          <input type="date" id="export-desde" />
+        </label>
+        <label class="nb-field">
+          <span>Hasta</span>
+          <input type="date" id="export-hasta" />
+        </label>
+        <div class="admin-export-preview nb-field--full" id="export-preview">
+          <p class="admin-export-preview__title">Vista previa</p>
+          <div class="admin-export-preview__card" id="export-preview-body">
+            <p class="text-sm text-[var(--nb-text-muted)]">Selecciona un estudiante para ver el resumen del reporte.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="nb-modal__footer nb-modal__footer--split">
+      <button type="button" class="nb-btn-ghost" data-export-close>Cancelar</button>
+      <div class="nb-modal__footer-actions">
+        <button type="button" id="export-generar-zip" class="nb-btn-secondary">
+          <span class="material-symbols-outlined text-lg">folder_zip</span>
+          Todos (ZIP)
+        </button>
+        <button type="button" id="export-generar-pdf" class="nb-btn-primary">
+          <span class="material-symbols-outlined text-lg">download</span>
+          Un estudiante (PDF)
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+<div id="admin-export-toast" class="nb-toast hidden" role="status"></div>

@@ -1,0 +1,118 @@
+﻿<div id="nb-cal-modal" class="nb-cal-modal hidden" aria-hidden="true" role="dialog" aria-labelledby="nb-cal-title">
+    <div class="nb-cal-modal__backdrop" data-nb-cal-close></div>
+    <div class="nb-cal-modal__panel" role="document">
+        <header class="nb-cal-modal__header">
+            <h2 id="nb-cal-title"><span class="material-symbols-outlined text-primary align-middle">calendar_month</span> Calendario académico</h2>
+            <div class="nb-cal-modal__toolbar">
+                <button type="button" class="nb-cal-btn nb-cal-btn--primary" id="nb-cal-new-btn">
+                    <span class="material-symbols-outlined text-lg">add</span> Nueva actividad
+                </button>
+                <button type="button" class="nb-cal-modal__close" data-nb-cal-close aria-label="Cerrar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </header>
+        <div class="nb-cal-modal__body">
+            <div class="nb-cal-main">
+                <div class="nb-cal-view-toggle">
+                    <button type="button" class="is-active" data-cal-view="week">Semana</button>
+                    <button type="button" data-cal-view="month">Mes</button>
+                </div>
+                <div class="nb-cal-nav">
+                    <button type="button" class="nb-cal-btn nb-cal-btn--ghost" id="nb-cal-prev" aria-label="Anterior">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <span id="nb-cal-range">—</span>
+                    <button type="button" class="nb-cal-btn nb-cal-btn--ghost" id="nb-cal-next" aria-label="Siguiente">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                    <button type="button" class="nb-cal-btn nb-cal-btn--ghost" id="nb-cal-today">Hoy</button>
+                </div>
+                <div id="nb-cal-week-wrap">
+                    <div class="nb-cal-week-headers" id="nb-cal-week-headers"></div>
+                    <div class="nb-cal-week" id="nb-cal-week-grid"></div>
+                </div>
+                <div id="nb-cal-month-wrap" class="hidden">
+                    <div class="nb-cal-month" id="nb-cal-month-grid"></div>
+                </div>
+                <div id="nb-cal-form-wrap" class="nb-cal-form-wrap hidden">
+                    <h3 id="nb-cal-form-title" style="margin:0 0 12px;font-size:1rem;font-weight:700">Nueva actividad</h3>
+                    <form id="nb-cal-form">
+                        <div class="nb-cal-form-grid">
+                            <label class="nb-cal-field nb-cal-field--full">
+                                <span>Título</span>
+                                <input type="text" name="titulo" required minlength="2" maxlength="120" placeholder="Ej. Examen de álgebra" />
+                            </label>
+                            <label class="nb-cal-field">
+                                <span>Materia</span>
+                                <select name="materia" id="nb-cal-materia"></select>
+                            </label>
+                            <label class="nb-cal-field">
+                                <span>Tipo</span>
+                                <select name="categoria">
+                                    <option value="evaluacion">Evaluación</option>
+                                    <option value="tarea">Tarea</option>
+                                    <option value="estudio" selected>Estudio</option>
+                                    <option value="reunion">Reunión</option>
+                                </select>
+                            </label>
+                            <label class="nb-cal-field">
+                                <span>Fecha</span>
+                                <input type="date" name="fecha" required />
+                            </label>
+                            <label class="nb-cal-field">
+                                <span>Hora</span>
+                                <input type="time" name="hora" />
+                            </label>
+                            <label class="nb-cal-field">
+                                <span>Prioridad</span>
+                                <select name="prioridad">
+                                    <option value="baja">Baja</option>
+                                    <option value="media" selected>Media</option>
+                                    <option value="alta">Alta</option>
+                                </select>
+                            </label>
+                            <label class="nb-cal-field">
+                                <span>Estado</span>
+                                <select name="estado">
+                                    <option value="pendiente" selected>Pendiente</option>
+                                    <option value="en_curso">En curso</option>
+                                    <option value="completada">Completada</option>
+                                </select>
+                            </label>
+                            <label class="nb-cal-field">
+                                <span>Recordatorio</span>
+                                <select name="recordatorio">
+                                    <option value="ninguno">Sin recordatorio</option>
+                                    <option value="15">15 min antes</option>
+                                    <option value="60">1 hora antes</option>
+                                    <option value="1440">1 día antes</option>
+                                </select>
+                            </label>
+                            <label class="nb-cal-field nb-cal-field--full">
+                                <span>Descripción</span>
+                                <textarea name="descripcion" rows="3" maxlength="800" placeholder="Notas, enlaces o instrucciones..."></textarea>
+                            </label>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px">
+                            <button type="submit" class="nb-cal-btn nb-cal-btn--primary">Guardar</button>
+                            <button type="button" class="nb-cal-btn nb-cal-btn--ghost" id="nb-cal-cancel-form">Cancelar</button>
+                            <button type="button" class="nb-cal-btn nb-cal-btn--ghost hidden" id="nb-cal-delete-btn" style="color:#dc2626;margin-left:auto">Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <aside class="nb-cal-sidebar">
+                <section class="nb-cal-upcoming">
+                    <h3>Próximas actividades</h3>
+                    <div id="nb-cal-upcoming-list"></div>
+                </section>
+                <p style="font-size:0.75rem;color:#9490a0;margin-top:16px;line-height:1.5">
+                    Arrastra eventos entre días para reprogramar. Los colores indican el tipo de actividad.
+                </p>
+            </aside>
+        </div>
+    </div>
+</div>
+<div id="nb-cal-toast" class="nb-cal-toast hidden" role="status"></div>
+

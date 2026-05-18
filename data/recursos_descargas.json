@@ -1,0 +1,26 @@
+[
+  {
+    "id_usuario": 2,
+    "recurso_id": "r1",
+    "titulo": "Guía de ecuaciones",
+    "materia": "math",
+    "pdf": "guia-ecuaciones.pdf",
+    "fecha": "2026-05-16 23:28"
+  },
+  {
+    "id_usuario": 2,
+    "recurso_id": "r2",
+    "titulo": "Simulador de reacciones",
+    "materia": "science",
+    "pdf": "simulador-reacciones.pdf",
+    "fecha": "2026-05-16 23:29"
+  },
+  {
+    "id_usuario": 2,
+    "recurso_id": 1,
+    "titulo": "Guía de ecuaciones",
+    "materia": "math",
+    "pdf": null,
+    "fecha": "2026-05-16 23:54"
+  }
+]

@@ -1,0 +1,142 @@
+.tutor-ai-page {
+    background-color: #f4f6fb;
+    color: #1e293b;
+}
+
+.tutor-ai-page .tutor-ai-sidebar {
+    background: #ffffff;
+    border-color: #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-sidebar-btn:hover {
+    background-color: #f1f5f9;
+}
+
+.tutor-ai-page .tutor-ai-main {
+    background: linear-gradient(180deg, #f8fafc 0%, #f0f3fa 100%);
+}
+
+.tutor-ai-page .tutor-ai-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e8edf5;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.tutor-ai-page .tutor-ai-panel-right {
+    background: #ffffff;
+    border-color: #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-msg-ai {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    color: #334155;
+}
+
+.tutor-ai-page .tutor-ai-msg-user {
+    background: #6a4bd8;
+    box-shadow: 0 4px 12px rgba(106, 77, 216, 0.25);
+}
+
+.tutor-ai-page .tutor-ai-formula {
+    background: #f3e8ff;
+    border: 1px solid #e9d5ff;
+    color: #5b21b6;
+}
+
+.tutor-ai-page .tutor-ai-input-bar {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.tutor-ai-page .tutor-ai-quick-action {
+    background: #f8fafc;
+    border: 1px solid #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-quick-action:hover {
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+}
+
+.tutor-ai-page .tutor-ai-lesson-card {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-lesson-card:hover {
+    border-color: #c4b5fd;
+}
+
+.tutor-ai-page .tutor-ai-recommended {
+    background: #faf5ff;
+    border: 1px solid #e9d5ff;
+}
+
+.tutor-ai-page .tutor-ai-pro-card {
+    background: linear-gradient(135deg, #6a4bd8 0%, #7c6cf0 50%, #8b5cf6 100%);
+    box-shadow: 0 8px 24px rgba(106, 77, 216, 0.28);
+}
+
+.tutor-ai-page .tutor-ai-status {
+    background: #f8fafc;
+    border: 1px solid #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-diagram {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+}
+
+.tutor-ai-page .nav-modulo-link {
+    color: #475569;
+}
+
+.tutor-ai-page .nav-modulo-link--active {
+    color: #6a4bd8;
+    background-color: rgba(106, 77, 216, 0.1);
+}
+
+.tutor-ai-page .notificaciones-panel {
+    background: #ffffff;
+    border-color: #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-typing {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 1.5rem;
+}
+
+.tutor-ai-page .tutor-ai-typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6a4bd8;
+    opacity: 0.35;
+    animation: tutor-ai-typing-bounce 1.2s ease-in-out infinite;
+}
+
+.tutor-ai-page .tutor-ai-typing-dot:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.tutor-ai-page .tutor-ai-typing-dot:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes tutor-ai-typing-bounce {
+    0%,
+    80%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.35;
+    }
+    40% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}

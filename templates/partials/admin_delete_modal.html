@@ -1,0 +1,15 @@
+<div id="admin-delete-modal" class="nb-modal hidden" aria-hidden="true" role="dialog" aria-labelledby="admin-delete-title">
+  <div class="nb-modal__backdrop" data-delete-close></div>
+  <div class="nb-modal__panel nb-modal__panel--sm">
+    <div class="admin-delete-modal__icon">
+      <span class="material-symbols-outlined">warning</span>
+    </div>
+    <h2 id="admin-delete-title">¿Seguro que deseas eliminar este estudiante?</h2>
+    <p id="admin-delete-desc" class="admin-delete-modal__desc">Esta acción no se puede deshacer. Se eliminarán sus cursos, progreso y evaluaciones.</p>
+    <p id="admin-delete-name" class="admin-delete-modal__name"></p>
+    <footer class="admin-delete-modal__actions">
+      <button type="button" class="nb-btn-ghost" data-delete-close>Cancelar</button>
+      <button type="button" id="admin-delete-confirm" class="nb-btn-danger">Eliminar</button>
+    </footer>
+  </div>
+</div>

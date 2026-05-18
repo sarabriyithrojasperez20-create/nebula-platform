@@ -1,0 +1,274 @@
+/* Nébula — Dashboard estudiante (premium) */
+
+.dashboard-main {
+  background: linear-gradient(180deg, #f4f2fa 0%, #f6f6f8 35%, #f8f9fc 100%);
+}
+
+.dashboard-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow:
+    0 1px 2px rgba(106, 75, 216, 0.04),
+    0 12px 32px rgba(106, 75, 216, 0.06);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.dashboard-ai-card {
+  background: linear-gradient(135deg, #6a4bd8 0%, #8b6cff 48%, #a78bfa 100%);
+  box-shadow: 0 16px 40px rgba(106, 75, 216, 0.35);
+}
+
+.dashboard-progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(106, 75, 216, 0.1);
+  overflow: hidden;
+}
+
+.dashboard-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6a4bd8, #9f7aea);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dashboard-eval-row:hover {
+  background: rgba(106, 75, 216, 0.06);
+}
+
+/* ——— Clases activas premium ——— */
+.dashboard-classes-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .dashboard-classes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+
+.dash-class-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 22px;
+  overflow: hidden;
+  min-height: 220px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 246, 255, 0.88) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 16px 40px rgba(106, 75, 216, 0.08);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease;
+}
+
+.dash-class-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.dash-class-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 24px 48px rgba(106, 75, 216, 0.14);
+}
+
+.dash-class-card--violet::before {
+  background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(106, 75, 216, 0.18), transparent 55%);
+}
+.dash-class-card--indigo::before {
+  background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(99, 102, 241, 0.16), transparent 55%);
+}
+.dash-class-card--sky::before {
+  background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(56, 189, 248, 0.14), transparent 55%);
+}
+.dash-class-card--emerald::before {
+  background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(16, 185, 129, 0.14), transparent 55%);
+}
+.dash-class-card--amber::before {
+  background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(245, 158, 11, 0.14), transparent 55%);
+}
+.dash-class-card--rose::before {
+  background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(244, 63, 94, 0.12), transparent 55%);
+}
+
+.dash-class-card__top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dash-class-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(106, 75, 216, 0.15), rgba(139, 108, 255, 0.08));
+  color: #6a4bd8;
+  box-shadow: 0 4px 12px rgba(106, 75, 216, 0.12);
+}
+
+.dash-class-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.dash-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.dash-badge--avanzado { background: rgba(16, 185, 129, 0.12); color: #047857; }
+.dash-badge--proceso { background: rgba(245, 158, 11, 0.12); color: #b45309; }
+.dash-badge--reforzar { background: rgba(239, 68, 68, 0.1); color: #b91c1c; }
+.dash-badge--nuevo { background: rgba(106, 75, 216, 0.1); color: #6a4bd8; }
+
+.dash-badge--ia {
+  background: linear-gradient(135deg, rgba(106, 75, 216, 0.15), rgba(167, 139, 250, 0.2));
+  color: #5b21b6;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.dash-class-card__body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.dash-class-card__title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #1c1a24;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+  line-height: 1.3;
+}
+
+.dash-class-card__meta {
+  font-size: 0.75rem;
+  color: #6b6578;
+  margin: 0 0 12px;
+}
+
+.dash-class-card__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.dash-class-stat {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(106, 75, 216, 0.05);
+  border: 1px solid rgba(106, 75, 216, 0.08);
+}
+
+.dash-class-stat span {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9490a0;
+}
+
+.dash-class-stat strong {
+  font-size: 0.75rem;
+  color: #1c1a24;
+  font-weight: 600;
+}
+
+.dash-class-card__progress-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5c5768;
+  margin-bottom: 6px;
+}
+
+.dash-class-card__progress-head em {
+  font-style: normal;
+  color: #6a4bd8;
+}
+
+.dash-class-card__footer {
+  position: relative;
+  z-index: 1;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(106, 75, 216, 0.08);
+}
+
+.dash-class-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #6a4bd8, #8b6cff);
+  box-shadow: 0 4px 14px rgba(106, 75, 216, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dash-class-card__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(106, 75, 216, 0.38);
+}
+
+.dash-btn-calendario {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6a4bd8;
+  background: rgba(106, 75, 216, 0.08);
+  border: 1px dashed rgba(106, 75, 216, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dash-btn-calendario:hover {
+  background: rgba(106, 75, 216, 0.14);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(106, 75, 216, 0.12);
+}

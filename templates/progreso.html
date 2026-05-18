@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Nébula - Progreso</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7f13ec",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#191022",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+   
+
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <div class="flex h-full grow flex-col">
+            <!-- Top Navigation Bar -->
+            <header
+                class="border-b border-primary/10 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+                <div class="flex items-center justify-between gap-4 px-6 lg:px-10 py-3">
+                <div class="flex items-center gap-4 lg:gap-8 min-w-0">
+                    <div class="flex items-center gap-3 text-primary">
+                        <div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+                            <span class="material-symbols-outlined">auto_awesome</span>
+                        </div>
+                        <h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Nébula
+                        </h2>
+                    </div>
+                    <div class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
+                        <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                            <div
+                                class="text-primary flex border-none bg-primary/5 items-center justify-center pl-4 rounded-l-xl">
+                                <span class="material-symbols-outlined text-[20px]">search</span>
+                            </div>
+                            <input
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-primary/5 focus:border-none h-full placeholder:text-primary/60 px-4 rounded-l-none pl-2 text-base font-normal"
+                                placeholder="Buscar en la base de conocimiento" value="" />
+                        </div>
+                    </div>
+                </div>
+                    <div class="flex items-center gap-4 shrink-0">
+                        {% with clase_boton='flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all' %}
+                        {% include 'partials/notificaciones_dropdown.html' %}
+                        {% endwith %}
+                        {% with link_class='block bg-primary/20 rounded-full size-10 overflow-hidden border-2 border-primary/30 shrink-0', img_class='w-full h-full object-cover' %}
+                        {% include 'partials/estudiante_nav_avatar.html' %}
+                        {% endwith %}
+                    </div>
+                </div>
+                <div class="px-6 lg:px-10 pb-3 nav-modulos-estudiante--bar">
+                    {% include 'partials/nav_estudiante.html' %}
+                </div>
+            </header>
+            <main class="max-w-[1200px] mx-auto w-full px-6 py-10">
+                <!-- Header Section -->
+                <div class="flex flex-col gap-2 mb-10">
+                    <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Tu progreso</h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-lg">Sigue tu crecimiento académico y domina nuevas habilidades en tus cursos.</p>
+                </div>
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
+                                Horas totales de estudio</p>
+                            <span class="material-symbols-outlined text-primary">schedule</span>
+                        </div>
+                        <div class="flex items-baseline gap-2">
+                            <p class="text-slate-900 dark:text-white text-4xl font-bold">0</p>
+                        </div>
+                        <p class="text-slate-400 text-xs mt-1">{% if tiene_cursos %}Registra tiempo al estudiar{% else %}Asigna cursos para comenzar{% endif %}</p>
+                    </div>
+                    <div class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
+                                Lecciones completadas</p>
+                            <span class="material-symbols-outlined text-primary">menu_book</span>
+                        </div>
+                        <div class="flex items-baseline gap-2">
+                            <p class="text-slate-900 dark:text-white text-4xl font-bold">{{ lecciones_completadas }}</p>
+                        </div>
+                        <p class="text-slate-400 text-xs mt-1">{% if tiene_cursos %}En tus cursos asignados{% else %}Sin lecciones completadas aún{% endif %}</p>
+                    </div>
+                    <div
+                        class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm border-orange-100 dark:border-orange-900/20">
+                        <div class="flex justify-between items-start">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
+                                Racha actual</p>
+                            <span class="material-symbols-outlined text-orange-500">local_fire_department</span>
+                        </div>
+                        <div class="flex items-baseline gap-2">
+                            <p class="text-slate-900 dark:text-white text-4xl font-bold">{{ racha_actual }} días</p>
+                        </div>
+                        <p class="text-slate-400 text-xs mt-1">{% if racha_actual > 0 %}Nivel {{ racha_nivel }} · récord {{ racha_mejor }} días{% else %}Comienza tu racha al estudiar{% endif %}</p>
+                    </div>
+                </div>
+                <!-- Main Performance Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Line Chart: Performance Trend -->
+                    <div class="lg:col-span-2 glass-card rounded-xl p-8 shadow-sm">
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Tendencia de rendimiento</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm">Precisión media en los últimos 30
+                                    días</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button
+                                    class="px-3 py-1 rounded-full bg-primary text-white text-xs font-bold">30D</button>
+                                <button
+                                    class="px-3 py-1 rounded-full bg-primary/5 text-primary text-xs font-bold">90D</button>
+                            </div>
+                        </div>
+                        <div class="relative h-[240px] w-full mt-4">
+                            <svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40">
+                                <defs>
+                                    <lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#7f13ec" stop-opacity="0.2"></stop>
+                                        <stop offset="100%" stop-color="#7f13ec" stop-opacity="0"></stop>
+                                    </lineargradient>
+                                </defs>
+                                <path d="M0,30 Q10,25 20,28 T40,15 T60,20 T80,5 T100,10 L100,40 L0,40 Z"
+                                    fill="url(#chartGradient)"></path>
+                                <path d="M0,30 Q10,25 20,28 T40,15 T60,20 T80,5 T100,10" fill="none" stroke="#7f13ec"
+                                    stroke-linecap="round" stroke-width="1.5"></path>
+                            </svg>
+                            <div class="flex justify-between mt-4 px-2">
+                                <span class="text-[10px] text-slate-400 font-bold uppercase">Semana 1</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase">Semana 2</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase">Semana 3</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase">Semana 4</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Skills Proficiency -->
+                    <div class="glass-card rounded-xl p-8 shadow-sm">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">Dominio de competencias</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">Dominio por área académica</p>
+                        {% if tiene_cursos and cursos %}
+                        <div class="space-y-6">
+                            {% for curso in cursos %}
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-600 dark:text-slate-300 font-medium">{{ curso.titulo }}</span>
+                                    <span class="text-primary font-bold">{{ curso.porcentaje|default(0) }}%</span>
+                                </div>
+                                <div class="w-full h-2 bg-primary/10 rounded-full overflow-hidden">
+                                    <div class="bg-primary h-full rounded-full" style="width: {{ curso.porcentaje|default(0) }}%"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="py-8 text-center">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Sin datos de dominio. Asigna cursos y completa lecciones para ver tu avance.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </main>
+            <footer
+                class="mt-auto px-10 py-8 border-t border-primary/10 flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm gap-4">
+                <div class="flex items-center gap-2">
+                    <div class="size-5 flex items-center justify-center bg-primary/20 rounded text-primary">
+                        <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                    </div>
+                    <span>© 2024 Nébula Academic AI. Formando a la próxima generación.</span>
+                </div>
+                <div class="flex gap-6">
+                    <a class="hover:text-primary" href="#">Soporte</a>
+                    <a class="hover:text-primary" href="#">Política de privacidad</a>
+                    <a class="hover:text-primary" href="#">Términos de servicio</a>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    {% include 'partials/nebula_user_boot.html' %}
+</body>
+
+</html>

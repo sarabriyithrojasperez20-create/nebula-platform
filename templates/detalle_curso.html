@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Nébula - {{ curso.titulo }}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/curso-detalle.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leccion-quiz.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/curso-diagnostico.css') }}">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6a4bd8",
+                        "background-dark": "#151220",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body
+    class="curso-detalle-page bg-background-dark font-display text-slate-100 min-h-screen">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <header
+            class="border-b border-primary/20 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+            <div class="flex items-center justify-between gap-4 px-6 lg:px-20 py-3">
+                <div class="flex items-center gap-4 text-primary min-w-0">
+                    <div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg shrink-0">
+                        <span class="material-symbols-outlined text-3xl">auto_awesome</span>
+                    </div>
+                    <h2 class="text-white text-xl font-bold leading-tight tracking-tight truncate">Nébula</h2>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    {% with clase_boton='flex items-center justify-center rounded-full size-10 bg-primary/20 text-slate-200 hover:bg-primary hover:text-white transition-all', icono_clase='text-[20px]' %}
+                    {% include 'partials/notificaciones_dropdown.html' %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="px-6 lg:px-20 pb-3 nav-modulos-estudiante--bar">
+                {% include 'partials/nav_estudiante.html' %}
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-[1200px] mx-auto w-full px-6 lg:px-20 py-8">
+            <a href="{{ url_for('mis_cursos') }}"
+                class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors mb-6">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+                Volver a Mis cursos
+            </a>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="curso-detalle-card overflow-hidden">
+                        <div class="aspect-[21/9] max-h-56 w-full overflow-hidden">
+                            <img class="w-full h-full object-cover opacity-90" src="{{ curso.imagen }}"
+                                alt="{{ curso.titulo }}">
+                        </div>
+                        <div class="p-6 sm:p-8">
+                            <div class="flex flex-wrap items-center gap-3 mb-3">
+                                <h1 class="text-2xl sm:text-3xl font-black text-white">{{ curso.titulo }}</h1>
+                                <span
+                                    class="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase tracking-wide">{{ curso.nivel }}</span>
+                            </div>
+                            <p class="text-slate-400 leading-relaxed mb-6">{{ curso.descripcion }}</p>
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-slate-400 mb-4">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-base text-primary">schedule</span>
+                                    {{ curso.duracion_total }}
+                                </span>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm font-semibold mb-2">
+                                    <span class="text-slate-300">Progreso del curso</span>
+                                    <span class="text-primary">{{ curso.porcentaje }}%</span>
+                                </div>
+                                <div class="curso-detalle-progress-track">
+                                    <div class="curso-detalle-progress-fill" style="width: {{ curso.porcentaje }}%;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% include 'partials/curso_diagnostico_quiz.html' %}
+
+                    {% if diagnostico_completado and leccion_actual %}
+                    <div class="curso-detalle-card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <p class="text-xs font-bold text-primary uppercase tracking-wider mb-1">Siguiente paso</p>
+                            <h2 class="text-lg font-bold text-white">{{ leccion_actual.titulo }}</h2>
+                            <p class="text-sm text-slate-400 mt-1">Duración estimada: {{ leccion_actual.duracion }}</p>
+                            {% if leccion_actual.recomendada %}
+                            <p class="text-xs text-amber-400 mt-2 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">star</span>
+                                Recomendada según tu diagnóstico
+                            </p>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('ver_leccion', slug=curso.slug, leccion_id=leccion_actual.id) }}"
+                            class="shrink-0 inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-full transition-all shadow-lg shadow-primary/25">
+                            {% if leccion_actual.estado == 'pendiente' %}
+                            Iniciar lección
+                            {% else %}
+                            Continuar lección
+                            {% endif %}
+                            <span class="material-symbols-outlined">play_arrow</span>
+                        </a>
+                    </div>
+                    {% elif not diagnostico_completado %}
+                    <div class="curso-detalle-card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border border-amber-500/30">
+                        <div>
+                            <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">Paso requerido</p>
+                            <h2 class="text-lg font-bold text-white">Completa el quiz diagnóstico</h2>
+                            <p class="text-sm text-slate-400 mt-1">Debes realizar el diagnóstico antes de iniciar las lecciones.</p>
+                        </div>
+                        <button type="button" data-iniciar-diagnostico="true"
+                            class="shrink-0 inline-flex items-center justify-center gap-2 bg-amber-500/90 hover:bg-amber-500 text-white font-bold px-6 py-3 rounded-full transition-all">
+                            <span class="material-symbols-outlined">quiz</span>
+                            Realizar diagnóstico
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-6">
+                    <section class="curso-detalle-card p-6">
+                        <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">topic</span>
+                            Temas del curso
+                        </h2>
+                        <ul class="space-y-2">
+                            {% for tema in curso.temas %}
+                            <li class="flex items-start gap-2 text-sm text-slate-300">
+                                <span class="material-symbols-outlined text-primary text-base shrink-0 mt-0.5">check_circle</span>
+                                {{ tema }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+
+                    <section class="curso-detalle-card p-6">
+                        <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">view_module</span>
+                            Módulos
+                        </h2>
+                        <ol class="space-y-3">
+                            {% for modulo in curso.modulos %}
+                            <li class="text-sm text-slate-300 pl-1 border-l-2 border-primary/40 py-1">{{ modulo }}</li>
+                            {% endfor %}
+                        </ol>
+                    </section>
+                </div>
+            </div>
+
+            <section id="lecciones" class="curso-detalle-card p-6 sm:p-8 scroll-mt-24">
+                <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">menu_book</span>
+                    Lecciones disponibles
+                </h2>
+                {% if diagnostico_completado %}
+                <p class="text-sm text-slate-400 mb-6">Ordenadas según tu diagnóstico. Las marcadas con estrella son prioridad para ti.</p>
+                {% else %}
+                <p class="text-sm text-slate-400 mb-6">Completa el diagnóstico para desbloquear y personalizar tu ruta.</p>
+                {% endif %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for leccion in curso.lecciones %}
+                    <article class="curso-detalle-card p-4 curso-detalle-leccion--{{ leccion.estado }}{% if leccion.bloqueada %} opacity-60{% endif %} flex flex-col gap-3">
+                        <div class="flex items-start justify-between gap-2 flex-wrap">
+                            <h3 class="text-sm font-bold text-white leading-snug">{{ leccion.titulo }}</h3>
+                            <div class="flex flex-wrap gap-1 justify-end">                            {% if leccion.bloqueada %}
+                            <span class="shrink-0 px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 text-[10px] font-bold uppercase">Bloqueada</span>
+                            {% elif leccion.recomendada %}
+                            <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase">Prioridad</span>
+                            {% elif leccion.opcional %}
+                            <span class="shrink-0 px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-300 text-[10px] font-bold uppercase">Opcional</span>
+                            {% endif %}
+                            {% if leccion.estado == 'completado' %}
+                            <span class="shrink-0 px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 text-[10px] font-bold uppercase">Completado</span>
+                            {% elif leccion.estado == 'en_progreso' %}
+                            <span class="shrink-0 px-2 py-0.5 rounded-full bg-primary/25 text-primary text-[10px] font-bold uppercase">En progreso</span>
+                            {% elif not leccion.bloqueada %}
+                            <span class="shrink-0 px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 text-[10px] font-bold uppercase">Pendiente</span>
+                            {% endif %}
+                            </div>
+                        </div>
+                        {% if leccion.etiqueta_ruta %}
+                        <p class="text-[11px] text-primary/90">{{ leccion.etiqueta_ruta }}</p>
+                        {% endif %}
+                        <p class="text-xs text-slate-400 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">schedule</span>
+                            {{ leccion.duracion }}
+                        </p>
+                        {% if diagnostico_completado and not leccion.bloqueada %}
+                        <a href="{{ url_for('ver_leccion', slug=curso.slug, leccion_id=leccion.id) }}"
+                            class="mt-auto w-full text-center text-xs font-bold py-2 rounded-lg {% if leccion.estado == 'en_progreso' %}bg-primary text-white{% else %}bg-white/5 text-slate-300 hover:bg-primary/20{% endif %} transition-colors block">
+                            {% if leccion.estado == 'completado' %}Repasar{% elif leccion.estado == 'en_progreso' %}Continuar{% else %}Iniciar{% endif %}
+                        </a>
+                        {% elif leccion.bloqueada %}
+                        <span class="mt-auto w-full text-center text-xs font-bold py-2 rounded-lg bg-white/5 text-slate-500 cursor-not-allowed block">
+                            Completa lecciones anteriores
+                        </span>
+                        {% else %}
+                        <span class="mt-auto w-full text-center text-xs font-bold py-2 rounded-lg bg-white/5 text-slate-500 cursor-not-allowed block">
+                            Requiere diagnóstico
+                        </span>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
+    {% if quiz_diagnostico and not diagnostico_completado %}
+    <script type="application/json" id="curso-diagnostico-data">{{ quiz_diagnostico | tojson }}</script>
+    <script>
+        window.CURSO_DIAGNOSTICO = JSON.parse(document.getElementById('curso-diagnostico-data').textContent);
+        window.CURSO_DIAGNOSTICO_META = {
+            slug: {{ curso.slug | tojson }},
+            userId: {{ id_usuario | tojson }},
+            guardarUrl: {{ url_for('api_guardar_diagnostico', slug=curso.slug) | tojson }}
+        };
+    </script>
+    <script src="{{ url_for('static', filename='curso-diagnostico.js') }}"></script>
+    {% endif %}
+    <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    {% include 'partials/nebula_user_boot.html' %}
+</body>
+
+</html>

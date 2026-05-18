@@ -1,0 +1,54 @@
+[
+  {
+    "id": 4,
+    "type": "leccion_iniciada",
+    "title": "Lección iniciada",
+    "message": "Estudiante Demo inició Doble hélice y replicación",
+    "user_id": 2,
+    "user": "Estudiante Demo",
+    "avatar": "/static/uploads/perfiles/user_2_af43c134ded1.png?v=20260517170355",
+    "icon": "notifications",
+    "created_at": "2026-05-17T22:27:44",
+    "read": false,
+    "meta": {}
+  },
+  {
+    "id": 3,
+    "type": "registro_estudiante",
+    "title": "Nuevo usuario registrado",
+    "message": "adriana se registró en la plataforma",
+    "user_id": 5,
+    "user": "adriana",
+    "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuBlwoGAr4OcQHRwHR-lcqSiVtRczHOqU4jSeFWxNy7vEHCCeSC_b1mKIRSSHlj-Uah3OA6pbCC0gL6OOi-k9lVNngXgPGI8SMaNT5qfa2MvmU_9BDlAs2sFfycz7MTtG1JhdpkytvtTvG0qlm796rX77xURSs3c0qR1vFJfRms9-GFoWgsllXenDXJ4WbdK-n98_bzU82KSmO2gh53b7AdV-AawOUYUnwE3qSGyNOAiyNmiNSUmRB79gyWgUowkW0vRWKOHp2m4EFo",
+    "icon": "person_add",
+    "created_at": "2026-05-17T22:27:44",
+    "read": false,
+    "meta": {}
+  },
+  {
+    "id": 2,
+    "type": "curso_inscrito",
+    "title": "Curso añadido",
+    "message": "adriana añadió el curso Algoritmos y lógica",
+    "user_id": 5,
+    "user": "adriana",
+    "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuBlwoGAr4OcQHRwHR-lcqSiVtRczHOqU4jSeFWxNy7vEHCCeSC_b1mKIRSSHlj-Uah3OA6pbCC0gL6OOi-k9lVNngXgPGI8SMaNT5qfa2MvmU_9BDlAs2sFfycz7MTtG1JhdpkytvtTvG0qlm796rX77xURSs3c0qR1vFJfRms9-GFoWgsllXenDXJ4WbdK-n98_bzU82KSmO2gh53b7AdV-AawOUYUnwE3qSGyNOAiyNmiNSUmRB79gyWgUowkW0vRWKOHp2m4EFo",
+    "icon": "bookmark_add",
+    "created_at": "2026-05-17T22:27:44",
+    "read": false,
+    "meta": {}
+  },
+  {
+    "id": 1,
+    "type": "registro_estudiante",
+    "title": "Nuevo usuario registrado",
+    "message": "diego rojas  se registró en la plataforma",
+    "user_id": 6,
+    "user": "diego rojas ",
+    "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuBlwoGAr4OcQHRwHR-lcqSiVtRczHOqU4jSeFWxNy7vEHCCeSC_b1mKIRSSHlj-Uah3OA6pbCC0gL6OOi-k9lVNngXgPGI8SMaNT5qfa2MvmU_9BDlAs2sFfycz7MTtG1JhdpkytvtTvG0qlm796rX77xURSs3c0qR1vFJfRms9-GFoWgsllXenDXJ4WbdK-n98_bzU82KSmO2gh53b7AdV-AawOUYUnwE3qSGyNOAiyNmiNSUmRB79gyWgUowkW0vRWKOHp2m4EFo",
+    "icon": "person_add",
+    "created_at": "2026-05-17T22:27:44",
+    "read": false,
+    "meta": {}
+  }
+]

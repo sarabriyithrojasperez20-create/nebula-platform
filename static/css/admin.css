@@ -1,0 +1,17 @@
+/* Admin — Nébula (Poppins, scrollbar, componentes panel) */
+@import url('css/admin.css');
+
+/* Panel de gestión */
+/* Movido a css/admin.css */
+
+/* Navegación admin */
+.admin-page-enter .admin-main {
+    animation: adminFadeIn 0.35s ease;
+}
+@keyframes adminFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.admin-profile-dropdown.hidden {
+    display: none !important;
+}

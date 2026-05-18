@@ -1,0 +1,49 @@
+<div
+    class="mis-cursos-card group flex flex-col h-full bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1"
+    data-slug="{{ curso.slug }}"
+    data-materia="{{ curso.materia }}"
+    data-nivel="{{ curso.nivel }}">
+    <div class="relative aspect-[16/9] w-full shrink-0 overflow-hidden">
+        <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            alt="{{ curso.titulo }}"
+            src="{{ curso.imagen }}">
+        <div class="absolute top-4 right-4 bg-background-dark/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full">
+            {{ curso.nivel }}
+        </div>
+    </div>
+    <div class="p-6 flex flex-col flex-1 min-h-0 w-full">
+        <div class="flex justify-between items-start gap-3 mb-3 flex-1 min-h-[7.5rem]">
+            <div class="flex-1 min-w-0 pr-1">
+                <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-1">{{ curso.titulo }}</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm line-clamp-2">{{ curso.descripcion }}</p>
+            </div>
+            <div class="relative size-14 shrink-0 mis-cursos-progress-ring">
+                <svg class="size-full -rotate-90" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="stroke-slate-200 dark:stroke-primary/10" cx="18" cy="18" fill="none" r="16"
+                        stroke-width="3"></circle>
+                    <circle class="stroke-primary mis-cursos-progress-arc" cx="18" cy="18" fill="none" r="16"
+                        stroke-dasharray="100" stroke-dashoffset="{{ curso.stroke_dashoffset }}"
+                        stroke-linecap="round" stroke-width="3"></circle>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-[10px] font-bold text-primary mis-cursos-progress-text">{{ curso.porcentaje }}%</span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-auto pt-4 shrink-0 w-full">
+            {% if curso.diagnostico_completado %}
+            <a href="{{ url_for('detalle_curso', slug=curso.slug) }}"
+                class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-full transition-all group-hover:shadow-lg group-hover:shadow-primary/30">
+                <span>Continuar aprendiendo</span>
+                <span class="material-symbols-outlined text-[20px]">play_arrow</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('detalle_curso', slug=curso.slug) }}#diagnostico"
+                class="w-full flex items-center justify-center gap-2 bg-amber-500/90 hover:bg-amber-500 text-white font-bold py-3 rounded-full transition-all group-hover:shadow-lg group-hover:shadow-amber-500/30">
+                <span>Realizar diagnóstico</span>
+                <span class="material-symbols-outlined text-[20px]">quiz</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

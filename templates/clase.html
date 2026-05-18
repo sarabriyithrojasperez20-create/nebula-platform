@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Nébula - Lesson Detailed View</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<!-- 2. Luego Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+    <div class="flex flex-col h-screen">
+        <!-- Top Navigation -->
+        <header
+            class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-3 z-50">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-3 text-primary">
+                    <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined">auto_awesome</span>
+                    </div>
+                    <h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">Nébula
+                    </h2>
+                </div>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium"
+                        href="#">Dashboard</a>
+                    <a class="text-primary text-sm font-bold" href="#">My Courses</a>
+                    <a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium"
+                        href="#">Study Groups</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden sm:block">
+                    <span
+                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary/60 text-lg">search</span>
+                    <input
+                        class="pl-10 pr-4 py-2 bg-primary/5 border-none rounded-full text-sm focus:ring-2 focus:ring-primary w-64"
+                        placeholder="Search lessons..." type="text" />
+                </div>
+                <button class="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+                <a href="{{ url_for('perfil') }}" class="perfil-avatar-link block size-10 rounded-full border-2 border-primary/20 p-0.5 overflow-hidden shrink-0" aria-label="Ir al perfil">
+                    {% with avatar_class='w-full h-full object-cover rounded-full' %}
+                    {% include 'partials/estudiante_avatar.html' %}
+                    {% endwith %}
+                </a>
+            </div>
+        </header>
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar: Curriculum -->
+            <aside
+                class="w-80 border-r border-primary/10 bg-white dark:bg-background-dark flex flex-col hidden lg:flex">
+                <div class="p-6 border-b border-primary/5">
+                    <h3 class="font-bold text-lg">Algebra Essentials</h3>
+                    <div class="mt-4">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-500">Course Progress</span>
+                            <span class="font-bold text-primary">65%</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-primary/10 rounded-full">
+                            <div class="h-full bg-primary rounded-full" style="width: 65%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
+                    <!-- Chapter 1 -->
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 p-2 font-semibold text-sm text-slate-500">
+                            <span class="material-symbols-outlined text-xs">keyboard_arrow_down</span>
+                            Chapter 1: Linear Equations
+                        </div>
+                        <div class="space-y-1 pl-4">
+                            <button class="w-full flex items-center gap-3 p-2 rounded hover:bg-primary/5 text-sm group">
+                                <span
+                                    class="material-symbols-outlined text-green-500 text-lg fill-current">check_circle</span>
+                                <span class="flex-1 text-left text-slate-600">Introduction</span>
+                                <span class="text-[10px] text-slate-400">4:20</span>
+                            </button>
+                            <button
+                                class="w-full flex items-center gap-3 p-2 rounded-lg bg-primary/10 text-primary text-sm font-semibold group">
+                                <span class="material-symbols-outlined text-lg">play_circle</span>
+                                <span class="flex-1 text-left">Slope-Intercept Form</span>
+                                <span class="text-[10px] opacity-70">12:45</span>
+                            </button>
+                            <button class="w-full flex items-center gap-3 p-2 rounded hover:bg-primary/5 text-sm group">
+                                <span
+                                    class="material-symbols-outlined text-slate-300 text-lg">radio_button_unchecked</span>
+                                <span class="flex-1 text-left text-slate-600">Point-Slope Practice</span>
+                                <span class="text-[10px] text-slate-400">8:15</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Chapter 2 -->
+                    <div class="space-y-1 pt-4">
+                        <div class="flex items-center gap-2 p-2 font-semibold text-sm text-slate-500">
+                            <span class="material-symbols-outlined text-xs">lock</span>
+                            Chapter 2: Systems
+                        </div>
+                        <div class="space-y-1 pl-4 opacity-50">
+                            <div class="w-full flex items-center gap-3 p-2 text-sm">
+                                <span class="material-symbols-outlined text-slate-300 text-lg">lock</span>
+                                <span class="flex-1 text-left text-slate-600">Substitution Method</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-primary/5 m-4 rounded">
+                    <button
+                        class="w-full bg-primary text-white py-2 px-4 rounded-full text-sm font-bold flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">download</span>
+                        Syllabus PDF
+                    </button>
+                </div>
+            </aside>
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto custom-scrollbar bg-background-light dark:bg-background-dark p-6">
+                <div class="max-w-5xl mx-auto space-y-6">
+                    <!-- Breadcrumbs -->
+                    <div class="flex items-center gap-2 text-sm text-slate-500">
+                        <a class="hover:text-primary" href="#">Courses</a>
+                        <span class="material-symbols-outlined text-xs">chevron_right</span>
+                        <a class="hover:text-primary" href="#">Algebra Essentials</a>
+                        <span class="material-symbols-outlined text-xs">chevron_right</span>
+                        <span class="text-primary font-medium">Slope-Intercept Form</span>
+                    </div>
+                    <!-- Video Player Section -->
+                    <div class="relative aspect-video rounded-xl overflow-hidden bg-black shadow-2xl group">
+                        <img class="w-full h-full object-cover opacity-80"
+                            data-alt="Educational video frame showing complex math equations on a digital whiteboard"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWkPcZZKsp7Hkp9hdhCfj7lfCpoQNb0q7S0tg3sPq552YaSkwn8qnl4MH8w01SgMWP9eCC6Z1eMJtoSbA1wv7-zeXZ_DR7DmKWeua11NC9fOgCR9TiyeCnKfFRExPIowoOQYuiS5TK8_oSmzuTnlUxBcyUtpQ276yYEoJzuk5v0K2de12lycl0GHQaToNEjokG3Xhjz3NKLS2nP5G58tNlcBZJAyLX1kEKtc31UYTnDpq92mjytn7SpBPwNdFW-pf6CeBK5xbtlVs" />
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <button
+                                class="size-20 bg-primary rounded-full flex items-center justify-center text-white shadow-lg hover:scale-105 transition-transform">
+                                <span class="material-symbols-outlined text-5xl fill-current">play_arrow</span>
+                            </button>
+                        </div>
+                        <!-- Video Controls (Faux) -->
+                        <div
+                            class="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black/80 to-transparent pt-20 translate-y-2 group-hover:translate-y-0 transition-transform">
+                            <div class="h-1.5 w-full bg-white/20 rounded-full mb-4 relative cursor-pointer">
+                                <div class="absolute top-0 left-0 h-full bg-primary w-1/3 rounded-full"></div>
+                                <div
+                                    class="absolute top-1/2 left-1/3 -translate-y-1/2 size-4 bg-white rounded-full shadow-lg border-2 border-primary">
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-white">
+                                <div class="flex items-center gap-4">
+                                    <span
+                                        class="material-symbols-outlined cursor-pointer hover:text-primary">play_arrow</span>
+                                    <span
+                                        class="material-symbols-outlined cursor-pointer hover:text-primary">skip_next</span>
+                                    <span
+                                        class="material-symbols-outlined cursor-pointer hover:text-primary">volume_up</span>
+                                    <span class="text-sm font-medium">04:32 / 12:45</span>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span
+                                        class="material-symbols-outlined cursor-pointer hover:text-primary">closed_caption</span>
+                                    <span
+                                        class="material-symbols-outlined cursor-pointer hover:text-primary">settings</span>
+                                    <span
+                                        class="material-symbols-outlined cursor-pointer hover:text-primary">fullscreen</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tabs & Content -->
+                    <div
+                        class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm border border-primary/5">
+                        <div class="flex border-b border-primary/5 px-6">
+                            <button class="py-4 px-6 text-primary border-b-2 border-primary font-bold text-sm">Lesson
+                                Notes</button>
+                            <button class="py-4 px-6 text-slate-500 hover:text-primary font-medium text-sm">Resources
+                                (3)</button>
+                            <button class="py-4 px-6 text-slate-500 hover:text-primary font-medium text-sm">Q&amp;A
+                                (12)</button>
+                        </div>
+                        <div class="p-8 space-y-6">
+                            <div class="prose dark:prose-invert max-w-none">
+                                <h2 class="text-xl font-bold">Understanding y = mx + b</h2>
+                                <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    In this lesson, we break down the most common linear equation format. The variable
+                                    <span class="bg-primary/10 text-primary px-1 rounded">m</span> represents the slope,
+                                    while <span class="bg-primary/10 text-primary px-1 rounded">b</span> represents the
+                                    y-intercept.
+                                </p>
+                                <div class="grid md:grid-cols-2 gap-4 mt-6">
+                                    <div
+                                        class="p-4 bg-background-light dark:bg-background-dark rounded border-l-4 border-primary">
+                                        <p class="font-bold text-sm text-primary uppercase tracking-wider mb-2">Key
+                                            Definition</p>
+                                        <p class="text-sm">Slope is defined as the change in y divided by the change in
+                                            x (rise over run).</p>
+                                    </div>
+                                    <div
+                                        class="p-4 bg-background-light dark:bg-background-dark rounded border-l-4 border-primary">
+                                        <p class="font-bold text-sm text-primary uppercase tracking-wider mb-2">The
+                                            Formula</p>
+                                        <code class="text-lg font-mono">y = mx + b</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <!-- AI Tutor Panel -->
+            <aside
+                class="w-96 border-l border-primary/10 bg-white dark:bg-background-dark flex flex-col hidden xl:flex">
+                <div class="p-6 border-b border-primary/5 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="size-8 bg-primary/20 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-xl">auto_awesome</span>
+                        </div>
+                        <h3 class="font-bold">AI Tutor</h3>
+                    </div>
+                    <span
+                        class="text-xs font-bold text-green-500 bg-green-500/10 px-2 py-1 rounded-full uppercase tracking-widest">Active</span>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+                    <div class="bg-primary/5 p-4 rounded-xl rounded-tl-none border border-primary/10">
+                        <p class="text-sm text-slate-700 dark:text-slate-300">Hello! I'm watching the video with you. At
+                            <span class="font-bold text-primary">04:32</span>, you mentioned the slope. Need help
+                            visualizing that?</p>
+                    </div>
+                    <div class="flex flex-col items-end space-y-1">
+                        <div class="bg-primary text-white p-4 rounded-xl rounded-tr-none text-sm max-w-[85%]">
+                            How does the 'b' value change if the line shifts up?
+                        </div>
+                        <span class="text-[10px] text-slate-400 px-1">Just now</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="size-8 rounded-full bg-primary/20 shrink-0 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+                        </div>
+                        <div
+                            class="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl rounded-tl-none border border-primary/5 space-y-2">
+                            <p class="text-sm text-slate-700 dark:text-slate-300">Great question! If the line shifts up,
+                                the <span class="font-bold">b</span> value increases. It literally represents where the
+                                line crosses the vertical axis.</p>
+                            <div
+                                class="p-2 bg-white dark:bg-slate-900 rounded border border-primary/10 text-[10px] text-slate-500 italic">
+                                Reference: Video Timestamp 05:12
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 border-t border-primary/5">
+                    <div class="relative">
+                        <textarea
+                            class="w-full rounded-xl border-primary/10 dark:bg-slate-900 focus:ring-primary focus:border-primary text-sm pr-12 resize-none"
+                            placeholder="Ask about this video timestamp..." rows="2"></textarea>
+                        <button
+                            class="absolute right-3 bottom-3 p-2 bg-primary text-white rounded-lg shadow-lg hover:shadow-primary/20 transition-all">
+                            <span class="material-symbols-outlined text-lg">send</span>
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-center mt-3 text-slate-400">Context: Linear Equations (04:32)</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+    {% include 'partials/nebula_user_boot.html' %}
+</body>
+
+</html>

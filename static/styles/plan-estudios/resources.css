@@ -1,0 +1,41 @@
+/**
+ * Plan de estudios — panel de recursos académicos
+ */
+
+.recurso-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recurso-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
+}
+
+/* Abrir recurso — morado Nébula (#6a4bd8), mismo spacing que Tailwind en HTML */
+.plan-estudios-page .recurso-abrir {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    border: none !important;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plan-estudios-page .recurso-abrir:hover:not(:disabled) {
+    background-color: var(--primary-color-hover) !important;
+    color: #ffffff !important;
+    transform: scale(1.01);
+    box-shadow: 0 8px 20px rgba(106, 75, 216, 0.35);
+}
+
+.plan-estudios-page .recurso-abrir:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.plan-estudios-page .recurso-abrir:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.plan-estudios-page .recurso-abrir .material-symbols-outlined {
+    color: #ffffff !important;
+}

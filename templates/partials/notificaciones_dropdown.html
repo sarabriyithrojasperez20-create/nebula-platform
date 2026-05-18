@@ -1,0 +1,49 @@
+<div class="notificaciones-dropdown relative inline-flex">
+    <button type="button"
+        class="notificaciones-toggle {{ clase_boton }}"
+        aria-expanded="false"
+        aria-haspopup="true"
+        aria-label="Abrir notificaciones">
+        <span class="material-symbols-outlined {{ icono_clase | default('') }}">notifications</span>
+    </button>
+    <div class="notificaciones-panel" hidden>
+        <div class="notificaciones-panel__header">
+            <h3 class="notificaciones-panel__title">Notificaciones</h3>
+        </div>
+        <ul class="notificaciones-panel__list" role="list">
+            <li class="notificaciones-panel__item">
+                <div class="notificaciones-panel__icon">
+                    <span class="material-symbols-outlined">school</span>
+                </div>
+                <div class="notificaciones-panel__content">
+                    <p class="notificaciones-panel__message">Nueva lección disponible en Fundamentos de álgebra</p>
+                    <span class="notificaciones-panel__time">hace 3 horas</span>
+                    <a class="notificaciones-panel__link" href="#">Ver notificación completa</a>
+                </div>
+            </li>
+            <li class="notificaciones-panel__item">
+                <div class="notificaciones-panel__icon">
+                    <span class="material-symbols-outlined">quiz</span>
+                </div>
+                <div class="notificaciones-panel__content">
+                    <p class="notificaciones-panel__message">Tienes un quiz pendiente en Biología molecular</p>
+                    <span class="notificaciones-panel__time">hace 1 día</span>
+                    <a class="notificaciones-panel__link" href="#">Ver notificación completa</a>
+                </div>
+            </li>
+            <li class="notificaciones-panel__item">
+                <div class="notificaciones-panel__icon">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                </div>
+                <div class="notificaciones-panel__content">
+                    <p class="notificaciones-panel__message">El Tutor IA tiene una recomendación de estudio para ti</p>
+                    <span class="notificaciones-panel__time">hace 2 días</span>
+                    <a class="notificaciones-panel__link" href="#">Ver notificación completa</a>
+                </div>
+            </li>
+        </ul>
+        <div class="notificaciones-panel__footer">
+            <a class="notificaciones-panel__ver-todo" href="#">Ver todo</a>
+        </div>
+    </div>
+</div>

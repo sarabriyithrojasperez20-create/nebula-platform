@@ -1,0 +1,79 @@
+/* Perfil administrador — extensión del layout nb-admin */
+
+.nb-page-head {
+  margin-bottom: 28px;
+}
+
+.nb-page-head h2 {
+  margin: 0 0 6px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--nb-text, #1c1a24);
+  letter-spacing: -0.02em;
+}
+
+.nb-page-head p {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--nb-text-secondary, #5c5768);
+}
+
+.perfil-admin-badge {
+  display: inline-block;
+  margin: 8px 0 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6a4bd8;
+  background: rgba(106, 75, 216, 0.1);
+}
+
+.perfil-edit-layout--page .perfil-edit-aside,
+.perfil-edit-layout--page .perfil-edit-form-card {
+  backdrop-filter: blur(12px);
+}
+
+.admin-perfil-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: #1c1a24;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 12px 32px rgba(15, 13, 20, 0.2);
+  animation: adminToastIn 0.25s ease;
+}
+
+.admin-perfil-toast.hidden { display: none; }
+.admin-perfil-toast--err { background: #dc2626; }
+.admin-perfil-toast--loading { background: #6d4aff; }
+
+.admin-avatar-dropzone.is-dragover .admin-avatar-dropzone__ring {
+  box-shadow: 0 0 0 3px rgba(109, 74, 255, 0.45);
+}
+
+.admin-avatar-dropzone.is-loading .admin-avatar-dropzone__ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.65);
+  animation: adminAvatarPulse 1s ease infinite;
+}
+
+@keyframes adminToastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes adminAvatarPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}

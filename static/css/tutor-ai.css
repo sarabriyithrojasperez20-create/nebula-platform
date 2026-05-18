@@ -1,0 +1,225 @@
+.tutor-ai-page {
+    background-color: #f4f6fb;
+    color: #1e293b;
+}
+
+.tutor-ai-page .tutor-ai-sidebar {
+    background: #ffffff;
+    border-color: #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-sidebar-btn:hover {
+    background-color: #f1f5f9;
+}
+
+.tutor-ai-page .tutor-ai-main {
+    background: linear-gradient(180deg, #f8fafc 0%, #f0f3fa 100%);
+}
+
+.tutor-ai-page .tutor-ai-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e8edf5;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.tutor-ai-page .tutor-ai-panel-right {
+    background: #ffffff;
+    border-color: #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-msg-ai {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    color: #334155;
+}
+
+.tutor-ai-page .tutor-ai-msg-user {
+    background: #6a4bd8;
+    box-shadow: 0 4px 12px rgba(106, 77, 216, 0.25);
+}
+
+.tutor-ai-page .tutor-ai-formula {
+    background: #f3e8ff;
+    border: 1px solid #e9d5ff;
+    color: #5b21b6;
+}
+
+.tutor-ai-page .tutor-ai-input-bar {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.tutor-ai-page .tutor-ai-send-btn {
+    background: #7a5cff;
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(122, 92, 255, 0.35);
+}
+
+.tutor-ai-page .tutor-ai-send-btn:hover:not(:disabled) {
+    background: #6b4ef0;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(122, 92, 255, 0.42);
+}
+
+.tutor-ai-page .tutor-ai-send-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.tutor-ai-page .tutor-ai-attach-btn:hover,
+.tutor-ai-page .tutor-ai-attach-btn:focus-visible {
+    color: #7a5cff;
+    background: rgba(122, 92, 255, 0.1);
+}
+
+.tutor-ai-page .tutor-ai-attach-btn:active {
+    background: rgba(122, 92, 255, 0.16);
+}
+
+.tutor-ai-page .tutor-ai-msg-error {
+    border-color: #fecaca;
+    background: #fef2f2;
+}
+
+.tutor-ai-page .tutor-ai-msg-error .tutor-msg-body {
+    color: #991b1b;
+}
+
+.tutor-ai-page .tutor-ai-quick-action {
+    background: #f8fafc;
+    border: 1px solid #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-quick-action:hover {
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+}
+
+.tutor-ai-page .tutor-ai-lesson-card {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-lesson-card:hover {
+    border-color: #c4b5fd;
+}
+
+.tutor-ai-page .tutor-ai-recommended {
+    background: #faf5ff;
+    border: 1px solid #e9d5ff;
+}
+
+.tutor-ai-page .tutor-ai-pro-card {
+    background: linear-gradient(135deg, #6a4bd8 0%, #7c6cf0 50%, #8b5cf6 100%);
+    box-shadow: 0 8px 24px rgba(106, 77, 216, 0.28);
+}
+
+.tutor-ai-page .tutor-ai-status {
+    background: #f8fafc;
+    border: 1px solid #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-diagram {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+}
+
+.tutor-ai-page .nav-modulo-link {
+    color: #475569;
+}
+
+.tutor-ai-page .nav-modulo-link--active {
+    color: #6a4bd8;
+    background-color: rgba(106, 77, 216, 0.1);
+}
+
+.tutor-ai-page .notificaciones-panel {
+    background: #ffffff;
+    border-color: #e8edf5;
+}
+
+.tutor-ai-page .tutor-ai-typing {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 1.5rem;
+}
+
+.tutor-ai-page .tutor-ai-typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6a4bd8;
+    opacity: 0.35;
+    animation: tutor-ai-typing-bounce 1.2s ease-in-out infinite;
+}
+
+.tutor-ai-page .tutor-ai-typing-dot:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.tutor-ai-page .tutor-ai-typing-dot:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.tutor-ai-page .tutor-status-bar {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    text-align: center;
+}
+
+.tutor-ai-page .tutor-status-bar--processing {
+    color: #5b21b6;
+    background: rgba(122, 92, 255, 0.1);
+    border: 1px solid rgba(122, 92, 255, 0.2);
+}
+
+.tutor-ai-page .tutor-status-bar--retry {
+    color: #b45309;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+}
+
+.tutor-ai-page .tutor-toast {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.tutor-ai-page .tutor-toast--info {
+    background: #f5f3ff;
+    color: #5b21b6;
+    border: 1px solid #ddd6fe;
+}
+
+.tutor-ai-page .tutor-toast--retry {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.tutor-ai-page .tutor-toast--error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+@keyframes tutor-ai-typing-bounce {
+    0%,
+    80%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.35;
+    }
+    40% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}

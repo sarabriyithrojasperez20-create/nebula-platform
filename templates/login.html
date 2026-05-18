@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Nébula — Iniciar Sesión</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark min-h-screen">
+
+<div id="toast"></div>
+
+<div id="banner-bienvenida"
+  class="hidden fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-primary to-purple-500 text-white text-center py-3 text-sm font-semibold shadow-lg">
+  <span class="material-symbols-outlined text-base align-middle mr-1">check_circle</span>
+  ¡Cuenta creada exitosamente! Inicia sesión para continuar.
+  <button onclick="document.getElementById('banner-bienvenida').classList.add('hidden')"
+    class="ml-4 opacity-70 hover:opacity-100 transition">✕</button>
+</div>
+
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-gradient-radial">
+
+  <header class="flex items-center justify-between whitespace-nowrap px-10 py-6 absolute top-0 left-0 w-full z-10">
+    <div class="flex items-center gap-3 text-slate-900">
+      <div class="size-8 text-primary">
+        <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2 class="text-slate-900 dark:text-slate-100 text-2xl font-bold leading-tight tracking-tight">Nébula</h2>
+    </div>
+
+    <div class="flex items-center gap-8">
+      <nav class="hidden md:flex items-center gap-8"></nav>
+
+      <a href="{{ url_for('crear_cuenta') }}"
+        class="flex min-w-[100px] cursor-pointer items-center justify-center rounded-full h-10 px-6 bg-primary/10 text-primary text-sm font-bold hover:bg-primary/20 transition-all">
+        Sign Up
+      </a>
+    </div>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center px-6 lg:px-20 py-24">
+    <div class="grid lg:grid-cols-2 w-full max-w-[1280px] gap-12 items-center">
+
+      <div class="flex flex-col items-center lg:items-start order-2 lg:order-1">
+        <div class="glass-card p-10 lg:p-12 rounded-3xl shadow-2xl w-full max-w-[520px]">
+
+          <div class="mb-8 text-center lg:text-left">
+            <h1 class="text-slate-900 text-4xl font-extrabold tracking-tight mb-3">Bienvenido a Nébula</h1>
+            <p class="text-slate-600 text-base">Conoce tus retos, conquista tus logros</p>
+          </div>
+
+          <form id="form-login" action="{{ url_for('login') }}" method="POST" class="space-y-5">
+
+            <div class="flex flex-col gap-1">
+              <label class="text-slate-800 text-sm font-semibold ml-1">Correo Electrónico</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-4 text-slate-400">mail</span>
+                <input id="email" name="correo"
+                  class="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 bg-white/60"
+                  placeholder="example@nebula.edu" type="email" autocomplete="email" required>
+              </div>
+              <span class="field-msg" id="msg-email">Ingresa un correo válido.</span>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="text-slate-800 text-sm font-semibold ml-1">Contraseña</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-4 text-slate-400">lock</span>
+                <input id="password" name="password"
+                  class="w-full pl-12 pr-12 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 bg-white/60"
+                  placeholder="••••••••" type="password" autocomplete="current-password" required>
+
+                <button type="button" onclick="togglePass()"
+                  class="absolute right-4 text-slate-400 hover:text-primary transition">
+                  <span class="material-symbols-outlined text-xl" id="pass-icon">visibility</span>
+                </button>
+              </div>
+              <span class="field-msg" id="msg-password">La contraseña es obligatoria.</span>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="recordar" type="checkbox"
+                  class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary">
+                <span class="text-sm text-slate-600">Recordarme</span>
+              </label>
+
+              <a href="#" onclick="mostrarOlvide()" class="text-sm text-primary font-medium hover:underline">
+                Olvidé mi contraseña
+              </a>
+            </div>
+
+            <div class="pt-2">
+              <button id="btn-login" type="submit"
+                class="purple-gradient-btn w-full text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100">
+                <div class="spinner" id="spinner"></div>
+                <span id="btn-texto">Iniciar Sesión</span>
+                <span class="material-symbols-outlined text-xl" id="btn-icon">arrow_forward</span>
+              </button>
+            </div>
+
+          </form>
+
+          <div class="flex items-center gap-3 my-6">
+            <div class="flex-1 h-px bg-slate-200"></div>
+            <span class="text-xs text-slate-400 font-medium">¿No tienes cuenta?</span>
+            <div class="flex-1 h-px bg-slate-200"></div>
+          </div>
+
+          <a href="{{ url_for('crear_cuenta') }}"
+            class="w-full py-3.5 rounded-xl border-2 border-primary/20 text-primary font-bold hover:bg-primary/5 transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-xl">person_add</span>
+            Crear una cuenta
+          </a>
+
+        </div>
+      </div>
+
+      <div class="hidden lg:flex flex-col items-center justify-center order-1 lg:order-2">
+        <div class="relative w-full aspect-square max-w-[600px]">
+          <div class="absolute inset-0 bg-primary/20 blur-[120px] rounded-full"></div>
+
+          <div class="relative z-10 w-full h-full flex items-center justify-center">
+            <div class="w-full h-full bg-cover bg-center bg-no-repeat drop-shadow-2xl"
+              style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCd975-gLIKUhdaSzIMsVuLAtgagpkNpH5giG189YSNFbAeEO5ksz8hZ2JqL3D0Wyp16fixPPCAABJm-hXRa25PfHQMRCt2FmmGlceqVMPxcOWYjKbA70WZTmU230_Vhj8AC4C3lPlI8F4aOpeA0CAleDOONhKKxNMj-lIuSRNiRS8UUqGAaSr8WVY2ZGHyL-2gcSEXOCsoZIZQaqPsXJI6BOnnyl6GePcYN1WTcEmxcSBKYGd9l6KUWmzzTN4XRdyKjmKaNVJaFHs');">
+            </div>
+          </div>
+
+          <div class="float-1 absolute top-10 right-10 w-24 h-24 bg-white/50 backdrop-blur-md rounded-2xl shadow-xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-4xl text-primary">auto_stories</span>
+          </div>
+
+          <div class="float-2 absolute bottom-20 left-0 w-20 h-20 bg-white/50 backdrop-blur-md rounded-full shadow-xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-3xl text-primary">lightbulb</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div class="absolute bottom-0 left-0 w-full h-64 overflow-hidden -z-10 opacity-30 pointer-events-none">
+    <svg class="absolute bottom-0 w-full" viewBox="0 0 1440 320">
+      <path d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,224C960,203,1056,149,1152,144C1248,139,1344,181,1392,202.7L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+        fill="#5d34ef" fill-opacity="0.1"/>
+    </svg>
+  </div>
+</div>
+
+<div id="modal-olvide"
+  class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md space-y-5">
+    <div class="flex items-center justify-between">
+      <h3 class="text-xl font-bold text-slate-900">Recuperar contraseña</h3>
+      <button onclick="cerrarOlvide()" class="text-slate-400 hover:text-slate-700 transition">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <p class="text-slate-500 text-sm">Ingresa tu correo y te enviaremos instrucciones para restablecer tu contraseña.</p>
+
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">mail</span>
+      <input id="email-recuperar" type="email" placeholder="example@nebula.edu"
+        class="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-slate-900">
+    </div>
+
+    <button onclick="enviarRecuperacion()"
+      class="w-full purple-gradient-btn text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">send</span>
+      Enviar instrucciones
+    </button>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="{{ url_for('static', filename='nebula-api.js') }}"></script>
+
+</body>
+</html>

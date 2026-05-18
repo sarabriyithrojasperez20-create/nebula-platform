@@ -1,0 +1,18 @@
+<div class="nb-notif" id="nb-notif-root">
+  <button type="button" class="nb-icon-btn nb-notif__trigger" id="nb-notif-trigger"
+    aria-expanded="false" aria-haspopup="true" aria-label="Notificaciones">
+    <span class="material-symbols-outlined">notifications</span>
+    <span class="nb-notif__badge hidden" id="nb-notif-badge" aria-live="polite">0</span>
+  </button>
+  <div class="nb-notif__panel hidden" id="nb-notif-panel" role="dialog" aria-label="Panel de notificaciones">
+    <header class="nb-notif__header">
+      <h3>Notificaciones</h3>
+      <button type="button" class="nb-notif__mark-all" id="nb-notif-mark-all">Marcar todas</button>
+    </header>
+    <ul class="nb-notif__list" id="nb-notif-list" role="list"></ul>
+    <footer class="nb-notif__footer">
+      <button type="button" class="nb-notif__footer-link" id="nb-notif-ver-todas">Ver todas las notificaciones</button>
+    </footer>
+  </div>
+</div>
+<div id="nb-notif-toast-host" class="nb-notif-toast-host" aria-live="polite"></div>

@@ -1,0 +1,582 @@
+[
+  {
+    "session_id": "550d2ede-7f23-4f63-9a8c-b9b00b277274",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:01:42.746380"
+      }
+    ],
+    "creada_at": "2026-05-17T00:01:42.746410",
+    "actualizada_at": "2026-05-17T00:01:42.746416"
+  },
+  {
+    "session_id": "8511372f-a4be-4b5f-bad5-5aa2f110bc9c",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:03:07.884161"
+      }
+    ],
+    "creada_at": "2026-05-17T00:03:07.884184",
+    "actualizada_at": "2026-05-17T00:03:07.884189"
+  },
+  {
+    "session_id": "8a118ec0-c4b2-44d4-8225-674081567b4a",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:05:59.737159"
+      }
+    ],
+    "creada_at": "2026-05-17T00:05:59.737216",
+    "actualizada_at": "2026-05-17T00:05:59.737223"
+  },
+  {
+    "session_id": "cdea727f-b33a-494e-8c4f-b669561ac426",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:11:18.551226"
+      },
+      {
+        "role": "user",
+        "content": "Explica de forma clara y simplificada el concepto central del tema actual (Cálculo II: Series de Taylor). Incluye un ejemplo y una analogía.",
+        "created_at": "2026-05-17T00:31:01.517074"
+      },
+      {
+        "role": "user",
+        "content": "Genera un mini cuestionario de exactamente 5 preguntas sobre el tema actual (Cálculo II: Series de Taylor), con opciones A-D y al final las respuestas correctas brevemente.",
+        "created_at": "2026-05-17T00:31:02.975208"
+      },
+      {
+        "role": "user",
+        "content": "Genera un resumen del día de estudio sobre el tema (Cálculo II: Series de Taylor): puntos clave, fórmulas importantes si aplican, y 3 ideas para repasar mañana.",
+        "created_at": "2026-05-17T00:31:04.370498"
+      }
+    ],
+    "creada_at": "2026-05-17T00:11:18.551248",
+    "actualizada_at": "2026-05-17T00:31:04.370520"
+  },
+  {
+    "session_id": "dab5c82a-76ee-491c-b71b-63a6e1a9fc71",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:11:22.838428"
+      },
+      {
+        "role": "user",
+        "content": "HOLA ME PUEDES AYUADR",
+        "created_at": "2026-05-17T00:11:30.217912"
+      },
+      {
+        "role": "assistant",
+        "content": "Entiendo tu pregunta sobre **Cálculo II: Series de Taylor**. HOLA ME PUEDES AYUADR\n\nTe recomiendo desglosar el problema en pasos: definiciones → ejemplo → verificación. ¿Prefieres una explicación intuitiva o formal?\n\n_Conecta `OPENAI_API_KEY` en el servidor para respuestas completas con IA._",
+        "created_at": "2026-05-17T00:11:30.505585"
+      },
+      {
+        "role": "user",
+        "content": "QUIERO SABEER COMO HAGO UNA ECUACION EN ALEJEBAGRA",
+        "created_at": "2026-05-17T00:12:15.529548"
+      },
+      {
+        "role": "assistant",
+        "content": "Entiendo tu pregunta sobre **Cálculo II: Series de Taylor**. QUIERO SABEER COMO HAGO UNA ECUACION EN ALEJEBAGRA\n\nTe recomiendo desglosar el problema en pasos: definiciones → ejemplo → verificación. ¿Prefieres una explicación intuitiva o formal?\n\n_Conecta `OPENAI_API_KEY` en el servidor para respuestas completas con IA._",
+        "created_at": "2026-05-17T00:12:15.837091"
+      }
+    ],
+    "creada_at": "2026-05-17T00:11:22.838456",
+    "actualizada_at": "2026-05-17T00:12:15.837118"
+  },
+  {
+    "session_id": "94395c3b-0489-4395-9d24-e76d2ab1507b",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:26:37.366001"
+      }
+    ],
+    "creada_at": "2026-05-17T00:26:37.366059",
+    "actualizada_at": "2026-05-17T00:26:37.366065"
+  },
+  {
+    "session_id": "b1e08f8e-555b-4d29-92c3-6e67f78e65f7",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:29:33.985966"
+      }
+    ],
+    "creada_at": "2026-05-17T00:29:33.986052",
+    "actualizada_at": "2026-05-17T00:29:33.986058"
+  },
+  {
+    "session_id": "666d3771-12de-43d1-b4c6-7c32ac49d0ee",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:29:45.008579"
+      }
+    ],
+    "creada_at": "2026-05-17T00:29:45.008605",
+    "actualizada_at": "2026-05-17T00:29:45.008612"
+  },
+  {
+    "session_id": "de96074b-4ffd-4383-bf17-c4232da80c45",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:30:39.008637"
+      }
+    ],
+    "creada_at": "2026-05-17T00:30:39.008661",
+    "actualizada_at": "2026-05-17T00:30:39.008666"
+  },
+  {
+    "session_id": "a61cdf3a-a17c-4355-b58d-3ecd1e348ca9",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T00:45:28.063628"
+      }
+    ],
+    "creada_at": "2026-05-17T00:45:28.063649",
+    "actualizada_at": "2026-05-17T00:45:28.063655"
+  },
+  {
+    "session_id": "960c5d1b-4ed5-46ed-ab88-c7aca9b761ac",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T13:43:08.271971"
+      },
+      {
+        "role": "user",
+        "content": "hola",
+        "created_at": "2026-05-17T13:43:13.453565"
+      }
+    ],
+    "creada_at": "2026-05-17T13:43:08.271983",
+    "actualizada_at": "2026-05-17T13:43:13.453574"
+  },
+  {
+    "session_id": "0be5d55a-3021-4312-a7c3-b3707b9df746",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T14:27:25.137504"
+      }
+    ],
+    "creada_at": "2026-05-17T14:27:25.137516",
+    "actualizada_at": "2026-05-17T14:27:25.137519"
+  },
+  {
+    "session_id": "0093d1fa-1696-4a8e-94d1-07a6e06db9dd",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T14:27:56.526461"
+      }
+    ],
+    "creada_at": "2026-05-17T14:27:56.526474",
+    "actualizada_at": "2026-05-17T14:27:56.526477"
+  },
+  {
+    "session_id": "3ba10857-f960-442e-bbf3-c694860d44ec",
+    "id_usuario": 5,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "0 lecciones completadas; curso destacado: Algoritmos y lógica (0%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T14:39:43.738660"
+      }
+    ],
+    "creada_at": "2026-05-17T14:39:43.738680",
+    "actualizada_at": "2026-05-17T14:39:43.738685"
+  },
+  {
+    "session_id": "bb2fa10d-8d15-474e-a77d-c6d786aad642",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T15:25:33.107097"
+      }
+    ],
+    "creada_at": "2026-05-17T15:25:33.107119",
+    "actualizada_at": "2026-05-17T15:25:33.107123"
+  },
+  {
+    "session_id": "d5e288b2-f22b-4f0b-9d5d-df56111886a6",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T15:34:12.292213"
+      }
+    ],
+    "creada_at": "2026-05-17T15:34:12.292229",
+    "actualizada_at": "2026-05-17T15:34:12.292234"
+  },
+  {
+    "session_id": "b9afc3d9-6a62-4a8d-b994-86e3ca913c16",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T17:56:35.608318"
+      }
+    ],
+    "creada_at": "2026-05-17T17:56:35.608354",
+    "actualizada_at": "2026-05-17T17:56:35.608363"
+  },
+  {
+    "session_id": "7a2d159a-06e1-4ffc-a3bb-55942b9aa7cb",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T18:37:57.660823"
+      },
+      {
+        "role": "user",
+        "content": "hola",
+        "created_at": "2026-05-17T18:38:01.709354"
+      }
+    ],
+    "creada_at": "2026-05-17T18:37:57.660850",
+    "actualizada_at": "2026-05-17T18:38:01.709378"
+  },
+  {
+    "session_id": "16023cf6-8a95-4997-a7c1-56e54602e6e6",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T18:41:45.578762"
+      }
+    ],
+    "creada_at": "2026-05-17T18:41:45.578785",
+    "actualizada_at": "2026-05-17T18:41:45.578790"
+  },
+  {
+    "session_id": "9381bb7d-5708-4aaf-8890-b82a840fb1e2",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T18:59:26.994316"
+      }
+    ],
+    "creada_at": "2026-05-17T18:59:26.994329",
+    "actualizada_at": "2026-05-17T18:59:26.994332"
+  },
+  {
+    "session_id": "bd1c6cb4-c40d-4a00-af43-cc35a75f2052",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T19:14:06.995304"
+      },
+      {
+        "role": "user",
+        "content": "HOLA",
+        "created_at": "2026-05-17T19:14:11.854437"
+      },
+      {
+        "role": "user",
+        "content": "HOLA",
+        "created_at": "2026-05-17T19:14:30.617132"
+      }
+    ],
+    "creada_at": "2026-05-17T19:14:06.995315",
+    "actualizada_at": "2026-05-17T19:14:30.617143"
+  },
+  {
+    "session_id": "b5e685a4-9fe0-44b4-8ed2-2dcc7f1ad63d",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T19:14:58.203731"
+      },
+      {
+        "role": "user",
+        "content": "HOLA",
+        "created_at": "2026-05-17T19:15:01.531677"
+      },
+      {
+        "role": "user",
+        "content": "Genera un resumen del día de estudio sobre el tema (Cálculo II: Series de Taylor): puntos clave, fórmulas importantes si aplican, y 3 ideas para repasar mañana.",
+        "created_at": "2026-05-17T19:15:32.678050"
+      },
+      {
+        "role": "user",
+        "content": "Explica de forma clara y simplificada el concepto central del tema actual (Cálculo II: Series de Taylor). Incluye un ejemplo y una analogía.",
+        "created_at": "2026-05-17T19:15:35.485940"
+      }
+    ],
+    "creada_at": "2026-05-17T19:14:58.203760",
+    "actualizada_at": "2026-05-17T19:15:35.485951"
+  },
+  {
+    "session_id": "ef1ae3bb-2fb1-4485-8ea0-04668af0f16b",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T19:20:36.867431"
+      }
+    ],
+    "creada_at": "2026-05-17T19:20:36.867443",
+    "actualizada_at": "2026-05-17T19:20:36.867445"
+  },
+  {
+    "session_id": "bf4e464e-db59-4ab4-b0fa-29443929ae3a",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T19:20:42.366027"
+      },
+      {
+        "role": "user",
+        "content": "HOLA",
+        "created_at": "2026-05-17T19:20:47.366937"
+      }
+    ],
+    "creada_at": "2026-05-17T19:20:42.366039",
+    "actualizada_at": "2026-05-17T19:20:47.366967"
+  },
+  {
+    "session_id": "b0573228-f0f8-473d-9c53-ebbea911f245",
+    "id_usuario": 2,
+    "titulo": "Cálculo II: Series de Taylor",
+    "contexto": {
+      "titulo": "Cálculo II: Series de Taylor",
+      "materia": "matematicas",
+      "descripcion": "Series de Taylor y Maclaurin, convergencia y aplicaciones",
+      "progreso_resumen": "2 lecciones completadas; curso destacado: Fundamentos de álgebra (25%)."
+    },
+    "mensajes": [
+      {
+        "role": "assistant",
+        "content": "¡Hola! Soy **Nébula**, tu tutor de Cálculo II: Series de Taylor. Puedo explicar conceptos, resolver dudas paso a paso, generar ejemplos, mini cuestionarios y resúmenes. ¿En qué te ayudo hoy?",
+        "created_at": "2026-05-17T19:46:15.593228"
+      },
+      {
+        "role": "user",
+        "content": "HOLA",
+        "created_at": "2026-05-17T19:46:19.358436"
+      }
+    ],
+    "creada_at": "2026-05-17T19:46:15.593240",
+    "actualizada_at": "2026-05-17T19:46:19.358452"
+  }
+]

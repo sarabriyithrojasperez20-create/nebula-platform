@@ -1,0 +1,52 @@
+/**
+ * Plan de estudios — racha diaria, heatmap, widget streak
+ */
+
+.plan-estudios-page .plan-estudios-streak {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 55%, var(--accent-color) 100%);
+    box-shadow: 0 8px 24px var(--primary-color-22);
+}
+
+.streak-day-active {
+    background: linear-gradient(135deg, var(--streak-orange-start), var(--streak-orange-end));
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+}
+
+.streak-day-today {
+    ring: 2px;
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* Botón registrar actividad (tarjeta morada) */
+.plan-estudios-page #btn-registrar-actividad {
+    background-color: var(--primary-color-active) !important;
+    color: #ffffff !important;
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.plan-estudios-page #btn-registrar-actividad:hover:not(:disabled) {
+    background-color: #4c3599 !important;
+    border-color: rgba(255, 255, 255, 0.65) !important;
+    transform: scale(1.02);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.plan-estudios-page #btn-registrar-actividad:disabled {
+    cursor: default;
+    opacity: 0.92;
+}
+
+.plan-estudios-page #btn-registrar-actividad.is-registered {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+    border-color: rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.25);
+}
+
+.plan-estudios-page #btn-registrar-actividad.is-loading {
+    opacity: 0.75;
+    pointer-events: none;
+}

@@ -1,0 +1,102 @@
+[
+    {
+        "id_usuario": 2,
+        "slug": "fundamentos-algebra",
+        "nivel": "avanzado",
+        "titulo_nivel": "Nivel avanzado",
+        "porcentaje": 100,
+        "correctas": 5,
+        "total": 5,
+        "errores_por_leccion": {},
+        "detalle": [
+            {
+                "indice": 0,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "intro-ecuaciones-lineales"
+            },
+            {
+                "indice": 1,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "sistemas-ecuaciones-2x2"
+            },
+            {
+                "indice": 2,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "funciones-cuadraticas"
+            },
+            {
+                "indice": 3,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "operaciones-polinomios"
+            },
+            {
+                "indice": 4,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "operaciones-polinomios"
+            }
+        ],
+        "fecha": "2026-05-15 15:43",
+        "id_diagnostico": 1
+    },
+    {
+        "id_usuario": 2,
+        "slug": "biologia-molecular",
+        "nivel": "avanzado",
+        "titulo_nivel": "Nivel avanzado",
+        "porcentaje": 80,
+        "correctas": 4,
+        "total": 5,
+        "errores_por_leccion": {
+            "doble-helice-replicacion": 1
+        },
+        "detalle": [
+            {
+                "indice": 0,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "estructura-adn"
+            },
+            {
+                "indice": 1,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "estructura-adn"
+            },
+            {
+                "indice": 2,
+                "elegida": "C",
+                "correcta": "A",
+                "acierto": false,
+                "leccion_id": "doble-helice-replicacion"
+            },
+            {
+                "indice": 3,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "organulos-metabolismo"
+            },
+            {
+                "indice": 4,
+                "elegida": "A",
+                "correcta": "A",
+                "acierto": true,
+                "leccion_id": "mutaciones-expresion"
+            }
+        ],
+        "fecha": "2026-05-15 15:45",
+        "id_diagnostico": 2
+    }
+]

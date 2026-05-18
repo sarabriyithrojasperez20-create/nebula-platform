@@ -1,0 +1,7 @@
+<a href="{{ url_for('perfil') }}"
+    class="perfil-avatar-link {{ link_class|default('block shrink-0') }}"
+    aria-label="Ir al perfil">
+    {% with avatar_class=img_class|default('aspect-square rounded-full size-9 object-cover') %}
+    {% include 'partials/estudiante_avatar.html' %}
+    {% endwith %}
+</a>

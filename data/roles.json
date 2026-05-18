@@ -1,0 +1,12 @@
+[
+  {
+    "id_rol": 1,
+    "nombre_rol": "administrador",
+    "descripcion": "Usuario encargado de gestionar cursos, usuarios, contenidos y reportes."
+  },
+  {
+    "id_rol": 2,
+    "nombre_rol": "estudiante",
+    "descripcion": "Usuario que accede a los cursos, lecciones, actividades y seguimiento de progreso."
+  }
+]

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<title>Nébula — Perfil administrador</title>
+{% include 'partials/admin_head.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile-admin.css') }}">
+</head>
+<body class="nb-admin nb-page-enter">
+{% include 'partials/admin_sidebar.html' %}
+<main class="nb-main">
+{% include 'partials/admin_header.html' %}
+<div class="nb-canvas">
+{% include 'partials/admin_perfil_content.html' %}
+</div>
+</main>
+{% include 'partials/admin_foot_scripts.html' %}
+<script src="{{ url_for('static', filename='js/nebula-avatar-upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nebula-admin-perfil.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin-nav.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin-shell.js') }}"></script>
+</body>
+</html>

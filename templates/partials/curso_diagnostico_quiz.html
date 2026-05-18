@@ -1,0 +1,94 @@
+{% if quiz_diagnostico %}
+<section id="diagnostico" class="leccion-quiz-section curso-diagnostico-section scroll-mt-24">
+    {% if diagnostico_completado and diagnostico %}
+    <div class="curso-diagnostico-resultado curso-detalle-card p-6 sm:p-8 mb-8">
+        <div class="flex flex-wrap items-start gap-4">
+            <div class="size-14 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-3xl text-primary">verified</span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-primary uppercase tracking-wider mb-1">Diagnóstico completado</p>
+                <h2 class="text-xl font-bold text-white mb-1">{{ diagnostico.titulo_nivel or curso.diagnostico_titulo_nivel }}</h2>
+                <p class="text-sm text-slate-400 mb-3">Puntaje: {{ diagnostico.porcentaje }}% — {{ curso.diagnostico_mensaje or '' }}</p>
+                <p class="text-xs text-slate-500">Tu ruta de lecciones está personalizada según este resultado.</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div id="diag-intro-wrap" class="leccion-quiz-intro-wrap">
+        <div class="leccion-quiz-intro-card curso-diagnostico-intro">
+            <h2>Quiz diagnóstico</h2>
+            <p class="subtitle">{{ quiz_diagnostico.titulo_tema }}</p>
+            <p class="desc">Antes de iniciar las lecciones, responde {{ quiz_diagnostico.preguntas|length }} preguntas para conocer tu nivel y personalizar tu ruta de estudio.</p>
+            <button type="button" id="diag-start-btn" class="leccion-quiz-btn-primary">
+                <span class="material-symbols-outlined">quiz</span>
+                Realizar quiz diagnóstico
+            </button>
+        </div>
+    </div>
+
+    <div id="diag-active-wrap" class="leccion-quiz-active">
+        <div class="leccion-quiz-progress-card">
+            <div class="leccion-quiz-progress-top">
+                <span id="diag-counter" class="counter">Pregunta 1 de {{ quiz_diagnostico.preguntas|length }}</span>
+                <span id="diag-percent" class="percent">0%</span>
+            </div>
+            <div class="leccion-quiz-progress-bar">
+                <div id="diag-progress-fill" class="leccion-quiz-progress-bar-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="leccion-quiz-layout">
+            <div>
+                <article class="leccion-quiz-question-card">
+                    <span id="diag-type-badge" class="leccion-quiz-type-badge">Opción múltiple</span>
+                    <h3 id="diag-question"></h3>
+                    <div id="diag-options" class="leccion-quiz-options"></div>
+                    <div id="diag-feedback" class="leccion-quiz-feedback"></div>
+                    <div class="leccion-quiz-actions">
+                        <button type="button" id="diag-prev-btn" class="leccion-quiz-btn-secondary" disabled>
+                            <span class="material-symbols-outlined text-lg">arrow_back</span>
+                            Anterior
+                        </button>
+                        <button type="button" id="diag-submit-btn" class="leccion-quiz-btn-primary">
+                            Enviar respuesta
+                        </button>
+                        <button type="button" id="diag-next-btn" class="leccion-quiz-btn-primary" style="display: none;">
+                            Siguiente pregunta
+                        </button>
+                    </div>
+                </article>
+            </div>
+            <aside class="leccion-quiz-assistant">
+                <div class="leccion-quiz-assistant-header">
+                    <div class="leccion-quiz-assistant-icon">
+                        <span class="material-symbols-outlined">psychology</span>
+                    </div>
+                    <div>
+                        <h4>Diagnóstico Nébula</h4>
+                    </div>
+                </div>
+                <p>Evaluamos tu punto de partida para recomendar las lecciones que más necesitas.</p>
+                <div id="diag-hint-box" class="leccion-quiz-hint-box"></div>
+                <div class="leccion-quiz-assistant-btns">
+                    <button type="button" id="diag-show-hint">Mostrar pista</button>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="diag-summary" class="leccion-quiz-summary">
+        <div class="score-circle" id="diag-summary-score">0%</div>
+        <h3 id="diag-summary-title">Resultado del diagnóstico</h3>
+        <p id="diag-summary-nivel" class="text-primary font-bold text-lg"></p>
+        <p id="diag-summary-text"></p>
+        <p id="diag-summary-detail" class="text-sm"></p>
+        <div class="flex flex-wrap justify-center gap-3 mt-4">
+            <button type="button" id="diag-finish-btn" class="leccion-quiz-btn-primary" disabled>
+                Ver mi ruta de lecciones
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endif %}

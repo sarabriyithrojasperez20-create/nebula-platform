@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Nébula - Panel del estudiante</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+         <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendario-modal.css') }}">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6a4bd8",
+                        "primary-light": "#7a5cf0",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#151220",
+                        "nebula-blue": "#eaf3ff",
+                        "nebula-blue-dark": "#d7e7ff",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 flex-shrink-0 border-r border-primary/10 bg-white dark:bg-slate-900 hidden lg:flex flex-col h-full min-h-0 overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center gap-3">
+                    <div class="size-10 rounded-xl bg-primary flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined">filter_drama</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-primary leading-tight" >Nébula</h1>
+                        <p class="text-xs text-slate-500 font-medium" >Plataforma academica</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 space-y-2 mt-4">
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/5 transition-colors sidebar-active"
+                    href="#" >
+                    <span class="material-symbols-outlined" >dashboard</span>
+                    <span class="font-medium text-sm" >Panel</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/5 transition-colors text-slate-600 dark:text-slate-400"
+                href="{{ url_for('mis_cursos') }}">
+                    <span class="material-symbols-outlined">book_4</span>
+                    <span class="font-medium text-sm">Mis cursos</span>
+                </a>
+               <a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/5 transition-colors text-slate-600 dark:text-slate-400"
+               href="{{ url_for('plan_estudios') }}">
+                <div class="menu-item">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <span>Plan de estudios</span>
+            </div>
+            </a>
+               <a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/5 transition-colors text-slate-600 dark:text-slate-400"
+                href="{{ url_for('progreso') }}">
+                    <span class="material-symbols-outlined">insights</span>
+                    <span class="font-medium text-sm">Progreso</span>
+                </a>
+
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/5 transition-colors text-slate-600 dark:text-slate-400"
+                href="{{ url_for('tutor_ai') }}">
+                    
+                <div class="menu-item">
+                    <span class="material-symbols-outlined">smart_toy</span>
+                    <span>Tutor IA</span>
+                </div>
+                </a>
+            </nav>
+            <div class="p-4 flex-shrink-0 pb-5">
+                <div class="bg-primary/10 rounded-2xl p-4 border border-primary/20">
+                    <p class="text-xs font-semibold text-primary uppercase tracking-wider mb-2" >Plan Pro</p>
+                    <p class="text-xs text-slate-600 mb-3">Acceso ilimitado al tutor con IA.</p>
+                    <button
+                        class="w-full py-2 bg-primary text-white text-xs font-bold rounded-lg shadow-lg shadow-primary/20"
+                       >Mejorar plan</button>
+                </div>
+
+                <div class="flex items-center gap-3 mt-6 px-2">
+                    <a href="{{ url_for('perfil') }}" class="perfil-avatar-link block shrink-0" aria-label="Ir al perfil">
+                        {% with avatar_class='size-10 rounded-full object-cover', avatar_alt='Avatar de ' ~ nombre %}
+                        {% include 'partials/estudiante_avatar.html' %}
+                        {% endwith %}
+                    </a>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold truncate">{{ nombre }}</p>
+                        <p class="text-[10px] text-slate-500">Estudiante ID: #{{ session.id_usuario }}</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}"
+                    class="flex items-center gap-2 mt-4 px-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                    Cerrar sesión
+                </a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="dashboard-main flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+            <div class="dashboard-main__inner mx-auto w-full px-6 lg:px-8 py-6 lg:py-8">
+                <header class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+                    <div class="min-w-0 flex-1">
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">¡Hola, {{ nombre }}!
+                        </h2>
+                        <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-xl leading-relaxed">¿Listo para
+                            continuar tu recorrido de aprendizaje hoy? Tu mente es una nebulosa de posibilidades.</p>
+                    </div>
+                    <div class="dashboard-card flex items-center gap-3 px-4 py-3 shrink-0 self-start sm:self-center">
+                        <div class="size-11 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
+                            <span class="material-symbols-outlined">local_fire_department</span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-500">Racha diaria</p>
+                            <p class="text-base font-bold text-slate-900">{{ racha_actual }} días</p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="space-y-6 lg:space-y-8">
+                    <section>
+                        <div class="flex items-center justify-between gap-3 mb-4">
+                                <h3 class="text-lg font-bold text-slate-900">Clases activas</h3>
+                                <a href="{{ url_for('mis_cursos') }}"
+                                    class="text-sm font-semibold text-primary hover:opacity-90 shrink-0">Ver todo</a>
+                            </div>
+                            <div class="dashboard-classes-grid">
+                                {% if clases_activas %}
+                                {% for item in clases_activas %}
+                                <article class="dash-class-card dash-class-card--{{ item.color_theme }}">
+                                    <div class="dash-class-card__top">
+                                        <div class="dash-class-card__icon">
+                                            <span class="material-symbols-outlined text-2xl">{{ item.icono }}</span>
+                                        </div>
+                                        <div class="dash-class-card__badges">
+                                            <span class="dash-badge dash-badge--{{ item.badge }}">{{ item.dificultad }}</span>
+                                            {% if item.ia_recomendado %}
+                                            <span class="dash-badge dash-badge--ia">
+                                                <span class="material-symbols-outlined text-[12px]">auto_awesome</span>
+                                                Recomendado
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="dash-class-card__body">
+                                        <h4 class="dash-class-card__title">{{ item.titulo }}</h4>
+                                        <p class="dash-class-card__meta">{{ item.estado_curso }} · {{ item.proxima_leccion }}</p>
+                                        <div class="dash-class-card__stats">
+                                            <div class="dash-class-stat">
+                                                <span>Progreso</span>
+                                                <strong>{{ item.porcentaje }}%</strong>
+                                            </div>
+                                            <div class="dash-class-stat">
+                                                <span>Tiempo est.</span>
+                                                <strong>{{ item.tiempo_restante }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="dash-class-card__progress-head">
+                                            <span>Avance del curso</span>
+                                            <em>{{ item.porcentaje }}%</em>
+                                        </div>
+                                        <div class="dashboard-progress-track">
+                                            <div class="dashboard-progress-fill" style="width: {{ item.porcentaje }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="dash-class-card__footer">
+                                        <a href="{{ url_for('mis_cursos') }}" class="dash-class-card__cta">
+                                            Continuar
+                                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                                        </a>
+                                    </div>
+                                </article>
+                                {% endfor %}
+                                {% else %}
+                                <div class="sm:col-span-2 dashboard-card p-8 text-center">
+                                    <span class="material-symbols-outlined text-4xl text-primary mb-3">school</span>
+                                    <p class="text-sm font-semibold text-slate-700">No tienes clases activas</p>
+                                    <p class="text-xs text-slate-500 mt-1">Asigna cursos desde Mis cursos para ver tu progreso aquí.</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </section>
+
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                        <section class="dashboard-card p-5 sm:p-6">
+                            <div class="flex items-center gap-2 mb-5">
+                                <span class="material-symbols-outlined text-primary text-xl">event_note</span>
+                                <h3 class="text-base font-bold text-slate-900">Próximas evaluaciones</h3>
+                            </div>
+                            {% if evaluaciones %}
+                            <ul id="dashboard-eval-list" class="space-y-3">
+                                {% for ev in evaluaciones %}
+                                <li>
+                                    <div class="dashboard-eval-row flex items-center gap-3 p-3 rounded-xl transition-colors">
+                                        <div class="bg-white px-2.5 py-2 rounded-lg text-center shadow-sm border border-slate-100 shrink-0 min-w-[3rem]">
+                                            <p class="text-[10px] font-bold text-primary uppercase leading-none">{{ ev.mes|default('â€”') }}</p>
+                                            <p class="text-lg font-black text-slate-900 leading-tight mt-0.5">{{ ev.dia|default('â€”') }}</p>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h5 class="text-sm font-bold text-slate-900 truncate">{{ ev.titulo }}</h5>
+                                            <p class="text-[11px] text-slate-500 truncate">{{ ev.descripcion|default('') }}</p>
+                                        </div>
+                                        <span class="material-symbols-outlined text-slate-400 text-xl shrink-0">chevron_right</span>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <div class="py-4 text-center">
+                                <p class="text-sm font-semibold text-slate-700">No hay evaluaciones próximas</p>
+                                <p class="text-xs text-slate-500 mt-1">Tus evaluaciones programadas se mostrarán aquí.</p>
+                            </div>
+                            {% endif %}
+                            <button type="button" data-nb-cal-open
+                                class="dash-btn-calendario w-full mt-5 py-2.5 border-2 border-dashed border-primary/25 rounded-xl text-primary text-sm font-bold hover:bg-primary/5 transition-colors">
+                                <span class="material-symbols-outlined text-lg align-middle mr-1">event_available</span>
+                                Añadir al calendario
+                            </button>
+                        </section>
+
+                        <section class="dashboard-ai-card text-white rounded-2xl p-5 sm:p-6 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-28 h-28 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl pointer-events-none">
+                            </div>
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="material-symbols-outlined">auto_awesome</span>
+                                    <h3 class="text-base font-bold">Asistente IA</h3>
+                                </div>
+                                {% if tiene_cursos %}
+                                <p class="text-sm text-white/90 leading-relaxed">Sigue con tus cursos asignados. Cada lección completada suma a tu progreso personal.</p>
+                                {% else %}
+                                <p class="text-sm text-white/90 leading-relaxed">Aún no tienes cursos asignados. Explora el catálogo y elige por dónde quieres empezar.</p>
+                                {% endif %}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+    {% include 'partials/calendario_modal.html' %}
+    <script type="application/json" id="nebula-calendario-boot">{{ {'eventos': eventos_calendario, 'materias': materias_calendario} | tojson }}</script>
+    {% include 'partials/nebula_user_boot.html' %}
+    <script src="{{ url_for('static', filename='js/nebula-calendario.js') }}" defer></script>
+</body>
+
+</html>

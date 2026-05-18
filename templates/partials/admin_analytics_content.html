@@ -1,0 +1,161 @@
+{% set m = analytics.metricas %}
+<div class="nb-canvas admin-analytics-root" id="analytics-root" data-periodo-dias="{{ m.periodo_dias|default(30) }}">
+  <div class="aa-loading hidden" id="analytics-loading" aria-live="polite">
+    <span class="aa-loading__spinner"></span>
+    <span>Actualizando datos…</span>
+  </div>
+
+  <header class="aa-page-header">
+    <div class="aa-page-header__text">
+      <h2>Análisis y estadísticas</h2>
+      <p>Visualiza el rendimiento de la plataforma · <span data-analytics-period-label>{{ m.periodo_etiqueta|default('Último mes') }}</span></p>
+    </div>
+    <div class="aa-page-header__actions">
+      <div class="aa-select-wrap">
+        <select id="analytics-periodo" class="aa-select" aria-label="Periodo" {% if analytics.periodo %}data-initial="{{ analytics.periodo.dias }}"{% endif %}>
+          <option value="7" {% if m.periodo_dias == 7 %}selected{% endif %}>Últimos 7 días</option>
+          <option value="30" {% if m.periodo_dias|default(30) == 30 %}selected{% endif %}>Último mes</option>
+          <option value="365" {% if m.periodo_dias == 365 %}selected{% endif %}>Último año</option>
+        </select>
+        <span class="material-symbols-outlined aa-select-icon">expand_more</span>
+      </div>
+      <button type="button" id="analytics-exportar" class="aa-btn-export">
+        <span class="material-symbols-outlined" id="analytics-exportar-icon">picture_as_pdf</span>
+        <span id="analytics-exportar-label">Exportar reporte</span>
+      </button>
+      <button type="button" id="analytics-exportar-uno" class="aa-btn-ghost" title="Exportar un estudiante">
+        <span class="material-symbols-outlined">person</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="aa-kpi-grid" aria-label="Indicadores principales" id="analytics-kpis">
+    <a href="{{ url_for('admin') }}" data-admin-open-panel="usuarios" class="aa-kpi-card">
+      <div class="aa-kpi-card__icon"><span class="material-symbols-outlined">group</span></div>
+      <p class="aa-kpi-card__label">Estudiantes activos</p>
+      <p class="aa-kpi-card__value" data-kpi="usuarios_activos">{{ m.usuarios_activos }}</p>
+      <p class="aa-kpi-card__hint"><span data-kpi-hint="total_estudiantes">{{ m.total_estudiantes }}</span> registrados</p>
+    </a>
+    <a href="{{ url_for('admin') }}" data-admin-open-panel="cursos" class="aa-kpi-card">
+      <div class="aa-kpi-card__icon"><span class="material-symbols-outlined">school</span></div>
+      <p class="aa-kpi-card__label">Cursos activos</p>
+      <p class="aa-kpi-card__value" data-kpi="cursos_activos">{{ m.cursos_activos }}</p>
+      <p class="aa-kpi-card__hint"><span data-kpi-hint="cursos_completados">{{ m.cursos_completados }}</span> completados</p>
+    </a>
+    <article class="aa-kpi-card">
+      <div class="aa-kpi-card__icon"><span class="material-symbols-outlined">check_circle</span></div>
+      <p class="aa-kpi-card__label">Lecciones en periodo</p>
+      <p class="aa-kpi-card__value" data-kpi="lecciones_completadas">{{ m.lecciones_completadas }}</p>
+      <p class="aa-kpi-card__hint">Completadas en el rango</p>
+    </article>
+    <article class="aa-kpi-card">
+      <div class="aa-kpi-card__icon"><span class="material-symbols-outlined">quiz</span></div>
+      <p class="aa-kpi-card__label">Quizzes en periodo</p>
+      <p class="aa-kpi-card__value" data-kpi="total_evaluaciones">{{ m.total_evaluaciones }}</p>
+      <p class="aa-kpi-card__hint">Evaluaciones realizadas</p>
+    </article>
+    <article class="aa-kpi-card">
+      <div class="aa-kpi-card__icon"><span class="material-symbols-outlined">trending_up</span></div>
+      <p class="aa-kpi-card__label">Progreso global</p>
+      <p class="aa-kpi-card__value" data-kpi="progreso_general">{{ m.progreso_general }}%</p>
+      <p class="aa-kpi-card__hint">Promedio plataforma</p>
+    </article>
+  </section>
+
+  <section class="aa-charts-row">
+    <article class="aa-panel aa-panel--chart aa-panel--wide">
+      <div class="aa-panel__head">
+        <h3>Actividad en el periodo</h3>
+        <span class="aa-legend"><i></i> Eventos del sistema</span>
+      </div>
+      <div class="aa-bar-chart" id="analytics-barras">
+        {% for barra in analytics.barras_semana %}
+        <div class="aa-bar-chart__col">
+          <div class="aa-bar-chart__bar" style="height: {{ barra.altura }}%;" title="{{ barra.valor|default('') }}"></div>
+          <span>{{ barra.etiqueta }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </article>
+    <article class="aa-panel aa-panel--chart">
+      <div class="aa-panel__head"><h3>Usuarios por grado</h3></div>
+      <div class="aa-donut">
+        <svg viewBox="0 0 36 36" class="aa-donut__svg" id="analytics-donut-svg">
+          <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="rgba(109,74,255,0.12)" stroke-width="3.5"/>
+          {% for seg in analytics.donut_segmentos %}
+          <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="{{ seg.stroke }}" stroke-width="3.5"
+            stroke-dasharray="{{ seg.dasharray }}" stroke-dashoffset="{{ seg.dashoffset }}" stroke-linecap="round"/>
+          {% endfor %}
+        </svg>
+        <ul class="aa-donut__legend" id="analytics-donut-legend">
+          {% for g in analytics.distribucion_grado.por_grado %}
+          <li><i style="background:{{ g.color }}"></i>{{ g.nombre }} <b>{{ g.porcentaje }}%</b></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <section class="aa-bottom-grid">
+    <article class="aa-panel">
+      <div class="aa-panel__head"><h3>Actividad reciente</h3></div>
+      <ul class="aa-activity-list" id="analytics-actividad">
+        {% for act in analytics.actividad_reciente %}
+        <li>
+          <span class="material-symbols-outlined">{{ act.icono }}</span>
+          <div><strong>{{ act.titulo }}</strong><p>{{ act.descripcion }}</p></div>
+          <time>{{ act.relativo }}</time>
+        </li>
+        {% else %}
+        <li class="aa-empty">Sin actividad en este periodo.</li>
+        {% endfor %}
+      </ul>
+    </article>
+    <article class="aa-panel aa-panel--table">
+      <div class="aa-panel__head">
+        <h3>Avance por estudiante</h3>
+        <a href="{{ url_for('admin') }}" data-admin-open-panel="usuarios">Ver todo</a>
+      </div>
+      <div class="aa-table-wrap">
+        <table class="aa-table">
+          <thead>
+            <tr>
+              <th>Estudiante</th>
+              <th>Lecciones</th>
+              <th>Quizzes</th>
+              <th>Progreso</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-estudiantes-body">
+            {% for fila in analytics.rendimiento_estudiantes %}
+            <tr>
+              <td>
+                <div class="aa-table-user">
+                  {% with avatar_url=fila.avatar_url, avatar_alt=fila.nombre, avatar_class='aa-table-user__avatar aa-table-user__avatar--img' %}
+                  {% include 'partials/usuario_avatar.html' %}
+                  {% endwith %}
+                  <div><strong>{{ fila.nombre }}</strong><small>#{{ fila.id_usuario }}</small></div>
+                </div>
+              </td>
+              <td><span class="aa-pill">{{ fila.lecciones_periodo|default(0) }}</span></td>
+              <td><span class="aa-pill">{{ fila.quizzes_periodo|default(0) }}</span></td>
+              <td>
+                <div class="aa-table-progress"><i style="width:{{ fila.progreso }}%"></i></div>
+                <span>{{ fila.progreso }}%</span>
+              </td>
+              <td><span class="aa-status aa-status--{{ fila.estado|lower }}">{{ fila.estado }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="aa-empty">Sin datos de rendimiento en este periodo.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+</div>
+<script type="application/json" id="analytics-meta-json">{{ {
+  "adminUrl": url_for("admin"),
+  "periodo": analytics.periodo|default({"dias": 30, "desde": "", "hasta": "", "etiqueta": "Último mes"})
+}|tojson }}</script>

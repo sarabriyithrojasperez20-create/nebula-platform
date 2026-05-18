@@ -1,0 +1,79 @@
+[
+    {
+        "id_racha": 1,
+        "id_usuario": 2,
+        "racha_actual": 1,
+        "mejor_racha": 1,
+        "ultima_fecha_actividad": "2026-05-17",
+        "ultima_actividad_at": "2026-05-17T12:39:56.469445-06:00",
+        "dias_activos": [
+            "2026-05-17"
+        ],
+        "estudio_minutos_por_dia": {},
+        "actividades_por_dia": {
+            "2026-05-17": [
+                "plan_estudios",
+                "curso"
+            ]
+        },
+        "puntos_gamificacion": 130,
+        "version": 1
+    },
+    {
+        "id_racha": 2,
+        "id_usuario": 5,
+        "racha_actual": 1,
+        "mejor_racha": 1,
+        "ultima_fecha_actividad": "2026-05-17",
+        "ultima_actividad_at": "2026-05-17T13:39:30.795107-06:00",
+        "dias_activos": [
+            "2026-05-17"
+        ],
+        "estudio_minutos_por_dia": {},
+        "actividades_por_dia": {
+            "2026-05-17": [
+                "plan_estudios"
+            ]
+        },
+        "puntos_gamificacion": 20,
+        "version": 1
+    },
+    {
+        "id_racha": 3,
+        "id_usuario": 6,
+        "racha_actual": 1,
+        "mejor_racha": 1,
+        "ultima_fecha_actividad": "2026-05-17",
+        "ultima_actividad_at": "2026-05-17T13:41:54.782591-06:00",
+        "dias_activos": [
+            "2026-05-17"
+        ],
+        "estudio_minutos_por_dia": {},
+        "actividades_por_dia": {
+            "2026-05-17": [
+                "plan_estudios"
+            ]
+        },
+        "puntos_gamificacion": 10,
+        "version": 1
+    },
+    {
+        "id_racha": 4,
+        "id_usuario": 4,
+        "racha_actual": 1,
+        "mejor_racha": 1,
+        "ultima_fecha_actividad": "2026-05-17",
+        "ultima_actividad_at": "2026-05-17T15:23:42.620316-06:00",
+        "dias_activos": [
+            "2026-05-17"
+        ],
+        "estudio_minutos_por_dia": {},
+        "actividades_por_dia": {
+            "2026-05-17": [
+                "plan_estudios"
+            ]
+        },
+        "puntos_gamificacion": 30,
+        "version": 1
+    }
+]

@@ -1,0 +1,67 @@
+{% set nav = admin_nav|default('gestion') %}
+<div id="nb-sidebar-overlay" class="nb-sidebar-overlay" aria-hidden="true"></div>
+<aside id="nb-sidebar" class="nb-sidebar admin-sidebar" aria-label="Navegación principal">
+  <div class="nb-sidebar-brand">
+    <div class="nb-sidebar-logo">
+      <span class="material-symbols-outlined" style="font-size:22px">auto_awesome</span>
+    </div>
+    <div>
+      <h1>Nébula</h1>
+      <p>Admin Console</p>
+    </div>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto">
+    <div class="nb-nav-section">
+      <p class="nb-nav-label">Principal</p>
+      <a class="nb-nav-item {% if nav == 'gestion' %}nb-nav-item--active{% endif %}" href="{{ url_for('admin') }}">
+        <span class="material-symbols-outlined">dashboard</span>
+        Gestión
+      </a>
+      <a class="nb-nav-item {% if nav == 'analytics' %}nb-nav-item--active{% endif %}" href="{{ url_for('analytics') }}">
+        <span class="material-symbols-outlined">insights</span>
+        Analytics
+      </a>
+    </div>
+
+    <div class="nb-nav-section">
+      <p class="nb-nav-label">Contenido</p>
+      <a class="nb-nav-item {% if nav == 'usuarios' %}nb-nav-item--active{% endif %}" href="{{ url_for('admin') }}" data-admin-open="usuarios">
+        <span class="material-symbols-outlined">group</span>
+        Usuarios
+      </a>
+      <a class="nb-nav-item {% if nav == 'cursos' %}nb-nav-item--active{% endif %}" href="{{ url_for('admin') }}" data-admin-open="cursos">
+        <span class="material-symbols-outlined">school</span>
+        Cursos
+      </a>
+      <a class="nb-nav-item {% if nav == 'lecciones' %}nb-nav-item--active{% endif %}" href="{{ url_for('admin') }}" data-admin-open="lecciones">
+        <span class="material-symbols-outlined">menu_book</span>
+        Lecciones
+      </a>
+      <a class="nb-nav-item {% if nav == 'evaluaciones' %}nb-nav-item--active{% endif %}" href="{{ url_for('admin') }}" data-admin-open="evaluaciones">
+        <span class="material-symbols-outlined">assignment_turned_in</span>
+        Evaluaciones
+      </a>
+    </div>
+
+    <div class="nb-nav-section">
+      <p class="nb-nav-label">Cuenta</p>
+      <a class="nb-nav-item {% if nav == 'perfil' %}nb-nav-item--active{% endif %}" href="{{ url_for('admin_profile') }}">
+        <span class="material-symbols-outlined">person</span>
+        Perfil
+      </a>
+    </div>
+  </nav>
+
+  <div class="nb-sidebar-footer">
+    <div class="nb-pro-card">
+      <p>Plan Pro</p>
+      <p>Reportes avanzados, exportación y soporte prioritario.</p>
+      <button type="button" class="nb-btn-primary">Explorar planes</button>
+    </div>
+    <a class="nb-nav-item nb-nav-item--danger" href="{{ url_for('logout') }}">
+      <span class="material-symbols-outlined">logout</span>
+      Cerrar sesión
+    </a>
+  </div>
+</aside>

@@ -1,0 +1,185 @@
+<section id="admin-panel-usuarios" class="admin-detail-panel hidden">
+<div class="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(0,0,0,0.04)] overflow-hidden mb-6">
+<div class="p-6 border-b border-surface-container flex flex-wrap items-center justify-between gap-4">
+<div><h3 class="font-title-lg text-on-surface">Usuarios registrados</h3>
+<p class="text-body-md text-outline">{{ usuarios_admin|length }} usuarios en el sistema</p></div>
+<button type="button" class="admin-panel-back text-primary font-label-md hover:underline" data-admin-back>Volver al resumen</button>
+</div>
+<div class="overflow-x-auto"><table class="w-full admin-data-table">
+<thead><tr class="bg-surface-container-low text-left">
+<th class="px-6 py-3 font-label-md text-outline">Usuario</th>
+<th class="px-6 py-3 font-label-md text-outline">Correo</th>
+<th class="px-6 py-3 font-label-md text-outline">Rol</th>
+<th class="px-6 py-3 font-label-md text-outline">Grado</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Cursos</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Lecciones</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Estado</th>
+<th class="px-6 py-3 font-label-md text-outline text-right">Acciones</th>
+</tr></thead>
+<tbody class="divide-y divide-surface-container" id="admin-usuarios-tbody">
+{% for u in usuarios_admin %}
+<tr data-usuario-id="{{ u.id_usuario }}" data-rol="{{ u.id_rol }}">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+{% if u.id_rol == 2 %}
+{% with avatar_url=u.avatar_url, avatar_alt=u.nombre_completo, avatar_class='nb-user-avatar' %}
+{% include 'partials/usuario_avatar.html' %}
+{% endwith %}
+{% endif %}
+<div>
+<p class="font-body-md font-semibold text-on-surface">{{ u.nombre_completo }}</p>
+<p class="text-xs text-outline">@{{ u.username }}</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ u.correo }}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ u.rol }}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ u.grado }}</td>
+<td class="px-6 py-4 text-center text-body-md">{{ u.total_cursos }}</td>
+<td class="px-6 py-4 text-center text-body-md">{{ u.total_lecciones_completadas }}</td>
+<td class="px-6 py-4 text-center">
+{% if u.id_rol == 2 %}
+<span class="admin-estado-badge {% if u.activo %}admin-estado-badge--ok{% else %}admin-estado-badge--off{% endif %}">{% if u.activo %}Activo{% else %}Suspendido{% endif %}</span>
+{% else %}<span class="text-outline text-xs">—</span>{% endif %}
+</td>
+<td class="px-6 py-4 text-right">
+<button type="button" class="admin-ver-usuario sr-only" data-usuario-id="{{ u.id_usuario }}" aria-hidden="true"></button>
+<div class="admin-actions-cell">
+{% if u.id_rol == 2 %}
+<button type="button" class="admin-actions-trigger" data-admin-menu-toggle aria-label="Acciones">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<div class="admin-row-menu hidden">
+<button type="button" data-admin-action="ver" data-usuario-id="{{ u.id_usuario }}"><span class="material-symbols-outlined">visibility</span> Ver perfil</button>
+<button type="button" data-admin-action="{% if u.activo %}suspender{% else %}reactivar{% endif %}" data-usuario-id="{{ u.id_usuario }}" data-usuario-nombre="{{ u.nombre_completo }}">
+<span class="material-symbols-outlined">{% if u.activo %}pause_circle{% else %}play_circle{% endif %}</span>
+{% if u.activo %}Suspender{% else %}Reactivar{% endif %}
+</button>
+<button type="button" class="admin-row-menu__danger" data-admin-action="eliminar" data-usuario-id="{{ u.id_usuario }}" data-usuario-nombre="{{ u.nombre_completo }}">
+<span class="material-symbols-outlined">delete</span> Eliminar
+</button>
+</div>
+{% else %}
+<button type="button" class="admin-ver-usuario text-primary hover:bg-primary-fixed p-2 rounded-lg inline-flex" data-usuario-id="{{ u.id_usuario }}">
+<span class="material-symbols-outlined">visibility</span></button>
+{% endif %}
+</div>
+</td>
+</tr>
+{% endfor %}
+</tbody></table></div></div>
+<div id="admin-usuario-detalle" class="hidden bg-white rounded-[24px] p-6 shadow-[0px_10px_30px_rgba(0,0,0,0.04)] mb-6">
+<div class="flex justify-between items-start gap-4 mb-4">
+<h4 class="font-title-lg text-on-surface" id="admin-detalle-nombre"></h4>
+<button type="button" class="admin-cerrar-detalle text-outline hover:text-primary text-sm font-label-md">Cerrar detalle</button>
+</div>
+<div id="admin-detalle-contenido" class="space-y-4 text-body-md text-secondary"></div>
+</div>
+</section>
+<section id="admin-panel-cursos" class="admin-detail-panel hidden">
+<div class="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(0,0,0,0.04)] overflow-hidden mb-6">
+<div class="p-6 border-b border-surface-container flex flex-wrap items-center justify-between gap-4">
+<div><h3 class="font-title-lg text-on-surface">Cursos del catálogo</h3>
+<p class="text-body-md text-outline">{{ cursos_admin|length }} cursos activos</p></div>
+<button type="button" class="admin-panel-back text-primary font-label-md hover:underline" data-admin-back>Volver al resumen</button>
+</div>
+<div class="overflow-x-auto"><table class="w-full admin-data-table">
+<thead><tr class="bg-surface-container-low text-left">
+<th class="px-6 py-3 font-label-md text-outline">Curso</th>
+<th class="px-6 py-3 font-label-md text-outline">Categoría</th>
+<th class="px-6 py-3 font-label-md text-outline">Nivel</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Estudiantes</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Lecciones</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Progreso prom.</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Diagnósticos</th>
+<th class="px-6 py-3 font-label-md text-outline text-right">Inscritos</th>
+</tr></thead>
+<tbody class="divide-y divide-surface-container">
+{% for c in cursos_admin %}
+<tr>
+<td class="px-6 py-4 font-body-md font-semibold text-on-surface">{{ c.titulo }}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ c.categoria }}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ c.nivel }}</td>
+<td class="px-6 py-4 text-center">{{ c.estudiantes_inscritos }}</td>
+<td class="px-6 py-4 text-center">{{ c.num_lecciones }}</td>
+<td class="px-6 py-4 text-center">{{ c.progreso_promedio }}%</td>
+<td class="px-6 py-4 text-center">{{ c.diagnosticos_realizados }}</td>
+<td class="px-6 py-4 text-right">{% if c.estudiantes %}
+<button type="button" class="admin-ver-curso text-primary text-xs font-bold hover:underline" data-curso-slug="{{ c.slug }}">Ver lista</button>
+{% else %}<span class="text-outline text-xs">—</span>{% endif %}</td>
+</tr>
+<tr class="admin-curso-estudiantes hidden bg-surface-container-low/50" data-curso-estudiantes="{{ c.slug }}">
+<td colspan="8" class="px-6 py-4">
+<p class="font-label-md text-outline mb-2">Estudiantes inscritos — {{ c.titulo }}</p>
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-2">{% for e in c.estudiantes %}
+<li class="text-body-md text-secondary flex justify-between gap-2 bg-white rounded-lg px-3 py-2">
+<span>{{ e.nombre }}</span><span class="text-primary font-semibold">{{ e.progreso }}%</span></li>
+{% endfor %}</ul></td></tr>
+{% endfor %}
+</tbody></table></div></div>
+</section>
+<section id="admin-panel-lecciones" class="admin-detail-panel hidden">
+<div class="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(0,0,0,0.04)] overflow-hidden mb-6">
+<div class="p-6 border-b border-surface-container flex flex-wrap items-center justify-between gap-4">
+<div><h3 class="font-title-lg text-on-surface">Lecciones del catálogo</h3>
+<p class="text-body-md text-outline">{{ lecciones_admin|length }} lecciones en total</p></div>
+<button type="button" class="admin-panel-back text-primary font-label-md hover:underline" data-admin-back>Volver al resumen</button>
+</div>
+<div class="overflow-x-auto"><table class="w-full admin-data-table">
+<thead><tr class="bg-surface-container-low text-left">
+<th class="px-6 py-3 font-label-md text-outline">Lección</th>
+<th class="px-6 py-3 font-label-md text-outline">Curso</th>
+<th class="px-6 py-3 font-label-md text-outline">Duración</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Iniciaron</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Completaron</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">% finalización</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Prom. quiz</th>
+</tr></thead>
+<tbody class="divide-y divide-surface-container">{% for l in lecciones_admin %}
+<tr>
+<td class="px-6 py-4 font-body-md font-semibold text-on-surface">{{ l.titulo }}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ l.curso }}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ l.duracion }}</td>
+<td class="px-6 py-4 text-center">{{ l.iniciaron }}</td>
+<td class="px-6 py-4 text-center">{{ l.completaron }}</td>
+<td class="px-6 py-4 text-center">{{ l.porcentaje_finalizacion }}%</td>
+<td class="px-6 py-4 text-center">{{ l.promedio_quiz }}%</td>
+</tr>{% endfor %}
+</tbody></table></div></div>
+</section>
+<section id="admin-panel-evaluaciones" class="admin-detail-panel hidden">
+<div class="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(0,0,0,0.04)] overflow-hidden mb-6">
+<div class="p-6 border-b border-surface-container flex flex-wrap items-center justify-between gap-4">
+<div><h3 class="font-title-lg text-on-surface">Evaluaciones realizadas</h3>
+<p class="text-body-md text-outline">Diagnósticos y quizzes finales</p></div>
+<button type="button" class="admin-panel-back text-primary font-label-md hover:underline" data-admin-back>Volver al resumen</button>
+</div>
+<div class="overflow-x-auto"><table class="w-full admin-data-table">
+<thead><tr class="bg-surface-container-low text-left">
+<th class="px-6 py-3 font-label-md text-outline">Estudiante</th>
+<th class="px-6 py-3 font-label-md text-outline">Curso</th>
+<th class="px-6 py-3 font-label-md text-outline">Tipo</th>
+<th class="px-6 py-3 font-label-md text-outline">Tema</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">%</th>
+<th class="px-6 py-3 font-label-md text-outline">Estado</th>
+<th class="px-6 py-3 font-label-md text-outline text-center">Intentos</th>
+<th class="px-6 py-3 font-label-md text-outline">Fecha</th>
+</tr></thead>
+<tbody class="divide-y divide-surface-container">{% for ev in evaluaciones_admin %}
+<tr>
+<td class="px-6 py-4 text-body-md text-on-surface">{{ ev.estudiante }}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ ev.curso }}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{% if ev.tipo == 'diagnostico' %}Diagnóstico{% else %}Quiz final{% endif %}</td>
+<td class="px-6 py-4 text-body-md text-secondary">{{ ev.tema }}</td>
+<td class="px-6 py-4 text-center font-semibold">{{ ev.porcentaje }}%</td>
+<td class="px-6 py-4 text-body-md">{% if ev.tipo == 'diagnostico' %}<span class="text-primary">{{ ev.estado }}</span>
+{% elif ev.aprobado %}<span class="text-green-600 font-semibold">Aprobado</span>
+{% else %}<span class="text-error font-semibold">No aprobado</span>{% endif %}</td>
+<td class="px-6 py-4 text-center">{{ ev.intentos }}</td>
+<td class="px-6 py-4 text-body-md text-outline text-sm">{{ ev.fecha }}</td>
+</tr>{% else %}
+<tr><td colspan="8" class="px-6 py-8 text-center text-outline">Aún no hay evaluaciones registradas.</td></tr>
+{% endfor %}
+</tbody></table></div></div>
+</section>
+<script type="application/json" id="admin-usuarios-json">{{ usuarios_admin | tojson }}</script>

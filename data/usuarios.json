@@ -1,0 +1,86 @@
+[
+    {
+        "id_usuario": 1,
+        "nombre_completo": "Administrador",
+        "correo": "admin@nebula.com",
+        "username": "admin",
+        "password": "123456",
+        "id_rol": 1,
+        "activo": true,
+        "foto_perfil": "uploads/perfiles/user_1_6af48b12a540.png",
+        "foto_actualizada_en": "20260517175608"
+    },
+    {
+        "id_usuario": 2,
+        "nombre_completo": "Estudiante Demo",
+        "correo": "estudiante@nebula.com",
+        "username": "estudiante",
+        "password": "123456",
+        "id_rol": 2,
+        "activo": true,
+        "fecha_registro": "2026-04-27",
+        "foto_perfil": "uploads/perfiles/user_2_af43c134ded1.png",
+        "sobre_mi": "",
+        "nivel_academico": "",
+        "preferencias_aprendizaje": {
+            "dominante": "auditivo"
+        },
+        "foto_actualizada_en": "20260517170355"
+    },
+    {
+        "id_usuario": 3,
+        "nombre_completo": "Sara Rojas",
+        "correo": "sara@gmail.com",
+        "username": "sara.rojas",
+        "password": "1234567",
+        "id_rol": 2,
+        "activo": true,
+        "fecha_registro": "2026-04-27",
+        "foto_perfil": ""
+    },
+    {
+        "id_usuario": 4,
+        "nombre_completo": "natalia rojas",
+        "correo": "nataliarojas@nebula.com",
+        "username": "natalia.rojas",
+        "password": "12345678",
+        "id_rol": 2,
+        "activo": true,
+        "fecha_registro": "2026-05-09",
+        "foto_perfil": "uploads/perfiles/user_4_210a8a823f68.jpg",
+        "foto_actualizada_en": "20260517162524",
+        "sobre_mi": "",
+        "nivel_academico": "",
+        "preferencias_aprendizaje": {
+            "dominante": "visual"
+        }
+    },
+    {
+        "id_usuario": 5,
+        "nombre_completo": "adriana",
+        "correo": "adrianaperez@nebula.com",
+        "username": "adriana.perez",
+        "password": "1234567",
+        "grado": "noveno",
+        "nivel_academico": "Noveno",
+        "id_rol": 2,
+        "activo": true,
+        "fecha_registro": "2026-05-17",
+        "foto_perfil": "",
+        "progreso_materias": {}
+    },
+    {
+        "id_usuario": 6,
+        "nombre_completo": "diego rojas ",
+        "correo": "diegorojas@nebula.com",
+        "username": "diego.rojas",
+        "password": "12345678",
+        "grado": "universidad",
+        "nivel_academico": "Universidad",
+        "id_rol": 2,
+        "activo": true,
+        "fecha_registro": "2026-05-17",
+        "foto_perfil": "",
+        "progreso_materias": {}
+    }
+]

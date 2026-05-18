@@ -1,0 +1,13 @@
+/**
+ * Plan de estudios — barra lateral, navegación de secciones, widget progreso
+ */
+
+.plan-estudios-page .plan-estudios-sidebar-nav a:hover {
+    background-color: #f1f5f9;
+}
+
+.sidebar-nav-active {
+    background-color: var(--primary-color-10);
+    color: var(--primary-color);
+    font-weight: 500;
+}

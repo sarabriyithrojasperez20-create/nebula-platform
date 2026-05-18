@@ -1,0 +1,6 @@
+/**
+ * Punto de entrada legacy — mantiene compatibilidad con:
+ * url_for('static', filename='plan-estudios.css')
+ * Los estilos viven en static/styles/plan-estudios/
+ */
+@import url('styles/plan-estudios/main.css');

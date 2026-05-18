@@ -1,0 +1,66 @@
+.curso-diagnostico-section {
+    margin-bottom: 2rem;
+}
+
+.curso-diagnostico-section .hidden {
+    display: none !important;
+}
+
+.curso-diagnostico-intro {
+    border-color: rgba(106, 75, 216, 0.35);
+}
+
+.curso-diagnostico-resultado {
+    border: 1px solid rgba(106, 75, 216, 0.35);
+}
+
+.curso-detalle-page .leccion-quiz-question-card {
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(106, 75, 216, 0.15);
+}
+
+.curso-detalle-page .leccion-quiz-progress-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(106, 75, 216, 0.2);
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.curso-detalle-page .leccion-quiz-progress-top .counter,
+.curso-detalle-page .leccion-quiz-progress-top .percent {
+    color: #e2e8f0;
+}
+
+.curso-detalle-page .leccion-quiz-summary {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.curso-detalle-page .leccion-quiz-summary .score-circle {
+    width: 6rem;
+    height: 6rem;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #6a4bd8, #8b5cf6);
+    color: white;
+    box-shadow: 0 8px 24px rgba(106, 75, 216, 0.4);
+}
+
+.curso-detalle-page .leccion-quiz-summary h3 {
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.curso-detalle-page .leccion-quiz-summary p {
+    color: #94a3b8;
+}

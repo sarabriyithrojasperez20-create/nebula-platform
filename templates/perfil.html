@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Nébula - Perfil</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6a4bd8",
+                        "background-light": "#f4f6fb",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="perfil-page font-display min-h-screen">
+    {% set avatar_default = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBlwoGAr4OcQHRwHR-lcqSiVtRczHOqU4jSeFWxNy7vEHCCeSC_b1mKIRSSHlj-Uah3OA6pbCC0gL6OOi-k9lVNngXgPGI8SMaNT5qfa2MvmU_9BDlAs2sFfycz7MTtG1JhdpkytvtTvG0qlm796rX77xURSs3c0qR1vFJfRms9-GFoWgsllXenDXJ4WbdK-n98_bzU82KSmO2gh53b7AdV-AawOUYUnwE3qSGyNOAiyNmiNSUmRB79gyWgUowkW0vRWKOHp2m4EFo' %}
+    {% set avatar_src = avatar_url if avatar_url else avatar_default %}
+    {% set pref_dom = usuario.preferencias_aprendizaje.dominante if usuario.preferencias_aprendizaje else 'visual' %}
+
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <header class="perfil-header sticky top-0 z-50">
+            <div class="flex items-center justify-between gap-4 px-6 lg:px-10 py-3">
+                <div class="flex items-center gap-3 text-primary">
+                    <div class="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                    </div>
+                    <h2 class="text-slate-900 text-xl font-bold leading-tight tracking-tight">Nébula</h2>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    {% with clase_boton='flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors' %}
+                    {% include 'partials/notificaciones_dropdown.html' %}
+                    {% endwith %}
+                    <a href="{{ url_for('perfil') }}" class="perfil-avatar-link block shrink-0 rounded-full ring-2 ring-primary p-0.5"
+                        aria-label="Perfil actual">
+                        {% with avatar_class='size-10 rounded-full object-cover', avatar_alt='Avatar de ' ~ nombre %}
+                        {% include 'partials/estudiante_avatar.html' %}
+                        {% endwith %}
+                    </a>
+                </div>
+            </div>
+            <div class="px-6 lg:px-10 pb-3 nav-modulos-estudiante--bar">
+                {% include 'partials/nav_estudiante.html' %}
+            </div>
+        </header>
+
+        <main class="perfil-main max-w-[1080px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 pb-16">
+            <section class="perfil-hero relative mb-8">
+                <div class="perfil-cover w-full h-36 sm:h-44 rounded-2xl overflow-hidden relative"></div>
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 -mt-12 sm:-mt-14 px-2 sm:px-4 relative z-10">
+                    <div class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5">
+                        <div class="relative shrink-0 mx-auto sm:mx-0 group">
+                            <img id="perfil-avatar-main" class="perfil-avatar size-28 sm:size-[7.5rem] rounded-full object-cover bg-white"
+                                data-nebula-avatar src="{{ avatar_src }}" alt="Foto de perfil de {{ nombre }}">
+                            <button type="button" id="perfil-btn-cambiar-foto"
+                                class="perfil-avatar-edit absolute inset-0 rounded-full flex items-center justify-center bg-slate-900/45 text-white opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                                aria-label="Cambiar foto de perfil">
+                                <span class="material-symbols-outlined text-3xl">photo_camera</span>
+                            </button>
+                            <input type="file" id="perfil-input-foto" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp" />
+                        </div>
+                        <div class="text-center sm:text-left pb-1 min-w-0">
+                            <h1 id="perfil-nombre-display" class="text-2xl sm:text-[1.75rem] font-bold text-slate-900 tracking-tight truncate">{{ nombre }}</h1>
+                            <p id="perfil-username-display" class="text-primary font-medium text-sm mt-0.5{% if not usuario.username %} hidden{% endif %}">{% if usuario.username %}@{{ usuario.username }}{% endif %}</p>
+                            <p id="perfil-correo-display" class="text-slate-500 text-sm mt-1 truncate{% if not usuario.correo %} hidden{% endif %}">{{ usuario.correo or '' }}</p>
+                            <p class="text-slate-400 text-xs mt-1.5">ID #{{ usuario.id_usuario }}{% if usuario.grado %} · {{ usuario.grado }}{% endif %}</p>
+                        </div>
+                    </div>
+                    <button type="button" id="btn-editar-perfil"
+                        class="perfil-btn-edit flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-full shadow-lg shadow-primary/20 hover:opacity-95 transition-all mx-auto sm:mx-0 shrink-0">
+                        <span class="material-symbols-outlined text-lg">edit</span>
+                        Editar perfil
+                    </button>
+                </div>
+            </section>
+
+            <section class="perfil-stats-grid mb-8" aria-label="Resumen académico">
+                <article class="perfil-stat-card">
+                    <span class="material-symbols-outlined perfil-stat-card__icon">school</span>
+                    <div>
+                        <p class="perfil-stat-card__value">{{ cursos_activos|length }}</p>
+                        <p class="perfil-stat-card__label">Cursos activos</p>
+                    </div>
+                </article>
+                <article class="perfil-stat-card">
+                    <span class="material-symbols-outlined perfil-stat-card__icon">menu_book</span>
+                    <div>
+                        <p class="perfil-stat-card__value">{{ datos_progreso.lecciones_completadas }}</p>
+                        <p class="perfil-stat-card__label">Lecciones completadas</p>
+                    </div>
+                </article>
+                <article class="perfil-stat-card">
+                    <span class="material-symbols-outlined perfil-stat-card__icon">local_fire_department</span>
+                    <div>
+                        <p class="perfil-stat-card__value">{{ resumen_racha.racha_actual|default(0) }}</p>
+                        <p class="perfil-stat-card__label">Días de racha</p>
+                    </div>
+                </article>
+                <article class="perfil-stat-card">
+                    <span class="material-symbols-outlined perfil-stat-card__icon">trending_up</span>
+                    <div>
+                        <p class="perfil-stat-card__value">{{ progreso_promedio }}%</p>
+                        <p class="perfil-stat-card__label">Progreso promedio</p>
+                    </div>
+                </article>
+            </section>
+
+            <div class="perfil-content-grid">
+                <article class="perfil-card p-6 sm:p-7">
+                    <h2 class="perfil-card__title">
+                        <span class="material-symbols-outlined text-primary">person</span>
+                        Información personal
+                    </h2>
+                    <div class="space-y-5 text-sm">
+                        <div>
+                            <p class="perfil-field-label">Sobre mí</p>
+                            <p id="perfil-sobre-mi-display" class="perfil-field-value leading-relaxed">
+                                {{ usuario.sobre_mi or 'Estudiante de Nébula enfocado en el aprendizaje continuo y el refuerzo académico personalizado.' }}
+                            </p>
+                        </div>
+                        <div class="perfil-info-rows">
+                            <div class="perfil-info-row">
+                                <span>Nivel académico</span>
+                                <strong id="perfil-nivel-display">{{ usuario.nivel_academico or '—' }}</strong>
+                            </div>
+                            {% if usuario.fecha_registro %}
+                            <div class="perfil-info-row">
+                                <span>Miembro desde</span>
+                                <strong>{{ usuario.fecha_registro }}</strong>
+                            </div>
+                            {% endif %}
+                            <div class="perfil-info-row">
+                                <span>Cuenta</span>
+                                <strong class="text-primary">Activa</strong>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('mis_cursos') }}" class="perfil-link-card">
+                            <span class="material-symbols-outlined">library_books</span>
+                            Gestionar mis cursos
+                            <span class="material-symbols-outlined ml-auto">arrow_forward</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="perfil-card p-6 sm:p-7">
+                    <h2 class="perfil-card__title">
+                        <span class="material-symbols-outlined text-primary">psychology</span>
+                        Preferencias de aprendizaje
+                    </h2>
+                    <div id="perfil-prefs-grid" class="perfil-prefs-grid">
+                        <div data-pref="visual" class="perfil-pref-card perfil-pref-item--active">
+                            <span class="material-symbols-outlined">visibility</span>
+                            <div>
+                                <p class="font-bold">Visual</p>
+                                <p class="perfil-pref-label">Dominante</p>
+                            </div>
+                        </div>
+                        <div data-pref="auditivo" class="perfil-pref-card">
+                            <span class="material-symbols-outlined">hearing</span>
+                            <div>
+                                <p class="font-bold">Auditivo</p>
+                                <p class="perfil-pref-label">Secundario</p>
+                            </div>
+                        </div>
+                        <div data-pref="kinestesico" class="perfil-pref-card">
+                            <span class="material-symbols-outlined">pan_tool</span>
+                            <div>
+                                <p class="font-bold">Kinestésico</p>
+                                <p class="perfil-pref-label">Secundario</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="perfil-hint mt-5">
+                        <span class="material-symbols-outlined text-primary text-lg shrink-0">info</span>
+                        Edita tu perfil para cambiar tu estilo de aprendizaje preferido.
+                    </p>
+                </article>
+
+                <article class="perfil-card p-6 sm:p-7 perfil-card--wide">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                        <h2 class="perfil-card__title mb-0">
+                            <span class="material-symbols-outlined text-primary">school</span>
+                            Mis cursos
+                        </h2>
+                        <a href="{{ url_for('mis_cursos') }}" class="text-sm font-semibold text-primary hover:underline">Ver todos</a>
+                    </div>
+                    {% if cursos_activos %}
+                    <ul class="perfil-courses-list">
+                        {% for curso in cursos_activos[:5] %}
+                        <li class="perfil-course-item">
+                            <div class="perfil-course-item__icon">
+                                <span class="material-symbols-outlined">auto_stories</span>
+                            </div>
+                            <div class="perfil-course-item__body">
+                                <p class="perfil-course-item__title">{{ curso.titulo }}</p>
+                                <p class="perfil-course-item__meta">{{ curso.nivel|default('Curso') }} · {{ curso.porcentaje|default(0) }}% completado</p>
+                                <div class="perfil-progress-track">
+                                    <div class="perfil-progress-fill" style="width: {{ curso.porcentaje|default(0) }}%;"></div>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('detalle_curso', slug=curso.slug) }}" class="perfil-course-item__action" aria-label="Continuar curso">
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="perfil-empty">
+                        <span class="material-symbols-outlined text-4xl text-primary/40">library_books</span>
+                        <p>Aún no tienes cursos asignados.</p>
+                        <a href="{{ url_for('explorar_cursos') }}" class="perfil-btn-secondary">Explorar catálogo</a>
+                    </div>
+                    {% endif %}
+                </article>
+
+                <article class="perfil-card p-6 sm:p-7 perfil-card--wide">
+                    <h2 class="perfil-card__title">
+                        <span class="material-symbols-outlined text-primary">emoji_events</span>
+                        Logros destacados
+                    </h2>
+                    <div class="perfil-achievements">
+                        {% if resumen_racha.racha_actual|default(0) >= 3 %}
+                        <div class="perfil-achievement perfil-achievement--unlocked">
+                            <span class="material-symbols-outlined">local_fire_department</span>
+                            <div>
+                                <p class="font-bold">Racha activa</p>
+                                <p class="text-xs text-slate-500">{{ resumen_racha.racha_actual }} días consecutivos estudiando</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="perfil-achievement">
+                            <span class="material-symbols-outlined">local_fire_department</span>
+                            <div>
+                                <p class="font-bold">Racha activa</p>
+                                <p class="text-xs text-slate-500">Estudia 3 días seguidos para desbloquear</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if datos_progreso.lecciones_completadas >= 1 %}
+                        <div class="perfil-achievement perfil-achievement--unlocked">
+                            <span class="material-symbols-outlined">menu_book</span>
+                            <div>
+                                <p class="font-bold">Primera lección</p>
+                                <p class="text-xs text-slate-500">Completaste tu primera lección en Nébula</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if datos_progreso.lecciones_completadas >= 10 %}
+                        <div class="perfil-achievement perfil-achievement--unlocked">
+                            <span class="material-symbols-outlined">military_tech</span>
+                            <div>
+                                <p class="font-bold">Estudiante constante</p>
+                                <p class="text-xs text-slate-500">10+ lecciones completadas</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if progreso_promedio >= 50 %}
+                        <div class="perfil-achievement perfil-achievement--unlocked">
+                            <span class="material-symbols-outlined">trending_up</span>
+                            <div>
+                                <p class="font-bold">Medio camino</p>
+                                <p class="text-xs text-slate-500">Más del 50% de progreso en tus cursos</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if cursos_activos|length == 0 and datos_progreso.lecciones_completadas == 0 and resumen_racha.racha_actual|default(0) < 3 %}
+                        <p class="perfil-empty-text col-span-full">Completa lecciones y mantén tu racha para desbloquear logros.</p>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('progreso') }}" class="perfil-link-card mt-5">
+                        <span class="material-symbols-outlined">insights</span>
+                        Ver progreso detallado
+                        <span class="material-symbols-outlined ml-auto">arrow_forward</span>
+                    </a>
+                </article>
+            </div>
+        </main>
+
+        <footer class="perfil-footer">
+            <p>© 2026 Nébula Academic AI. Plataforma de aprendizaje personalizado.</p>
+        </footer>
+    </div>
+
+    {% include 'partials/perfil_modal_editar.html' %}
+
+    <script type="application/json" id="nebula-perfil-config">{{ {
+        'avatarDefault': avatar_default,
+        'usuario': {
+            'nombre_completo': usuario.nombre_completo,
+            'username': usuario.username,
+            'correo': usuario.correo,
+            'sobre_mi': usuario.sobre_mi,
+            'nivel_academico': usuario.nivel_academico,
+            'preferencia_dominante': pref_dom,
+            'avatar_url': avatar_src
+        }
+    } | tojson }}</script>
+    <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    {% include 'partials/nebula_user_boot.html' %}
+    <script src="{{ url_for('static', filename='js/nebula-avatar-upload.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-perfil.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Nébula - {{ leccion.titulo }}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leccion.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leccion-quiz.css') }}">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6a4bd8",
+                        "background-dark": "#151220",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="leccion-page bg-background-dark font-display text-slate-100 min-h-screen">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <header class="border-b border-primary/20 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+            <div class="flex items-center justify-between gap-4 px-6 lg:px-20 py-3">
+                <div class="flex items-center gap-4 text-primary min-w-0">
+                    <div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg shrink-0">
+                        <span class="material-symbols-outlined text-3xl">auto_awesome</span>
+                    </div>
+                    <h2 class="text-white text-xl font-bold leading-tight tracking-tight truncate">Nébula</h2>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    {% with clase_boton='flex items-center justify-center rounded-full size-10 bg-primary/20 text-slate-200 hover:bg-primary hover:text-white transition-all', icono_clase='text-[20px]' %}
+                    {% include 'partials/notificaciones_dropdown.html' %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="px-6 lg:px-20 pb-3 nav-modulos-estudiante--bar">
+                {% include 'partials/nav_estudiante.html' %}
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-[1280px] mx-auto w-full px-6 lg:px-20 py-6 lg:py-8">
+            <nav class="leccion-breadcrumb text-sm mb-6 flex flex-wrap items-center gap-y-1" aria-label="Ruta">
+                <a href="{{ url_for('mis_cursos') }}">Cursos</a>
+                <span class="sep">/</span>
+                <a href="{{ url_for('detalle_curso', slug=curso.slug) }}">{{ curso.titulo }}</a>
+                <span class="sep">/</span>
+                <span class="text-white font-semibold">{{ leccion.titulo }}</span>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <section class="leccion-card overflow-hidden">
+                        <div class="leccion-video-wrap">
+                            <img class="leccion-video-bg" src="{{ contenido.video_imagen }}"
+                                alt="{{ leccion.titulo }}">
+                            <div class="leccion-video-overlay">
+                                <button type="button" class="leccion-play-btn" aria-label="Reproducir">
+                                    <span class="material-symbols-outlined text-4xl ml-1">play_arrow</span>
+                                </button>
+                            </div>
+                            <div class="leccion-video-controls">
+                                <div class="leccion-video-progress">
+                                    <div class="leccion-video-progress-fill"
+                                        style="width: {{ contenido.video_progreso }}%;"></div>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-slate-300">
+                                    <span>{{ contenido.video_tiempo_actual }} / {{ contenido.video_duracion }}</span>
+                                    <div class="flex items-center gap-3 text-slate-400">
+                                        <span class="material-symbols-outlined text-lg cursor-pointer hover:text-white"
+                                            title="Volumen">volume_up</span>
+                                        <span class="material-symbols-outlined text-lg cursor-pointer hover:text-white"
+                                            title="Configuración">settings</span>
+                                        <span class="material-symbols-outlined text-lg cursor-pointer hover:text-white"
+                                            title="Pantalla completa">fullscreen</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="leccion-card px-4 sm:px-6 pt-2">
+                        <div class="leccion-tabs" role="tablist">
+                            <button type="button" class="leccion-tab is-active" data-tab="notas" role="tab"
+                                aria-selected="true">Notas de la lección</button>
+                            <button type="button" class="leccion-tab" data-tab="recursos" role="tab"
+                                aria-selected="false">Recursos</button>
+                            <button type="button" class="leccion-tab" data-tab="preguntas" role="tab"
+                                aria-selected="false">Preguntas y respuestas</button>
+                            <button type="button" class="leccion-tab" id="quiz-tab-jump" role="tab"
+                                aria-selected="false">Quiz final</button>
+                        </div>
+                        <div class="px-0 sm:px-0 pb-4">
+                            <div id="panel-notas" class="leccion-tab-panel is-active" role="tabpanel">
+                                <ul class="space-y-2 text-sm text-slate-300">
+                                    {% for nota in contenido.notas %}
+                                    <li class="flex gap-2">
+                                        <span class="material-symbols-outlined text-primary text-base shrink-0">note</span>
+                                        {{ nota }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div id="panel-recursos" class="leccion-tab-panel" role="tabpanel" hidden>
+                                <ul class="space-y-2">
+                                    {% for recurso in contenido.recursos %}
+                                    <li>
+                                        <a href="{{ recurso.url }}"
+                                            class="text-sm text-primary hover:text-primary/80 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-base">link</span>
+                                            {{ recurso.titulo }}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div id="panel-preguntas" class="leccion-tab-panel" role="tabpanel" hidden>
+                                <div class="space-y-4">
+                                    {% for item in contenido.preguntas %}
+                                    <div class="border-b border-white/5 pb-3 last:border-0">
+                                        <p class="text-sm font-semibold text-white mb-1">{{ item.pregunta }}</p>
+                                        <p class="text-sm text-slate-400">{{ item.respuesta }}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="leccion-card p-6 sm:p-8 space-y-6">
+                        <div>
+                            <h1 class="text-2xl font-black text-white mb-3">{{ contenido.titulo_tema }}</h1>
+                            <p class="text-slate-400 leading-relaxed">{{ contenido.explicacion }}</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">menu_book</span>
+                                Definiciones clave
+                            </h2>
+                            {% for def in contenido.definiciones %}
+                            <div class="leccion-definicion">
+                                <p class="text-sm font-bold text-primary">{{ def.termino }}</p>
+                                <p class="text-sm text-slate-300 mt-1">{{ def.definicion }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if contenido.formulas %}
+                        <div>
+                            <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">functions</span>
+                                Fórmulas y conceptos importantes
+                            </h2>
+                            {% for formula in contenido.formulas %}
+                            <p class="leccion-formula">{{ formula }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="leccion-ejemplo">
+                            <h2 class="text-sm font-bold text-primary uppercase tracking-wide mb-2">Ejemplo resuelto</h2>
+                            <p class="text-sm text-white font-medium mb-2">{{ contenido.ejemplo.enunciado }}</p>
+                            <p class="text-sm text-slate-400">{{ contenido.ejemplo.solucion }}</p>
+                        </div>
+
+                        <div class="leccion-practica">
+                            <h2 class="text-sm font-bold text-green-400 uppercase tracking-wide mb-2">Actividad de
+                                práctica</h2>
+                            <p class="text-sm text-white font-medium mb-2">{{ contenido.practica.pregunta }}</p>
+                            <p class="text-xs text-slate-500"><span class="font-semibold">Pista:</span> {{
+                                contenido.practica.pista }}</p>
+                        </div>
+
+                        <p id="leccion-quiz-gate-msg" class="text-sm text-slate-400 mb-3 w-full" role="status"></p>
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <button type="button" id="btn-marcar-completada" disabled
+                                class="inline-flex items-center gap-2 bg-green-600/90 hover:bg-green-600 text-white font-bold px-5 py-2.5 rounded-full text-sm transition-all disabled:opacity-45 disabled:cursor-not-allowed disabled:hover:bg-green-600/90">
+                                <span class="material-symbols-outlined text-lg">check_circle</span>
+                                Marcar como completada
+                            </button>
+                            <a href="{{ continuar_url }}" id="btn-continuar-leccion"
+                                class="leccion-accion-continuar inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-5 py-2.5 rounded-full text-sm transition-all is-locked"
+                                aria-disabled="true">
+                                Continuar
+                                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+
+                <aside class="space-y-6">
+                    <section class="leccion-card p-6">
+                        <h2 class="text-sm font-bold text-white uppercase tracking-wide mb-4">Temas relacionados</h2>
+                        <ul class="space-y-1">
+                            {% for tema in contenido.temas_relacionados %}
+                            <li class="leccion-sidebar-item">
+                                <span class="material-symbols-outlined text-primary text-base">chevron_right</span>
+                                {{ tema }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+
+                    <section class="leccion-card p-6">
+                        <h2 class="text-sm font-bold text-white uppercase tracking-wide mb-3">Progreso de la lección</h2>
+                        <div class="flex justify-between text-xs text-slate-400 mb-2">
+                            <span>Avance del video</span>
+                            <span class="text-primary font-bold">{{ contenido.video_progreso }}%</span>
+                        </div>
+                        <div class="leccion-progress-track mb-4">
+                            <div class="leccion-progress-fill" style="width: {{ contenido.video_progreso }}%;"></div>
+                        </div>
+                        <p class="text-xs text-slate-400 flex items-center gap-1.5 mb-2">
+                            <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+                            Duración estimada: {{ leccion.duracion }}
+                        </p>
+                        <p class="text-xs font-semibold" id="leccion-estado-label">
+                            {% if leccion.estado == 'completado' %}
+                            <span class="text-green-400">Estado: Completado</span>
+                            {% elif leccion.estado == 'en_progreso' %}
+                            <span class="text-primary">Estado: En progreso</span>
+                            {% else %}
+                            <span class="text-slate-400">Estado: Pendiente</span>
+                            {% endif %}
+                        </p>
+                    </section>
+
+                    <section class="leccion-card p-6">
+                        <h2 class="text-sm font-bold text-white uppercase tracking-wide mb-3">Recursos descargables</h2>
+                        <ul class="space-y-2">
+                            {% for desc in contenido.recursos_descargables %}
+                            <li>
+                                <a href="{{ desc.url }}"
+                                    class="text-xs text-slate-300 hover:text-primary flex items-center gap-2 transition-colors">
+                                    <span class="material-symbols-outlined text-base">download</span>
+                                    {{ desc.titulo }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+
+                    <a href="{{ url_for('detalle_curso', slug=curso.slug) }}"
+                        class="leccion-card p-4 flex items-center justify-center gap-2 text-sm font-bold text-primary hover:bg-primary/10 transition-colors w-full">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        Volver al detalle del curso
+                    </a>
+                </aside>
+            </div>
+
+            <section id="leccion-quiz-section" class="leccion-quiz-section leccion-quiz-scroll-anchor">
+                <div id="quiz-intro-wrap" class="leccion-quiz-intro-wrap">
+                    <nav class="leccion-quiz-breadcrumb" aria-label="Ruta del quiz">
+                        <a href="{{ url_for('mis_cursos') }}">Cursos</a>
+                        <span class="sep"> / </span>
+                        <a href="{{ url_for('detalle_curso', slug=curso.slug) }}">{{ curso.titulo }}</a>
+                        <span class="sep"> / </span>
+                        <span>{{ contenido.quiz.titulo_tema }}</span>
+                        <span class="sep"> / </span>
+                        <span class="current">Quiz final</span>
+                    </nav>
+                    <div class="leccion-quiz-intro-card">
+                        <h2>Quiz final</h2>
+                        <p class="subtitle">Evaluación del tema</p>
+                        <p class="desc">Pon a prueba lo aprendido en «{{ leccion.titulo }}» con {{ contenido.quiz.preguntas|length }} preguntas de opción múltiple.</p>
+                        <button type="button" id="quiz-start-btn" class="leccion-quiz-btn-primary">
+                            <span class="material-symbols-outlined">quiz</span>
+                            Iniciar quiz
+                        </button>
+                    </div>
+                </div>
+
+                <div id="quiz-active-wrap" class="leccion-quiz-active">
+                    <nav class="leccion-quiz-breadcrumb mb-4" aria-label="Ruta del quiz activo">
+                        <span>Cursos</span>
+                        <span class="sep"> / </span>
+                        <span>{{ curso.titulo }}</span>
+                        <span class="sep"> / </span>
+                        <span>{{ contenido.quiz.titulo_tema }}</span>
+                        <span class="sep"> / </span>
+                        <span class="current">Quiz final</span>
+                    </nav>
+
+                    <div class="leccion-quiz-progress-card">
+                        <div class="leccion-quiz-progress-top">
+                            <span id="quiz-counter" class="counter">Pregunta 1 de {{ contenido.quiz.preguntas|length }}</span>
+                            <span id="quiz-percent" class="percent">0%</span>
+                            <span class="timer">
+                                <span class="material-symbols-outlined text-sm">timer</span>
+                                <span id="quiz-timer">10:00</span>
+                            </span>
+                        </div>
+                        <div class="leccion-quiz-progress-bar">
+                            <div id="quiz-progress-fill" class="leccion-quiz-progress-bar-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="leccion-quiz-layout">
+                        <div>
+                            <article class="leccion-quiz-question-card">
+                                <span id="quiz-type-badge" class="leccion-quiz-type-badge">Opción múltiple</span>
+                                <h3 id="quiz-question"></h3>
+                                <div id="quiz-options" class="leccion-quiz-options"></div>
+                                <div id="quiz-feedback" class="leccion-quiz-feedback"></div>
+                                <div class="leccion-quiz-actions">
+                                    <button type="button" id="quiz-prev-btn" class="leccion-quiz-btn-secondary" disabled>
+                                        <span class="material-symbols-outlined text-lg">arrow_back</span>
+                                        Anterior
+                                    </button>
+                                    <button type="button" id="quiz-submit-btn" class="leccion-quiz-btn-primary">
+                                        Enviar respuesta
+                                    </button>
+                                    <button type="button" id="quiz-next-btn" class="leccion-quiz-btn-primary" style="display: none;">
+                                        Siguiente pregunta
+                                    </button>
+                                </div>
+                            </article>
+                        </div>
+
+                        <aside class="leccion-quiz-assistant">
+                            <div class="leccion-quiz-assistant-header">
+                                <div class="leccion-quiz-assistant-icon">
+                                    <span class="material-symbols-outlined">auto_awesome</span>
+                                </div>
+                                <div>
+                                    <h4>Asistente Nébula</h4>
+                                </div>
+                            </div>
+                            <p>Piensa en el concepto principal antes de responder.</p>
+                            <div id="quiz-hint-box" class="leccion-quiz-hint-box"></div>
+                            <div class="leccion-quiz-assistant-btns">
+                                <button type="button" id="quiz-show-hint">Mostrar pista</button>
+                                <button type="button" id="quiz-stuck-btn">Estoy atascado</button>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+
+                <div id="quiz-summary" class="leccion-quiz-summary">
+                    <div class="score-circle" id="quiz-summary-score">0%</div>
+                    <h3>¡Quiz completado!</h3>
+                    <p id="quiz-summary-text">0 de 0 respuestas correctas</p>
+                    <p id="quiz-summary-detail"></p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button type="button" id="quiz-retry-btn" class="leccion-quiz-btn-secondary">
+                            Reintentar quiz
+                        </button>
+                        <a href="{{ url_for('detalle_curso', slug=curso.slug) }}" class="leccion-quiz-btn-primary">
+                            Volver al curso
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="application/json" id="leccion-quiz-data">{{ contenido.quiz | tojson }}</script>
+    <script>
+        window.LECCION_QUIZ = JSON.parse(document.getElementById('leccion-quiz-data').textContent);
+        window.LECCION_META = {
+            slug: {{ curso.slug | tojson }},
+            leccionId: {{ leccion.id | tojson }},
+            userId: {{ session.get('id_usuario', 0) | tojson }},
+            marcarUrl: {{ marcar_url | tojson }},
+            guardarQuizUrl: {{ guardar_quiz_url | tojson }},
+            continuarUrl: {{ continuar_url | tojson }},
+            leccionCompletada: {{ (leccion.estado == 'completado') | tojson }}
+        };
+    </script>
+    <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='leccion-acciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='leccion-quiz.js') }}"></script>
+    <script>
+        document.querySelectorAll('.leccion-tab').forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                if (tab.id === 'quiz-tab-jump') return;
+                var target = tab.getAttribute('data-tab');
+                document.querySelectorAll('.leccion-tab').forEach(function (t) {
+                    t.classList.remove('is-active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                document.querySelectorAll('.leccion-tab-panel').forEach(function (p) {
+                    p.classList.remove('is-active');
+                    p.hidden = true;
+                });
+                tab.classList.add('is-active');
+                tab.setAttribute('aria-selected', 'true');
+                var panel = document.getElementById('panel-' + target);
+                if (panel) {
+                    panel.classList.add('is-active');
+                    panel.hidden = false;
+                }
+            });
+        });
+    </script>
+    {% include 'partials/nebula_user_boot.html' %}
+</body>
+
+</html>

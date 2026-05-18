@@ -1,0 +1,20 @@
+[
+    {
+        "id_progreso_catalogo": 1,
+        "id_usuario": 2,
+        "slug": "fundamentos-algebra",
+        "lecciones_completadas": [
+            "funciones-cuadraticas"
+        ],
+        "fecha_actualizacion": "2026-05-15"
+    },
+    {
+        "id_progreso_catalogo": 2,
+        "id_usuario": 2,
+        "slug": "fisica-cuantica-1",
+        "lecciones_completadas": [
+            "dualidad-onda-particula"
+        ],
+        "fecha_actualizacion": "2026-05-15"
+    }
+]

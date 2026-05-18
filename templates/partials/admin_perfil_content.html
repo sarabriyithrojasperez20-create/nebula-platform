@@ -1,0 +1,87 @@
+{% set p = perfil %}
+{% set avatar_src = avatar_url if avatar_url is defined else (url_for('static', filename=p.foto_url) if p.foto_url else '') %}
+<section class="nb-page-head">
+  <div>
+    <h2>Perfil del administrador</h2>
+    <p>Gestiona tu identidad y preferencias de la consola Nébula.</p>
+  </div>
+</section>
+
+<div class="perfil-edit-layout perfil-edit-layout--page">
+  <aside class="perfil-edit-aside admin-perfil-aside" aria-label="Resumen del perfil">
+    <div id="admin-avatar-dropzone" class="admin-avatar-dropzone">
+      <div class="admin-avatar-dropzone__ring">
+        {% set _admin_av_default = nebula_avatar_default if nebula_avatar_default is defined else 'https://lh3.googleusercontent.com/aida-public/AB6AXuAD6gE4jiVX_QOu_PJnl4RoiCuFtEVvl9zCo9MjQ-6uWcAni9hqFLMcI20-1qtdN9Q_xdVtZe05nF7Tlb6ausQOLPV6C1ehxI3Juo6jIIyt19DjM33_aq6eO5-l35Kz2AFteSqdTMTR3Zmp7iAYn60YTj-cA3gb1nSVquColSTkQmpq19qftiFfA2gTl1Z188WVEIvsp4Eo0t0ugfLEL9wZg7-Gdmo_49YAbnCDVSHyiBwV4CnWdJFFpZhHm_Y6WsxL54wboT6QzAU' %}
+        <img id="admin-perfil-avatar" class="perfil-edit-aside__avatar nb-admin-avatar" data-nebula-avatar
+          src="{{ avatar_src or _admin_av_default }}"
+          data-avatar-fallback="{{ _admin_av_default }}"
+          alt="Avatar de {{ p.nombre_completo }}"
+          onerror="if(this.dataset.avatarFallback){this.onerror=null;this.src=this.dataset.avatarFallback;}">
+        <label class="admin-avatar-overlay" for="admin-perfil-foto-input" title="Cambiar foto">
+          <span class="material-symbols-outlined">photo_camera</span>
+        </label>
+        <span class="admin-avatar-dropzone__hint">Arrastra una imagen aquí</span>
+      </div>
+      <input type="file" id="admin-perfil-foto-input" class="sr-only" accept="image/jpeg,image/jpg,image/png,image/webp,.jpg,.jpeg,.png,.webp" />
+    </div>
+    <button type="button" id="admin-perfil-change-photo" class="perfil-edit-aside__upload admin-perfil-upload-btn">
+      <span class="material-symbols-outlined text-lg">upload</span>
+      Cambiar foto
+    </button>
+    <h3 class="perfil-edit-aside__name">{{ p.nombre_completo }}</h3>
+    <p class="perfil-edit-aside__handle">{% if p.username %}@{{ p.username }}{% endif %}</p>
+    <span class="perfil-admin-badge">{{ p.rol }}</span>
+    <dl class="perfil-edit-meta">
+      <div class="perfil-edit-meta__row">
+        <dt>Correo</dt>
+        <dd>{{ p.correo or '—' }}</dd>
+      </div>
+      <div class="perfil-edit-meta__row">
+        <dt>Estado</dt>
+        <dd>{% if p.activo %}<span class="perfil-status perfil-status--ok">Activo</span>{% else %}<span class="perfil-status">Inactivo</span>{% endif %}</dd>
+      </div>
+      <div class="perfil-edit-meta__row">
+        <dt>Registro</dt>
+        <dd>{{ p.fecha_registro }}</dd>
+      </div>
+      <div class="perfil-edit-meta__row">
+        <dt>Cursos gestionados</dt>
+        <dd>{{ p.cursos_administrados }}</dd>
+      </div>
+    </dl>
+  </aside>
+
+  <section class="perfil-edit-form-card" id="editar">
+    <h3 class="perfil-edit-form-card__title">
+      <span class="material-symbols-outlined">person_edit</span>
+      Información personal
+    </h3>
+    <form class="perfil-modal__form admin-perfil-form" novalidate>
+      <div class="perfil-form-grid">
+        <label class="perfil-field">
+          <span class="perfil-field__label">Nombre completo</span>
+          <input type="text" name="nombre_completo" value="{{ p.nombre_completo }}" autocomplete="name" required />
+        </label>
+        <label class="perfil-field">
+          <span class="perfil-field__label">Usuario</span>
+          <input type="text" name="username" value="{{ p.username }}" autocomplete="username" />
+        </label>
+        <label class="perfil-field perfil-field--full">
+          <span class="perfil-field__label">Correo electrónico</span>
+          <input type="email" name="correo" value="{{ p.correo }}" autocomplete="email" />
+        </label>
+        <label class="perfil-field perfil-field--full">
+          <span class="perfil-field__label">Sobre mí</span>
+          <textarea name="sobre_mi" rows="4" placeholder="Breve descripción profesional..."></textarea>
+        </label>
+      </div>
+      <footer class="perfil-modal__footer">
+        <button type="submit" class="perfil-btn-primary">
+          <span class="material-symbols-outlined text-lg">save</span>
+          Guardar cambios
+        </button>
+      </footer>
+    </form>
+  </section>
+</div>
+<div id="admin-perfil-toast" class="admin-perfil-toast hidden" role="status"></div>

@@ -1,0 +1,36 @@
+.curso-detalle-page {
+    background: linear-gradient(180deg, #151220 0%, #1a1628 50%, #151220 100%);
+}
+
+.curso-detalle-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(106, 75, 216, 0.2);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.curso-detalle-progress-track {
+    height: 0.625rem;
+    background: rgba(106, 75, 216, 0.15);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.curso-detalle-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6a4bd8 0%, #7a5cf0 100%);
+    border-radius: 9999px;
+}
+
+.curso-detalle-leccion--completado {
+    border-color: rgba(34, 197, 94, 0.35);
+}
+
+.curso-detalle-leccion--en_progreso {
+    border-color: rgba(106, 75, 216, 0.5);
+    background: rgba(106, 75, 216, 0.08);
+}
+
+.curso-detalle-leccion--pendiente {
+    border-color: rgba(148, 163, 184, 0.2);
+}

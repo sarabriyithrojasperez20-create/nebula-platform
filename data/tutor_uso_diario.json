@@ -1,0 +1,16 @@
+[
+  {
+    "id_usuario": 2,
+    "fecha": "2026-05-17",
+    "mensajes": 2,
+    "quizzes": 0,
+    "ultimo_mensaje_at": "2026-05-17T00:12:15.845687"
+  },
+  {
+    "id_usuario": 5,
+    "fecha": "2026-05-17",
+    "mensajes": 0,
+    "quizzes": 0,
+    "ultimo_mensaje_at": null
+  }
+]
