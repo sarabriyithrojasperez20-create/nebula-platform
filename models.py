@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Any
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     ForeignKey,
     Index,
@@ -19,7 +20,16 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from extensions import db
 
-JsonType = JSONB
+
+def _resolve_json_type():
+    """JSONB en PostgreSQL; JSON estándar en SQLite (desarrollo local)."""
+    from db import is_sqlite_url, resolve_database_url
+
+    url = resolve_database_url()
+    return JSON if is_sqlite_url(url) else JSONB
+
+
+JsonType = _resolve_json_type()
 
 
 class Role(db.Model):
@@ -54,7 +64,7 @@ class User(db.Model):
     nombre_completo: Mapped[str] = mapped_column(String(255), nullable=False)
     correo: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     username: Mapped[str] = mapped_column(String(128), nullable=False, unique=True, index=True)
-    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    password: Mapped[str] = mapped_column(String(512), nullable=False)
     id_rol: Mapped[int] = mapped_column(ForeignKey("roles.id_rol"), nullable=False, index=True)
     activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     foto_perfil: Mapped[str | None] = mapped_column(String(512))
@@ -68,16 +78,23 @@ class User(db.Model):
 
     rol: Mapped[Role] = relationship(back_populates="usuarios")
 
-    def to_dict(self) -> dict[str, Any]:
+    def plan_suscripcion(self) -> str:
+        prefs = self.preferencias_aprendizaje or {}
+        plan = prefs.get("plan") or "free"
+        return str(plan).strip().lower() or "free"
+
+    def to_dict(self, *, include_password: bool = False) -> dict[str, Any]:
         out: dict[str, Any] = {
             "id_usuario": self.id_usuario,
             "nombre_completo": self.nombre_completo,
             "correo": self.correo,
             "username": self.username,
-            "password": self.password,
             "id_rol": self.id_rol,
             "activo": self.activo,
+            "plan": self.plan_suscripcion(),
         }
+        if include_password:
+            out["password"] = self.password
         if self.foto_perfil:
             out["foto_perfil"] = self.foto_perfil
         if self.foto_actualizada_en:
@@ -98,12 +115,24 @@ class User(db.Model):
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> User:
+        from password_security import normalize_password_for_storage
+
+        prefs = dict(data.get("preferencias_aprendizaje") or {})
+        plan_raw = data.get("plan")
+        if plan_raw:
+            prefs["plan"] = str(plan_raw).strip().lower()
+
+        raw_pwd = data.get("password")
+        if raw_pwd is None or str(raw_pwd).strip() == "":
+            raise ValueError("password es obligatorio al crear un usuario.")
+        stored_pwd = normalize_password_for_storage(str(raw_pwd))
+
         return cls(
             id_usuario=int(data["id_usuario"]),
             nombre_completo=data.get("nombre_completo", ""),
             correo=data.get("correo", ""),
             username=data.get("username", ""),
-            password=data.get("password", ""),
+            password=stored_pwd,
             id_rol=int(data.get("id_rol", 2)),
             activo=bool(data.get("activo", True)),
             foto_perfil=data.get("foto_perfil") or None,
@@ -112,7 +141,7 @@ class User(db.Model):
             sobre_mi=data.get("sobre_mi"),
             nivel_academico=data.get("nivel_academico") or None,
             grado=data.get("grado") or None,
-            preferencias_aprendizaje=data.get("preferencias_aprendizaje"),
+            preferencias_aprendizaje=prefs or None,
             progreso_materias=data.get("progreso_materias"),
         )
 
@@ -178,7 +207,9 @@ class CourseAssignment(db.Model):
 
     id_asignacion: Mapped[int] = mapped_column(Integer, primary_key=True)
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), nullable=False, index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     slug: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     fecha_asignacion: Mapped[str | None] = mapped_column(String(16))
@@ -210,7 +241,9 @@ class CatalogProgress(db.Model):
 
     id_progreso_catalogo: Mapped[int] = mapped_column(Integer, primary_key=True)
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), nullable=False, index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     slug: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     lecciones_completadas: Mapped[list] = mapped_column(JsonType, default=list)
@@ -245,7 +278,9 @@ class DiagnosticRecord(db.Model):
 
     id_diagnostico: Mapped[int] = mapped_column(Integer, primary_key=True)
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), nullable=False, index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     slug: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     nivel: Mapped[str | None] = mapped_column(String(32))
@@ -308,7 +343,9 @@ class QuizResult(db.Model):
 
     id_resultado: Mapped[int] = mapped_column(Integer, primary_key=True)
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), nullable=False, index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     slug: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     leccion_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
@@ -401,7 +438,7 @@ class SystemActivity(db.Model):
     id_actividad: Mapped[int] = mapped_column(Integer, primary_key=True)
     tipo: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     id_usuario: Mapped[int | None] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"), index=True
     )
     titulo: Mapped[str] = mapped_column(String(255), nullable=False)
     descripcion: Mapped[str] = mapped_column(Text, nullable=False)
@@ -459,7 +496,10 @@ class StreakRecord(db.Model):
 
     id_racha: Mapped[int] = mapped_column(Integer, primary_key=True)
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), nullable=False, unique=True, index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
     )
     racha_actual: Mapped[int] = mapped_column(Integer, default=0)
     mejor_racha: Mapped[int] = mapped_column(Integer, default=0)
@@ -508,7 +548,9 @@ class StreakLog(db.Model):
 
     id_log: Mapped[int] = mapped_column(Integer, primary_key=True)
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), nullable=False, index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     payload: Mapped[dict] = mapped_column(JsonType, nullable=False)
 
@@ -532,7 +574,9 @@ class TutorSession(db.Model):
 
     session_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), nullable=False, index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     titulo: Mapped[str] = mapped_column(String(255), nullable=False)
     contexto: Mapped[dict] = mapped_column(JsonType, default=dict)
@@ -569,7 +613,9 @@ class TutorDailyUsage(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario"), nullable=False, index=True
+        ForeignKey("usuarios.id_usuario", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     fecha: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
     payload: Mapped[dict] = mapped_column(JsonType, nullable=False)
@@ -689,3 +735,90 @@ class StatisticsSnapshot(db.Model):
     __table_args__ = (
         Index("ix_estadisticas_metrica_id", "metrica", "id"),
     )
+
+
+class CatalogCourse(db.Model):
+    """Catálogo académico administrable (cursos visibles para estudiantes)."""
+
+    __tablename__ = "catalogo_cursos"
+
+    slug: Mapped[str] = mapped_column(String(128), primary_key=True)
+    titulo: Mapped[str] = mapped_column(String(255), nullable=False)
+    nivel: Mapped[str] = mapped_column(String(64), default="Intermedio", nullable=False)
+    categoria: Mapped[str] = mapped_column(String(64), default="matematicas", nullable=False)
+    descripcion: Mapped[str] = mapped_column(Text, default="")
+    imagen: Mapped[str] = mapped_column(String(512), default="")
+    duracion_total: Mapped[str] = mapped_column(String(64), default="")
+    temas: Mapped[list | None] = mapped_column(JsonType)
+    modulos: Mapped[list | None] = mapped_column(JsonType)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    orden: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    lecciones: Mapped[list["CatalogLesson"]] = relationship(
+        back_populates="curso", cascade="all, delete-orphan"
+    )
+    evaluaciones: Mapped[list["CatalogEvaluation"]] = relationship(
+        back_populates="curso", cascade="all, delete-orphan"
+    )
+
+
+class CatalogLesson(db.Model):
+    __tablename__ = "catalogo_lecciones"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    curso_slug: Mapped[str] = mapped_column(
+        ForeignKey("catalogo_cursos.slug", ondelete="CASCADE"), nullable=False, index=True
+    )
+    leccion_id: Mapped[str] = mapped_column(String(128), nullable=False)
+    titulo: Mapped[str] = mapped_column(String(255), nullable=False)
+    duracion: Mapped[str] = mapped_column(String(64), default="30 min")
+    orden: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    contenido: Mapped[dict | None] = mapped_column(JsonType)
+
+    curso: Mapped[CatalogCourse] = relationship(back_populates="lecciones")
+
+    __table_args__ = (
+        UniqueConstraint("curso_slug", "leccion_id", name="uq_catalogo_leccion_curso"),
+    )
+
+
+class CatalogEvaluation(db.Model):
+    __tablename__ = "catalogo_evaluaciones"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    curso_slug: Mapped[str] = mapped_column(
+        ForeignKey("catalogo_cursos.slug", ondelete="CASCADE"), nullable=False, index=True
+    )
+    tipo: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    leccion_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    titulo: Mapped[str] = mapped_column(String(255), default="")
+    porcentaje_aprobacion: Mapped[int] = mapped_column(Integer, default=70, nullable=False)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    nivel_lecciones: Mapped[dict | None] = mapped_column(JsonType)
+
+    curso: Mapped[CatalogCourse] = relationship(back_populates="evaluaciones")
+    preguntas: Mapped[list["CatalogQuestion"]] = relationship(
+        back_populates="evaluacion", cascade="all, delete-orphan", order_by="CatalogQuestion.orden"
+    )
+
+
+class CatalogQuestion(db.Model):
+    __tablename__ = "catalogo_preguntas"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    evaluacion_id: Mapped[int] = mapped_column(
+        ForeignKey("catalogo_evaluaciones.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    orden: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    enunciado: Mapped[str] = mapped_column(Text, nullable=False)
+    tipo: Mapped[str] = mapped_column(String(32), default="opcion_multiple")
+    opciones: Mapped[dict | None] = mapped_column(JsonType)
+    respuesta_correcta: Mapped[str] = mapped_column(String(8), nullable=False)
+    explicacion: Mapped[str] = mapped_column(Text, default="")
+    pista: Mapped[str] = mapped_column(Text, default="")
+    tema: Mapped[str] = mapped_column(String(128), default="")
+    dificultad: Mapped[str] = mapped_column(String(32), default="media")
+    leccion_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+
+    evaluacion: Mapped[CatalogEvaluation] = relationship(back_populates="preguntas")

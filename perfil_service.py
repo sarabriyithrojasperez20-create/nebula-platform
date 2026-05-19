@@ -102,8 +102,11 @@ def normalizar_usuario_perfil(usuario: dict) -> dict:
     dominante = prefs.get("dominante", "visual")
     if dominante not in PREFERENCIAS_VALIDAS:
         dominante = "visual"
+    foto = usuario.get("foto_perfil") or usuario.get("profile_image") or ""
     return {
         **usuario,
+        "foto_perfil": foto,
+        "profile_image": foto,
         "sobre_mi": (usuario.get("sobre_mi") or "").strip(),
         "nivel_academico": (usuario.get("nivel_academico") or "").strip(),
         "preferencias_aprendizaje": {**prefs, "dominante": dominante},
@@ -259,9 +262,39 @@ def guardar_foto_perfil(
 def marca_foto_actualizada(cambios: dict) -> dict:
     from datetime import datetime
 
+    now = datetime.now()
     cambios = dict(cambios)
-    cambios["foto_actualizada_en"] = datetime.now().strftime("%Y%m%d%H%M%S")
+    cambios["foto_actualizada_en"] = now.strftime("%Y%m%d%H%M%S")
+    cambios["updated_at"] = now.strftime("%Y-%m-%d %H:%M:%S")
+    if cambios.get("foto_perfil"):
+        cambios["profile_image"] = cambios["foto_perfil"]
     return cambios
+
+
+def eliminar_foto_perfil_usuario(
+    usuarios: list,
+    id_usuario: int,
+) -> tuple[Optional[dict], Optional[str]]:
+    """Quita la foto del usuario y borra el archivo en disco."""
+    usuario = None
+    for u in usuarios:
+        if u.get("id_usuario") == id_usuario:
+            usuario = u
+            break
+    if not usuario:
+        return None, "Usuario no encontrado."
+    anterior = usuario.get("foto_perfil") or usuario.get("profile_image")
+    if anterior:
+        _eliminar_foto_antigua(anterior)
+    from datetime import datetime
+
+    cambios = {
+        "foto_perfil": "",
+        "profile_image": "",
+        "foto_actualizada_en": datetime.now().strftime("%Y%m%d%H%M%S"),
+        "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    return actualizar_usuario_en_lista(usuarios, id_usuario, cambios), None
 
 
 def _eliminar_foto_antigua(foto_perfil: str) -> None:

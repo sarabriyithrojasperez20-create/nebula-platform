@@ -85,7 +85,7 @@
                             <div>
                                 <div class="flex justify-between text-sm font-semibold mb-2">
                                     <span class="text-slate-300">Progreso del curso</span>
-                                    <span class="text-primary">{{ curso.porcentaje }}%</span>
+                                    <span class="text-primary curso-detalle-progress-pct">{{ curso.porcentaje }}%</span>
                                 </div>
                                 <div class="curso-detalle-progress-track">
                                     <div class="curso-detalle-progress-fill" style="width: {{ curso.porcentaje }}%;">
@@ -237,6 +237,7 @@
     <script src="{{ url_for('static', filename='curso-diagnostico.js') }}"></script>
     {% endif %}
     <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-progreso.js') }}" defer></script>
     {% include 'partials/nebula_user_boot.html' %}
 </body>
 

@@ -1,0 +1,136 @@
+.nb-curso-select {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    flex: 1 1 14rem;
+    max-width: 100%;
+}
+
+.nb-curso-select__label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+
+.dark .nb-curso-select__label,
+html.dark .nb-curso-select__label {
+    color: rgba(196, 181, 253, 0.75);
+}
+
+.nb-curso-select__wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nb-curso-select__icon {
+    position: absolute;
+    left: 0.85rem;
+    pointer-events: none;
+    color: #6a4bd8;
+    font-size: 1.25rem;
+}
+
+.nb-curso-select__field {
+    width: 100%;
+    appearance: none;
+    padding: 0.65rem 2.5rem 0.65rem 2.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(106, 75, 216, 0.25);
+    background: rgba(106, 75, 216, 0.08);
+    color: #0f172a;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s, transform 0.25s;
+}
+
+.dark .nb-curso-select__field,
+html.dark .nb-curso-select__field {
+    background: rgba(106, 75, 216, 0.12);
+    border-color: rgba(106, 75, 216, 0.35);
+    color: #f1f5f9;
+}
+
+.nb-curso-select__field:hover:not(:disabled) {
+    border-color: rgba(106, 75, 216, 0.55);
+    box-shadow: 0 4px 18px rgba(106, 75, 216, 0.18);
+}
+
+.nb-curso-select__field:focus {
+    outline: none;
+    border-color: #6a4bd8;
+    box-shadow: 0 0 0 3px rgba(106, 75, 216, 0.25);
+}
+
+.nb-curso-select__field--empty {
+    opacity: 0.85;
+    cursor: not-allowed;
+}
+
+.nb-curso-select__field:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.nb-curso-select__chevron {
+    position: absolute;
+    right: 0.75rem;
+    pointer-events: none;
+    color: #64748b;
+    font-size: 1.35rem;
+}
+
+.nb-curso-select__field--refresh {
+    animation: nb-curso-select-refresh 0.32s ease;
+}
+
+.nb-curso-select--pulse .nb-curso-select__field {
+    animation: nb-curso-select-pulse 0.55s ease;
+}
+
+@keyframes nb-curso-select-refresh {
+    0% {
+        opacity: 0.5;
+        transform: translateY(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes nb-curso-select-pulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(106, 75, 216, 0);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(106, 75, 216, 0.28);
+    }
+}
+
+.mis-cursos-modal__btn-anadir--success {
+    animation: mis-cursos-btn-added 0.45s ease;
+}
+
+@keyframes mis-cursos-btn-added {
+    0% {
+        transform: scale(1);
+    }
+    40% {
+        transform: scale(1.04);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 640px) {
+    .nb-curso-select {
+        flex: 1 1 100%;
+    }
+}

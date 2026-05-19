@@ -205,6 +205,13 @@
                 } catch (e) {
                     /* ignore */
                 }
+                if (window.NebulaProgreso && meta.slug && body.progreso) {
+                    window.NebulaProgreso.onCursoUpdated(meta.slug, body.progreso);
+                } else if (window.NebulaProgreso && meta.slug && body.progreso_curso !== undefined) {
+                    window.NebulaProgreso.onCursoUpdated(meta.slug, {
+                        porcentaje: body.progreso_curso,
+                    });
+                }
                 if (finishBtn) {
                     finishBtn.disabled = false;
                     finishBtn.onclick = function () {

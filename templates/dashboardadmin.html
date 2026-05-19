@@ -66,39 +66,49 @@
   </section>
 
   <section id="admin-dashboard-widgets" class="nb-widget-grid nb-widget-grid--2-1">
-    <div class="nb-glass-card">
+    <div class="nb-glass-card" id="admin-resumen-actividad-card">
       <div class="nb-card-header">
         <div>
           <h3>Resumen de actividad</h3>
-          <p>Crecimiento y engagement de la plataforma</p>
+          <p id="admin-resumen-periodo-label">Crecimiento y engagement de la plataforma</p>
         </div>
-        <select class="text-xs font-medium px-3 py-2 rounded-lg border border-[var(--nb-border)] bg-white text-[var(--nb-text-secondary)]">
-          <option>Últimos 7 días</option>
-          <option selected>Últimos 30 días</option>
+        <select id="admin-resumen-periodo" class="text-xs font-medium px-3 py-2 rounded-lg border border-[var(--nb-border)] bg-white text-[var(--nb-text-secondary)]" aria-label="Periodo del resumen">
+          <option value="7">Últimos 7 días</option>
+          <option value="30" selected>Últimos 30 días</option>
+          <option value="mes">Este mes</option>
         </select>
       </div>
       <div class="nb-card-body">
-        <div class="h-56 flex items-end justify-between gap-2 px-2">
-          {% for i in range(7) %}
-          <div class="flex-1 flex flex-col items-center gap-2 group">
-            <div class="w-full rounded-t-lg bg-gradient-to-t from-[var(--nb-primary)] to-[#8b6cff]/40 transition-all group-hover:opacity-90" style="height: {{ [35, 55, 48, 72, 65, 80, 58][i] }}%"></div>
-            <span class="text-[10px] text-[var(--nb-text-muted)] font-medium">{{ ['L','M','X','J','V','S','D'][i] }}</span>
+        <div id="admin-resumen-chart-wrap" class="admin-activity-chart-wrap">
+          <div id="admin-resumen-chart" class="admin-activity-chart" role="img" aria-label="Gráfico de actividad"></div>
+          <div id="admin-resumen-empty" class="admin-activity-empty hidden">
+            <span class="material-symbols-outlined">insights</span>
+            <p>No hay suficiente actividad registrada para mostrar estadísticas.</p>
+            <p class="admin-activity-empty__hint">Los movimientos de estudiantes aparecerán aquí cuando se registren usuarios, cursos, lecciones o evaluaciones.</p>
           </div>
-          {% endfor %}
         </div>
-        <div class="flex gap-6 mt-6">
-          <span class="flex items-center gap-2 text-xs text-[var(--nb-text-secondary)]"><span class="w-2.5 h-2.5 rounded-full bg-[var(--nb-primary)]"></span> Registros</span>
-          <span class="flex items-center gap-2 text-xs text-[var(--nb-text-secondary)]"><span class="w-2.5 h-2.5 rounded-full bg-[var(--nb-violet-100)]"></span> Activos</span>
+        <div id="admin-resumen-indicadores" class="admin-activity-kpis">
+          <div class="admin-activity-kpi"><span class="admin-activity-kpi__val" data-ind="nuevos_usuarios">0</span><span class="admin-activity-kpi__lbl">Nuevos usuarios</span></div>
+          <div class="admin-activity-kpi"><span class="admin-activity-kpi__val" data-ind="cursos_anadidos">0</span><span class="admin-activity-kpi__lbl">Cursos añadidos</span></div>
+          <div class="admin-activity-kpi"><span class="admin-activity-kpi__val" data-ind="lecciones_completadas">0</span><span class="admin-activity-kpi__lbl">Lecciones completadas</span></div>
+          <div class="admin-activity-kpi"><span class="admin-activity-kpi__val" data-ind="evaluaciones_realizadas">0</span><span class="admin-activity-kpi__lbl">Evaluaciones</span></div>
+          <div class="admin-activity-kpi"><span class="admin-activity-kpi__val" data-ind="promedio_aprobacion">0%</span><span class="admin-activity-kpi__lbl">Prom. aprobación</span></div>
+          <div class="admin-activity-kpi"><span class="admin-activity-kpi__val" data-ind="actividad_total">0</span><span class="admin-activity-kpi__lbl">Actividad total</span></div>
         </div>
+        <div id="admin-resumen-leyenda" class="admin-activity-legend"></div>
       </div>
     </div>
+    {% if resumen_actividad %}
+    <script type="application/json" id="admin-resumen-actividad-boot">{{ resumen_actividad | tojson }}</script>
+    {% endif %}
 
     <div class="nb-glass-card">
       <div class="nb-card-header">
         <h3>Actividad reciente</h3>
       </div>
-      <div class="nb-card-body nb-timeline">
+      <div class="nb-card-body nb-timeline" id="admin-actividad-reciente-list">
         {% for act in actividad_reciente %}
+
         <div class="nb-timeline-item">
           <div class="nb-timeline-icon">
             <span class="material-symbols-outlined text-[18px]">{{ act.icono }}</span>
@@ -201,10 +211,13 @@
 </div>
 
 </main>
+{% include 'partials/admin_catalog_modals.html' %}
 {% include 'partials/admin_delete_modal.html' %}
 <div id="admin-student-toast" class="nb-toast hidden" role="status"></div>
 <script src="{{ url_for('static', filename='admin-panel.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin-students.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin-catalog.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin-activity-summary.js') }}"></script>
 {% include 'partials/admin_foot_scripts.html' %}
 <script src="{{ url_for('static', filename='js/admin-nav.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin-shell.js') }}"></script>

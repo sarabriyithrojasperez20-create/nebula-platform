@@ -12,11 +12,8 @@ from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
 from extensions import db, migrate
 
-# Fallback Render (solo si DATABASE_URL no está definida o está vacía)
-RENDER_DATABASE_DEFAULT = (
-    "postgresql://nebula_db_jtpf_user:GVyvgOkt7MSiDMwiEhNGQRmKMnlhCfyU@"
-    "dpg-d85707d8nd3s73dgf2eg-a.oregon-postgres.render.com/nebula_db_jtpf"
-)
+# Opcional: URL externa solo por variable de entorno (nunca credenciales en el repo)
+RENDER_DATABASE_DEFAULT = (os.getenv("RENDER_DATABASE_URL") or "").strip()
 
 
 def normalize_database_url(url: str) -> str:
@@ -31,15 +28,47 @@ def normalize_database_url(url: str) -> str:
     return url
 
 
+def _ensure_env_loaded() -> None:
+    try:
+        from dotenv import load_dotenv
+        from nebula_config import ENV_PATH
+
+        load_dotenv(ENV_PATH, override=False)
+        load_dotenv(override=False)
+    except ImportError:
+        pass
+
+
+def _default_sqlite_url() -> str:
+    """SQLite local en instance/ — desarrollo sin PostgreSQL."""
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent
+    instance = root / "instance"
+    instance.mkdir(parents=True, exist_ok=True)
+    db_path = instance / "nebula.db"
+    # Forma absoluta compatible con Windows (sqlite:///C:/...)
+    return f"sqlite:///{db_path.resolve().as_posix()}"
+
+
+def is_sqlite_url(url: str) -> bool:
+    return (url or "").strip().lower().startswith("sqlite:")
+
+
 def resolve_database_url(default_url: str | None = None) -> str:
     """
     Orden de prioridad:
     1. Variable de entorno DATABASE_URL (si no está vacía)
     2. default_url (p. ej. Render en app.py)
     3. POSTGRES_* solo si POSTGRES_HOST está definido explícitamente
+    4. SQLite en instance/nebula.db (desarrollo local, salvo NEBULA_DISABLE_SQLITE_FALLBACK=1)
     """
+    _ensure_env_loaded()
+
     env_url = (os.getenv("DATABASE_URL") or "").strip()
     if env_url:
+        if is_sqlite_url(env_url):
+            return env_url
         return normalize_database_url(env_url)
 
     fallback = (default_url or RENDER_DATABASE_DEFAULT or "").strip()
@@ -55,7 +84,14 @@ def resolve_database_url(default_url: str | None = None) -> str:
         built = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
         return normalize_database_url(built)
 
-    return ""
+    if os.getenv("NEBULA_DISABLE_SQLITE_FALLBACK", "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    ):
+        return ""
+
+    return _default_sqlite_url()
 
 
 def describe_database_target(url: str) -> dict[str, str]:
@@ -76,7 +112,8 @@ def apply_sqlalchemy_config(app, default_url: str | None = None) -> str:
     url = resolve_database_url(default_url=default_url)
     if not url:
         raise ValueError(
-            "No hay URL de base de datos. Define DATABASE_URL en .env o usa el fallback de Render."
+            "No hay URL de base de datos. Define DATABASE_URL en .env, usa Render "
+            "(RENDER_DATABASE_URL) o deja el fallback SQLite en instance/nebula.db."
         )
     app.config["SQLALCHEMY_DATABASE_URI"] = url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -108,7 +145,9 @@ def configure_app(app) -> None:
         "pool_recycle": int(os.getenv("DB_POOL_RECYCLE", "300")),
     }
     uri = (app.config.get("SQLALCHEMY_DATABASE_URI") or "").lower()
-    if "render.com" in uri or os.getenv("DB_SSLMODE", "").strip() == "require":
+    if is_sqlite_url(uri):
+        engine_opts["connect_args"] = {"check_same_thread": False}
+    elif "render.com" in uri or os.getenv("DB_SSLMODE", "").strip() == "require":
         engine_opts["connect_args"] = {"sslmode": "require"}
     app.config.setdefault("SQLALCHEMY_ENGINE_OPTIONS", engine_opts)
 
@@ -149,12 +188,20 @@ def report_database_startup_error(app, exc: BaseException) -> None:
     target = describe_database_target(uri)
     host = target["host"]
     falta_esquema = _is_missing_schema_error(exc)
+    sqlite = is_sqlite_url(uri)
 
-    titulo = (
-        "ERROR — Faltan tablas en PostgreSQL (Nébula)"
-        if falta_esquema
-        else "ERROR — No se pudo conectar a PostgreSQL (Nébula)"
-    )
+    if sqlite:
+        titulo = (
+            "ERROR — Faltan tablas en SQLite (Nébula)"
+            if falta_esquema
+            else "ERROR — No se pudo usar SQLite (Nébula)"
+        )
+    else:
+        titulo = (
+            "ERROR — Faltan tablas en PostgreSQL (Nébula)"
+            if falta_esquema
+            else "ERROR — No se pudo conectar a PostgreSQL (Nébula)"
+        )
 
     lines = [
         "",
@@ -180,6 +227,14 @@ def report_database_startup_error(app, exc: BaseException) -> None:
                 "",
                 "  Eso crea las tablas e importa usuarios/cursos desde data/*.json.",
                 "  Luego vuelve a ejecutar: python app.py",
+            ]
+        )
+    elif sqlite:
+        lines.extend(
+            [
+                "  Base SQLite local (instance/nebula.db). Prueba:",
+                "    python scripts/migrate_json_to_postgres.py",
+                "  o borra instance/nebula.db y reinicia python app.py",
             ]
         )
     elif host in ("localhost", "127.0.0.1", "::1"):

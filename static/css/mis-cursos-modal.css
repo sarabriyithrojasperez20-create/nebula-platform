@@ -164,10 +164,23 @@ html.dark .mis-cursos-modal__item-titulo {
 
 .mis-cursos-modal__btn-anadir:disabled,
 .mis-cursos-modal__btn-asignado {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
     background: rgba(34, 197, 94, 0.15);
     color: #16a34a;
     border: 1px solid rgba(34, 197, 94, 0.35);
     cursor: default;
+}
+
+.dark .mis-cursos-modal__btn-asignado,
+html.dark .mis-cursos-modal__btn-asignado {
+    color: #4ade80;
 }
 
 .mis-cursos-card-anadir {

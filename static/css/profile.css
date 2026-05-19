@@ -944,3 +944,8 @@ body.perfil-modal-open {
 [data-nebula-avatar] {
   object-fit: cover;
 }
+
+img[data-nebula-avatar].nebula-avatar--loading {
+  opacity: 0.55;
+  pointer-events: none;
+}

@@ -1,0 +1,24 @@
+{# Tarjeta de perfil en sidebar — enlace al perfil + menú de cuenta #}
+{% set _nombre = nombre|default(session.get('nombre', 'Estudiante')) %}
+{% set _username = nebula_menu_username|default(session.get('username', '')) %}
+<div class="dash-sidebar-profile">
+    <a href="{{ url_for('perfil') }}" class="dash-sidebar-profile__link" aria-label="Ir a mi perfil">
+        <span class="dash-sidebar-profile__avatar-wrap">
+            {% with avatar_class='dash-sidebar-profile__avatar' %}
+            {% include 'partials/estudiante_avatar.html' %}
+            {% endwith %}
+        </span>
+        <span class="dash-sidebar-profile__text">
+            <span class="dash-sidebar-profile__name">{{ _nombre }}</span>
+            {% if _username %}
+            <span class="dash-sidebar-profile__handle">@{{ _username }}</span>
+            {% else %}
+            <span class="dash-sidebar-profile__meta">Ver mi perfil</span>
+            {% endif %}
+        </span>
+        <span class="dash-sidebar-profile__chevron material-symbols-outlined" aria-hidden="true">chevron_right</span>
+    </a>
+    {% with menu_sidebar_compact=true %}
+    {% include 'partials/estudiante_user_menu.html' %}
+    {% endwith %}
+</div>

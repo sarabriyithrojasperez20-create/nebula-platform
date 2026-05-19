@@ -193,6 +193,23 @@ def calcular_rango_periodo(dias: int) -> tuple[str, str, str]:
     return desde.strftime("%Y-%m-%d"), hasta.strftime("%Y-%m-%d"), etiqueta
 
 
+def calcular_rango_periodo_admin(periodo: str) -> tuple[str, str, str, int]:
+    """Rango para el resumen del dashboard admin: 7, 30 o este mes."""
+    hoy = datetime.now().date()
+    p = (periodo or "30").strip().lower()
+    if p in ("mes", "este_mes", "month"):
+        desde = hoy.replace(day=1)
+        dias = (hoy - desde).days + 1
+        return desde.strftime("%Y-%m-%d"), hoy.strftime("%Y-%m-%d"), "Este mes", dias
+    if p in ("7", "7d", "semana"):
+        dias = 7
+    else:
+        dias = 30
+    desde = hoy - timedelta(days=dias - 1)
+    etiqueta = "Últimos 7 días" if dias == 7 else "Últimos 30 días"
+    return desde.strftime("%Y-%m-%d"), hoy.strftime("%Y-%m-%d"), etiqueta, dias
+
+
 def fecha_en_rango(fecha_str: str, fecha_desde: str, fecha_hasta: str) -> bool:
     if not fecha_str:
         return not fecha_desde and not fecha_hasta
@@ -343,15 +360,26 @@ def obtener_lista_usuarios_admin():
 
 
 def obtener_lista_cursos_admin():
+    from catalog_service import listar_cursos_admin_db
+
     CURSOS_CATALOGO, ORDEN_CURSOS_CATALOGO, MATERIA_POR_SLUG = _catalogo()
     por_curso = obtener_asignaciones_por_curso()
     diagnosticos = cargar_datos("diagnosticos_catalogo")
     quizzes = cargar_datos("resultados_quiz")
     progreso_regs = cargar_datos("progreso_catalogo")
     lista = []
+    db_cursos = listar_cursos_admin_db()
+    slugs_orden = [c["slug"] for c in sorted(db_cursos, key=lambda x: (x.get("orden") or 0, x.get("titulo") or ""))]
 
-    for slug in ORDEN_CURSOS_CATALOGO:
+    for slug in slugs_orden:
         base = CURSOS_CATALOGO.get(slug)
+        db_row = next((c for c in db_cursos if c["slug"] == slug), None)
+        if not base and db_row:
+            base = {
+                "titulo": db_row.get("titulo", slug),
+                "nivel": db_row.get("nivel", "—"),
+                "lecciones": [],
+            }
         if not base:
             continue
         estudiantes = por_curso.get(slug, [])
@@ -380,15 +408,22 @@ def obtener_lista_cursos_admin():
             promedio_prog = 0
             prom_aprobacion = 0
 
+        num_lecciones = len(base.get("lecciones", []))
+        num_evaluaciones = 0
+        if db_row:
+            num_lecciones = db_row.get("num_lecciones", num_lecciones)
+            num_evaluaciones = db_row.get("num_evaluaciones", 0)
+
         lista.append(
             {
                 "slug": slug,
                 "titulo": base["titulo"],
-                "categoria": MATERIA_POR_SLUG.get(slug, "general").capitalize(),
+                "categoria": (db_row.get("categoria") if db_row else MATERIA_POR_SLUG.get(slug, "general")).capitalize(),
                 "nivel": base.get("nivel", "—"),
-                "activo": True,
+                "activo": db_row.get("activo", True) if db_row else True,
                 "estudiantes_inscritos": n_est,
-                "num_lecciones": len(base.get("lecciones", [])),
+                "num_lecciones": num_lecciones,
+                "num_evaluaciones": num_evaluaciones,
                 "progreso_promedio": promedio_prog,
                 "diagnosticos_realizados": diag_count,
                 "quizzes_finales": quiz_count,
@@ -535,7 +570,179 @@ def _icono_actividad(tipo):
         "leccion_completada": "task_alt",
         "quiz_aprobado": "verified",
         "quiz_no_aprobado": "cancel",
+        "meta_creada": "flag",
+        "evento_creado": "event",
     }.get(tipo, "info")
+
+
+def _categoria_resumen_actividad(tipo: str) -> str:
+    """Agrupa tipos de actividad_sistema en series del gráfico."""
+    t = (tipo or "").strip().lower()
+    if t == "registro_usuario":
+        return "registros"
+    if t == "curso_anadido":
+        return "cursos"
+    if t == "diagnostico_completado":
+        return "diagnosticos"
+    if t in ("quiz_aprobado", "quiz_no_aprobado"):
+        return "quizzes"
+    if t in ("leccion_completada", "leccion_iniciada"):
+        return "lecciones"
+    if t == "meta_creada":
+        return "metas"
+    if t == "evento_creado":
+        return "eventos"
+    return "otros"
+
+
+def _obtener_actividades_sistema_completas() -> list[dict]:
+    actividades = cargar_datos("actividad_sistema")
+    if not actividades:
+        actividades = _reconstruir_actividad_desde_datos()
+    return actividades
+
+
+def _fechas_en_rango(fecha_desde: str, fecha_hasta: str) -> list[str]:
+    try:
+        d0 = datetime.strptime(fecha_desde, "%Y-%m-%d").date()
+        d1 = datetime.strptime(fecha_hasta, "%Y-%m-%d").date()
+    except ValueError:
+        return []
+    out = []
+    cur = d0
+    while cur <= d1:
+        out.append(cur.strftime("%Y-%m-%d"))
+        cur += timedelta(days=1)
+    return out
+
+
+def _etiqueta_dia_corta(fecha_str: str) -> str:
+    try:
+        dt = datetime.strptime(fecha_str, "%Y-%m-%d")
+        return ["L", "M", "X", "J", "V", "S", "D"][dt.weekday()]
+    except ValueError:
+        return fecha_str[-2:] if fecha_str else "—"
+
+
+def obtener_resumen_actividad_dashboard(periodo: str = "30") -> dict:
+    """Datos para la tarjeta «Resumen de actividad» del dashboard admin."""
+    fecha_desde, fecha_hasta, etiqueta, dias = calcular_rango_periodo_admin(periodo)
+    actividades = _obtener_actividades_sistema_completas()
+
+    filtradas = [
+        a
+        for a in actividades
+        if fecha_en_rango((a.get("fecha") or "")[:10], fecha_desde, fecha_hasta)
+    ]
+
+    conteos_tipo = {
+        "registros": 0,
+        "cursos": 0,
+        "diagnosticos": 0,
+        "quizzes": 0,
+        "lecciones": 0,
+        "metas": 0,
+        "eventos": 0,
+        "otros": 0,
+    }
+    for act in filtradas:
+        cat = _categoria_resumen_actividad(act.get("tipo"))
+        conteos_tipo[cat] = conteos_tipo.get(cat, 0) + 1
+
+    fechas = _fechas_en_rango(fecha_desde, fecha_hasta)
+    por_dia: dict[str, dict[str, int]] = {f: {k: 0 for k in conteos_tipo} for f in fechas}
+    for act in filtradas:
+        f = (act.get("fecha") or "")[:10]
+        if f not in por_dia:
+            continue
+        cat = _categoria_resumen_actividad(act.get("tipo"))
+        por_dia[f][cat] = por_dia[f].get(cat, 0) + 1
+
+    max_total = 0
+    columnas = []
+    for f in fechas:
+        segmentos = por_dia.get(f, {})
+        total_dia = sum(segmentos.values())
+        max_total = max(max_total, total_dia)
+        columnas.append(
+            {
+                "fecha": f,
+                "etiqueta": _etiqueta_dia_corta(f) if dias <= 14 else f[8:10] + "/" + f[5:7],
+                "total": total_dia,
+                "segmentos": segmentos,
+            }
+        )
+
+    if max_total <= 0:
+        max_total = 1
+
+    for col in columnas:
+        segs = []
+        total_dia = col["total"] or 0
+        for key, color, label in _SERIES_RESUMEN_ACTIVIDAD:
+            val = col["segmentos"].get(key, 0)
+            if val <= 0:
+                continue
+            segs.append(
+                {
+                    "clave": key,
+                    "valor": val,
+                    "altura_pct": round((val / total_dia) * 100) if total_dia else 0,
+                    "color": color,
+                    "label": label,
+                }
+            )
+        col["segmentos_visibles"] = segs
+        col["altura_pct"] = (
+            max(12, round((total_dia / max_total) * 100)) if total_dia else 0
+        )
+
+    quizzes_aprob = sum(
+        1 for a in filtradas if a.get("tipo") == "quiz_aprobado"
+    )
+    quizzes_total = conteos_tipo["quizzes"]
+    prom_aprob = round((quizzes_aprob / quizzes_total) * 100) if quizzes_total else 0
+
+    evaluaciones = conteos_tipo["diagnosticos"] + conteos_tipo["quizzes"]
+    actividad_total = sum(conteos_tipo.values()) - conteos_tipo.get("otros", 0)
+
+    return {
+        "periodo": {
+            "clave": periodo,
+            "dias": dias,
+            "etiqueta": etiqueta,
+            "desde": fecha_desde,
+            "hasta": fecha_hasta,
+        },
+        "vacio": actividad_total <= 0,
+        "columnas": columnas,
+        "leyenda": [
+            {"clave": k, "label": lbl, "color": c}
+            for k, c, lbl in _SERIES_RESUMEN_ACTIVIDAD
+        ],
+        "indicadores": {
+            "nuevos_usuarios": conteos_tipo["registros"],
+            "cursos_anadidos": conteos_tipo["cursos"],
+            "lecciones_completadas": conteos_tipo["lecciones"],
+            "evaluaciones_realizadas": evaluaciones,
+            "promedio_aprobacion": prom_aprob,
+            "actividad_total": actividad_total,
+            "metas_creadas": conteos_tipo["metas"],
+            "eventos_creados": conteos_tipo["eventos"],
+        },
+        "actividad_reciente": _actividad_reciente_en_periodo(fecha_desde, fecha_hasta, 8),
+    }
+
+
+_SERIES_RESUMEN_ACTIVIDAD = (
+    ("registros", "var(--nb-primary)", "Registros"),
+    ("cursos", "#8b6cff", "Cursos añadidos"),
+    ("diagnosticos", "#a78bfa", "Diagnósticos"),
+    ("quizzes", "#c4b5fd", "Quizzes"),
+    ("lecciones", "#10b981", "Lecciones"),
+    ("metas", "#f59e0b", "Metas"),
+    ("eventos", "#6366f1", "Eventos"),
+)
 
 
 def obtener_actividad_reciente_admin(limite=8):
@@ -597,6 +804,7 @@ def _reconstruir_actividad_desde_datos():
                     "titulo": "Nuevo usuario registrado",
                     "descripcion": f"{u.get('nombre_completo', '')} se registró en la plataforma",
                     "fecha": u.get("fecha_registro") + " 12:00",
+                    "id_usuario": u.get("id_usuario"),
                 }
             )
 
@@ -608,6 +816,7 @@ def _reconstruir_actividad_desde_datos():
                 "titulo": "Curso añadido",
                 "descripcion": f"{_nombre_usuario(asig['id_usuario'])} añadió {base.get('titulo', asig.get('slug', ''))}",
                 "fecha": (asig.get("fecha_asignacion") or "") + " 12:00",
+                "id_usuario": asig.get("id_usuario"),
             }
         )
 
@@ -619,6 +828,7 @@ def _reconstruir_actividad_desde_datos():
                 "titulo": "Diagnóstico completado",
                 "descripcion": f"{_nombre_usuario(d['id_usuario'])} — {base.get('titulo', '')} ({d.get('titulo_nivel', '')})",
                 "fecha": d.get("fecha", ""),
+                "id_usuario": d.get("id_usuario"),
             }
         )
 
@@ -632,6 +842,7 @@ def _reconstruir_actividad_desde_datos():
                     "titulo": "Lección completada",
                     "descripcion": f"{_nombre_usuario(reg['id_usuario'])} completó {(lec or {}).get('titulo', lid)}",
                     "fecha": (reg.get("fecha_actualizacion") or "") + " 18:00",
+                    "id_usuario": reg.get("id_usuario"),
                 }
             )
 
@@ -643,14 +854,39 @@ def _reconstruir_actividad_desde_datos():
                 "titulo": "Quiz final aprobado" if q.get("aprobado") else "Quiz final no aprobado",
                 "descripcion": f"{_nombre_usuario(q['id_usuario'])} — {q.get('titulo_leccion', '')} ({q.get('porcentaje', 0)}%)",
                 "fecha": q.get("fecha", ""),
+                "id_usuario": q.get("id_usuario"),
             }
         )
+
+    for act in cargar_datos("actividades"):
+        uid = act.get("id_usuario")
+        if act.get("tipo") == "meta":
+            items.append(
+                {
+                    "tipo": "meta_creada",
+                    "titulo": "Meta personalizada creada",
+                    "descripcion": f"{_nombre_usuario(uid)} — {act.get('titulo', 'Meta')}",
+                    "fecha": act.get("creado_en") or act.get("fecha", ""),
+                    "id_usuario": uid,
+                }
+            )
+        elif act.get("tipo") in ("calendario", "evaluacion"):
+            items.append(
+                {
+                    "tipo": "evento_creado",
+                    "titulo": "Evento en calendario",
+                    "descripcion": f"{_nombre_usuario(uid)} — {act.get('titulo', 'Evento')}",
+                    "fecha": act.get("creado_en") or act.get("fecha", ""),
+                    "id_usuario": uid,
+                }
+            )
 
     return items
 
 
 def obtener_datos_admin_completos():
     resumen = obtener_resumen_admin()
+    resumen_actividad = obtener_resumen_actividad_dashboard("30")
     return {
         "resumen": resumen,
         "usuarios": obtener_lista_usuarios_admin(),
@@ -659,7 +895,9 @@ def obtener_datos_admin_completos():
         "evaluaciones": obtener_lista_evaluaciones_admin(),
         "cursos_populares": obtener_cursos_populares(),
         "distribucion_roles": obtener_distribucion_roles(),
-        "actividad_reciente": obtener_actividad_reciente_admin(),
+        "actividad_reciente": resumen_actividad.get("actividad_reciente")
+        or obtener_actividad_reciente_admin(),
+        "resumen_actividad": resumen_actividad,
     }
 
 
@@ -764,13 +1002,11 @@ def _contar_cursos_completados() -> int:
 
 
 def _contar_rachas_activas() -> int:
-    ruta = os.path.join("data", "racha_diaria.json")
-    if not os.path.isfile(ruta):
-        return 0
     try:
-        with open(ruta, "r", encoding="utf-8") as f:
-            registros = json.load(f)
-    except (OSError, json.JSONDecodeError):
+        registros = cargar_datos("racha_diaria")
+    except Exception:
+        return 0
+    if not isinstance(registros, list):
         return 0
     return sum(1 for r in registros if int(r.get("racha_actual") or 0) > 0)
 
@@ -1070,7 +1306,7 @@ def obtener_datos_analytics(dias: int = 30):
         import logging
 
         logging.getLogger("nebula.analytics").warning(
-            "No se pudo sincronizar estadísticas SQLite: %s", exc
+            "No se pudo sincronizar estadísticas en BD: %s", exc
         )
         metricas_sqlite = {}
 
@@ -1099,9 +1335,7 @@ def obtener_datos_analytics(dias: int = 30):
 
 
 def _actividad_reciente_en_periodo(fecha_desde: str, fecha_hasta: str, limite: int = 8) -> list:
-    actividades = cargar_datos("actividad_sistema")
-    if not actividades:
-        actividades = _reconstruir_actividad_desde_datos()
+    actividades = _obtener_actividades_sistema_completas()
     filtradas = [
         a
         for a in actividades
@@ -1257,14 +1491,16 @@ def eliminar_estudiante(id_usuario: int, id_admin: int) -> None:
     """Elimina un estudiante y todos sus datos (PostgreSQL / capa nebula_data)."""
     if id_usuario == id_admin:
         raise ValueError("No puedes eliminar tu propia cuenta.")
-    usuarios = cargar_datos("usuarios")
-    usuario = next((u for u in usuarios if u.get("id_usuario") == id_usuario), None)
-    if not usuario:
-        raise ValueError("Estudiante no encontrado.")
-    if usuario.get("id_rol") != 2:
-        raise ValueError("Solo se pueden eliminar cuentas de estudiante.")
 
+    from extensions import db
+    from models import User
     from nebula_data import eliminar_usuario_completo
+
+    estudiante = db.session.get(User, int(id_usuario))
+    if estudiante is None:
+        raise ValueError("Estudiante no encontrado.")
+    if estudiante.id_rol != 2:
+        raise ValueError("Solo se pueden eliminar cuentas de estudiante.")
 
     eliminar_usuario_completo(id_usuario)
 
@@ -1281,9 +1517,9 @@ def suspender_estudiante(id_usuario: int, id_admin: int, activo: bool) -> dict:
         raise ValueError("Estudiante no encontrado.")
     if usuarios[idx].get("id_rol") != 2:
         raise ValueError("Solo se pueden suspender estudiantes.")
-    usuarios[idx]["activo"] = activo
-    n = _nebula()
-    n.guardar_datos("usuarios", usuarios)
+    from nebula_data import actualizar_campos_usuario
+
+    actualizar_campos_usuario(int(id_usuario), {"activo": bool(activo)})
     return {
         "id_usuario": id_usuario,
         "activo": activo,

@@ -49,3 +49,13 @@
   animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .glass-card {
+    padding: 1.25rem !important;
+  }
+  header.absolute.px-10 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}

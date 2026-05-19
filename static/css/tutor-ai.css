@@ -211,6 +211,58 @@
     border: 1px solid #fecaca;
 }
 
+@media (max-width: 1023px) {
+    .tutor-ai-page .flex.h-screen {
+        height: auto;
+        min-height: 100dvh;
+        flex-direction: column;
+    }
+
+    .tutor-ai-page .tutor-ai-sidebar {
+        width: 100% !important;
+        max-height: 42vh;
+        border-right: none !important;
+        border-bottom: 1px solid #e8edf5;
+    }
+
+    .tutor-ai-page .tutor-ai-main {
+        flex: 1;
+        min-height: 55vh;
+        min-width: 0;
+    }
+
+    .tutor-ai-page .tutor-ai-panel-right {
+        width: 100% !important;
+        border-left: none !important;
+        border-top: 1px solid #e8edf5;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .tutor-ai-page .flex.h-screen {
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 100dvh;
+    }
+
+    .tutor-ai-page .tutor-ai-sidebar {
+        width: 13rem !important;
+        min-height: 100dvh;
+    }
+
+    .tutor-ai-page .tutor-ai-main {
+        flex: 1 1 calc(100% - 13rem);
+        min-width: 0;
+    }
+
+    .tutor-ai-page .tutor-ai-panel-right {
+        flex: 1 1 100%;
+        width: 100% !important;
+        border-left: none !important;
+        border-top: 1px solid #e8edf5;
+    }
+}
+
 @keyframes tutor-ai-typing-bounce {
     0%,
     80%,

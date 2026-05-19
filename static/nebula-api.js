@@ -31,20 +31,6 @@ const NebulApi = {
     return localStorage.getItem('token');
   }
 };
-// ── Toggle visibilidad contraseña ──────────────────────────
-function togglePass(inputId, btn) {
-  const input = document.getElementById(inputId);
-  const icon  = btn.querySelector('.material-symbols-outlined');
-
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.textContent = 'visibility_off';
-  } else {
-    input.type = 'password';
-    icon.textContent = 'visibility';
-  }
-}
-
 // ── Barra de fortaleza de contraseña ──────────────────────
 function calcularFortaleza(val) {
   const bar = document.getElementById('strength-bar');
@@ -132,12 +118,15 @@ function setLoading(loading) {
 
 // ── Submit ────────────────────────────────────────────────
 
- document.getElementById('form-registro').addEventListener('submit', (e) => {
-  if (!validar()) {
-    e.preventDefault();
-    alert("Revisa los campos");
-  }
-});
+const formRegistro = document.getElementById('form-registro');
+if (formRegistro) {
+  formRegistro.addEventListener('submit', (e) => {
+    if (!validar()) {
+      e.preventDefault();
+      alert("Revisa los campos");
+    }
+  });
+}
 // ── Limpiar errores en tiempo real ────────────────────────
 ['nombre','email','password','confirmar'].forEach(id => {
   document.getElementById(id)?.addEventListener('input', () => setFieldError(id, false));

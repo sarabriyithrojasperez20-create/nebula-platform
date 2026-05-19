@@ -1,11 +1,45 @@
-.env
-.env.local
-.env.*.local
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 .Python
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Base de datos local (datos reales del desarrollador)
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Entornos virtuales
 venv/
 .venv/
+env/
+
+# IDEs y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
 *.log
+
+# Subidas de usuario (mantener carpeta con .gitkeep)
 static/uploads/perfiles/*
 !static/uploads/perfiles/.gitkeep
+
+# Copias duplicadas de Windows (no deben versionarse)
+__pycache__ (1)/
+templates (1)/
+static (1)/
+data (1)/
+**/partials (1)/
+
+# SQL de respaldo local opcional
+nebula (1).sql

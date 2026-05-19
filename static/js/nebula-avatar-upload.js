@@ -1,25 +1,34 @@
 /**
  * Nébula — módulo compartido de subida de avatar (estudiante + admin).
- * Equivalente a useProfileImage() para la app Flask multi-página.
  */
 (function (global) {
     'use strict';
 
-    var API_FOTO = '/api/perfil/foto';
+    var API_FOTO = '/upload-profile-image';
+    var API_FOTO_FALLBACK = '/api/perfil/foto';
     var MAX_BYTES = 5 * 1024 * 1024;
     var ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/pjpeg', 'image/png', 'image/webp', 'image/x-png'];
 
     var MSG = {
         loading: 'Actualizando foto…',
         ok: 'Imagen subida correctamente',
-        format: 'Formato no permitido',
-        size: 'La imagen supera el tamaño permitido',
+        format: 'Formato no permitido. Usa JPG, PNG o WEBP.',
+        size: 'La imagen supera el tamaño permitido (máx. 5 MB).',
         error: 'Error al subir la imagen',
         empty: 'No se recibió ninguna imagen',
     };
 
+    var activeBlobUrl = null;
+
     function profileStore() {
         return global.NebulaUserProfile || null;
+    }
+
+    function setLoadingState(on) {
+        var store = profileStore();
+        if (store && store.setAvatarLoading) {
+            store.setAvatarLoading(on);
+        }
     }
 
     function isAllowedType(file) {
@@ -55,38 +64,96 @@
         }
     }
 
+    function revokeBlob() {
+        if (activeBlobUrl) {
+            try {
+                URL.revokeObjectURL(activeBlobUrl);
+            } catch (e) {
+                /* ignore */
+            }
+            activeBlobUrl = null;
+        }
+    }
+
     function applyPreview(file, selectors) {
+        revokeBlob();
         var url = URL.createObjectURL(file);
-        (selectors || ['[data-nebula-avatar]', '.nb-avatar', '.nb-admin-avatar']).forEach(function (sel) {
-            document.querySelectorAll(sel).forEach(function (el) {
-                if (el.tagName === 'IMG') el.src = url;
-                else {
-                    el.style.backgroundImage = 'url("' + url.replace(/"/g, '\\"') + '")';
-                    el.style.backgroundSize = 'cover';
-                    el.style.backgroundPosition = 'center';
+        activeBlobUrl = url;
+        var store = profileStore();
+        if (store) {
+            document.querySelectorAll('[data-nebula-avatar]').forEach(function (el) {
+                if (el.tagName === 'IMG') {
+                    el.src = url;
+                    el.dataset.nebulaAvatarApplied = url;
                 }
             });
-        });
+        } else {
+            (selectors || ['[data-nebula-avatar]', '.nb-avatar', '.nb-admin-avatar']).forEach(function (sel) {
+                document.querySelectorAll(sel).forEach(function (el) {
+                    if (el.tagName === 'IMG') {
+                        el.src = url;
+                    }
+                });
+            });
+        }
         return url;
+    }
+
+    function buildProfilePatch(data) {
+        if (data.usuario) {
+            return data.usuario;
+        }
+        var ts = data.foto_actualizada_en || String(Date.now());
+        return {
+            avatar_url: data.avatar_url,
+            avatarUrl: data.avatar_url,
+            foto_perfil: data.foto_perfil,
+            profile_image: data.foto_perfil || data.profile_image,
+            foto_actualizada_en: ts,
+            foto_version: ts,
+        };
     }
 
     function syncGlobalFromResponse(data) {
         var store = profileStore();
-        if (!store) return;
-        if (data.usuario) {
-            store.setProfile(data.usuario);
-        } else if (data.avatar_url) {
-            store.setProfile({
-                avatarUrl: data.avatar_url,
-                avatar_url: data.avatar_url,
-                foto_version: data.foto_actualizada_en || String(Date.now()),
-            });
+        revokeBlob();
+        var patch = buildProfilePatch(data);
+        if (!patch.avatar_url && !patch.avatarUrl) {
+            return null;
         }
+        if (store) {
+            return store.setProfile(patch);
+        }
+        var url = patch.avatarUrl || patch.avatar_url;
+        var ts = patch.foto_actualizada_en || String(Date.now());
+        var busted = url.split('?')[0] + '?v=' + encodeURIComponent(String(ts));
+        document.querySelectorAll('[data-nebula-avatar], .nb-avatar, .nb-admin-avatar').forEach(function (el) {
+            if (el.tagName === 'IMG') {
+                el.removeAttribute('src');
+                void el.offsetHeight;
+                el.src = busted;
+            }
+        });
+        return patch;
+    }
+
+    async function postFoto(fd) {
+        var res = await fetch(API_FOTO, {
+            method: 'POST',
+            body: fd,
+            credentials: 'same-origin',
+        });
+        if (res.ok) return res;
+        return fetch(API_FOTO_FALLBACK, {
+            method: 'POST',
+            body: fd,
+            credentials: 'same-origin',
+        });
     }
 
     /**
      * @param {File} file
-     * @param {{ onLoading?: Function, onSuccess?: Function, onError?: Function, previewSelectors?: string[] }} hooks
+     * @param {{ onLoading?: Function, onSuccess?: Function, onError?: Function, previewSelectors?: string[], preview?: boolean }} hooks
      */
     async function uploadAvatar(file, hooks) {
         hooks = hooks || {};
@@ -96,36 +163,46 @@
             return { ok: false, message: validation.message };
         }
 
-        var blobUrl = null;
         if (hooks.preview !== false) {
-            blobUrl = applyPreview(file, hooks.previewSelectors);
+            applyPreview(file, hooks.previewSelectors);
         }
 
+        setLoadingState(true);
         if (hooks.onLoading) hooks.onLoading(MSG.loading);
 
         var fd = new FormData();
         fd.append('foto', file, file.name || 'avatar.jpg');
 
         try {
-            var res = await fetch(API_FOTO, {
-                method: 'POST',
-                body: fd,
-                credentials: 'same-origin',
-            });
+            var res = await postFoto(fd);
             var data = await parseJsonSafe(res);
 
             if (!res.ok || !data.ok) {
                 var msg = parseApiResponse(res, data);
-                if (blobUrl && profileStore()) profileStore().refreshFromServer();
+                revokeBlob();
+                setLoadingState(false);
+                if (profileStore()) {
+                    await profileStore().refreshFromServer();
+                }
                 if (hooks.onError) hooks.onError(msg);
                 return { ok: false, message: msg };
             }
 
+            if (!data.avatar_url && data.usuario && data.usuario.avatar_url) {
+                data.avatar_url = data.usuario.avatar_url;
+            }
+
             syncGlobalFromResponse(data);
+            setLoadingState(false);
+
             if (hooks.onSuccess) hooks.onSuccess(data.mensaje || MSG.ok, data);
             return { ok: true, data: data };
         } catch (e) {
-            if (profileStore()) profileStore().refreshFromServer().catch(function () {});
+            revokeBlob();
+            setLoadingState(false);
+            if (profileStore()) {
+                await profileStore().refreshFromServer().catch(function () {});
+            }
             var errMsg = MSG.error;
             if (hooks.onError) hooks.onError(errMsg);
             return { ok: false, message: errMsg };
@@ -136,6 +213,7 @@
         upload: uploadAvatar,
         validate: validateFile,
         applyPreview: applyPreview,
+        syncFromResponse: syncGlobalFromResponse,
         MSG: MSG,
         MAX_BYTES: MAX_BYTES,
     };

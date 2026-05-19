@@ -44,21 +44,22 @@
                                 <input type="text" name="titulo" required minlength="2" maxlength="120" placeholder="Ej. Examen de álgebra" />
                             </label>
                             <label class="nb-cal-field">
-                                <span>Materia</span>
-                                <select name="materia" id="nb-cal-materia"></select>
+                                <span>Curso / materia</span>
+                                <select name="curso_slug" id="nb-cal-curso" required></select>
                             </label>
                             <label class="nb-cal-field">
-                                <span>Tipo</span>
-                                <select name="categoria">
-                                    <option value="evaluacion">Evaluación</option>
+                                <span>Tipo de evento</span>
+                                <select name="categoria" id="nb-cal-categoria">
+                                    <option value="quiz">Quiz</option>
+                                    <option value="examen">Examen</option>
                                     <option value="tarea">Tarea</option>
-                                    <option value="estudio" selected>Estudio</option>
-                                    <option value="reunion">Reunión</option>
+                                    <option value="clase" selected>Clase</option>
                                 </select>
                             </label>
-                            <label class="nb-cal-field">
-                                <span>Fecha</span>
-                                <input type="date" name="fecha" required />
+                            <label class="nb-cal-field nb-cal-field--date">
+                                <span>Fecha del evento</span>
+                                <input type="date" name="fecha" id="nb-cal-fecha" required class="nb-cal-date-input" />
+                                <p id="nb-cal-fecha-countdown" class="nb-cal-countdown" aria-live="polite"></p>
                             </label>
                             <label class="nb-cal-field">
                                 <span>Hora</span>
@@ -103,12 +104,28 @@
                 </div>
             </div>
             <aside class="nb-cal-sidebar">
-                <section class="nb-cal-upcoming">
+                <section id="nb-cal-detail" class="nb-cal-detail hidden" aria-live="polite">
+                    <button type="button" class="nb-cal-detail__back" id="nb-cal-detail-back" aria-label="Volver">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <span id="nb-cal-detail-tipo" class="nb-cal-detail__badge">—</span>
+                    <h3 id="nb-cal-detail-titulo" class="nb-cal-detail__title">—</h3>
+                    <p id="nb-cal-detail-curso" class="nb-cal-detail__meta">—</p>
+                    <p id="nb-cal-detail-fecha" class="nb-cal-detail__meta">—</p>
+                    <p id="nb-cal-detail-countdown" class="nb-cal-detail__countdown">—</p>
+                    <p id="nb-cal-detail-desc" class="nb-cal-detail__desc"></p>
+                    <button type="button" class="nb-cal-btn nb-cal-btn--primary nb-cal-detail__cta" id="nb-cal-detail-go">Ir al curso</button>
+                    <p id="nb-cal-detail-unavailable" class="nb-cal-detail__unavailable hidden">Curso no disponible</p>
+                    <div class="nb-cal-detail__actions">
+                        <button type="button" class="nb-cal-btn nb-cal-btn--ghost" id="nb-cal-detail-edit">Editar</button>
+                    </div>
+                </section>
+                <section class="nb-cal-upcoming" id="nb-cal-upcoming-section">
                     <h3>Próximas actividades</h3>
                     <div id="nb-cal-upcoming-list"></div>
                 </section>
                 <p style="font-size:0.75rem;color:#9490a0;margin-top:16px;line-height:1.5">
-                    Arrastra eventos entre días para reprogramar. Los colores indican el tipo de actividad.
+                    Clic en un evento para ir al curso. Arrastra entre días para reprogramar.
                 </p>
             </aside>
         </div>

@@ -1,0 +1,134 @@
+<dialog id="admin-modal-curso" class="admin-catalog-modal rounded-2xl border-0 p-0 max-w-lg w-[calc(100%-2rem)] shadow-xl backdrop:bg-black/40">
+<form id="admin-form-curso" class="p-6">
+<h3 class="font-title-lg text-on-surface mb-4" id="admin-modal-curso-titulo">Nuevo curso</h3>
+<input type="hidden" id="admin-curso-edit-slug" name="edit_slug" value="">
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Nombre</span>
+<input name="titulo" required class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Identificador (slug)</span>
+<input name="slug" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm" placeholder="auto si se deja vacío"></label>
+<div class="grid grid-cols-2 gap-3 mb-3">
+<label class="block"><span class="text-xs font-semibold text-outline uppercase">Nivel</span>
+<select name="nivel" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm">
+<option>Principiante</option><option selected>Intermedio</option><option>Avanzado</option></select></label>
+<label class="block"><span class="text-xs font-semibold text-outline uppercase">Materia</span>
+<select name="categoria" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm">
+<option value="matematicas">Matemáticas</option><option value="ciencias">Ciencias</option>
+<option value="lenguaje">Lenguaje</option><option value="historia">Historia</option></select></label>
+</div>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Descripción</span>
+<textarea name="descripcion" rows="3" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></textarea></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Duración estimada</span>
+<input name="duracion_total" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm" placeholder="24 h estimadas"></label>
+<label class="flex items-center gap-2 mb-4"><input type="checkbox" name="activo" value="1" checked class="rounded">
+<span class="text-sm text-secondary">Curso activo (visible en catálogo)</span></label>
+<div class="flex gap-3 justify-end">
+<button type="button" class="admin-catalog-cancel px-4 py-2 rounded-xl text-sm font-semibold border border-surface-container">Cancelar</button>
+<button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-primary">Guardar cambios</button>
+</div>
+</form>
+</dialog>
+
+<dialog id="admin-modal-leccion" class="admin-catalog-modal rounded-2xl border-0 p-0 max-w-lg w-[calc(100%-2rem)] shadow-xl backdrop:bg-black/40">
+<form id="admin-form-leccion" class="p-6 max-h-[85vh] overflow-y-auto">
+<h3 class="font-title-lg text-on-surface mb-4" id="admin-modal-leccion-titulo">Nueva lección</h3>
+<input type="hidden" name="lesson_db_id">
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Curso</span>
+<select name="curso_slug" required class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm" id="admin-leccion-curso-select"></select></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Título</span>
+<input name="titulo" required class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Duración</span>
+<input name="duracion" value="30 min" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Explicación (contenido)</span>
+<textarea name="explicacion" rows="4" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></textarea></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Conceptos clave (uno por línea)</span>
+<textarea name="conceptos" rows="3" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm" placeholder="Término: definición"></textarea></label>
+<label class="flex items-center gap-2 mb-4"><input type="checkbox" name="activo" value="1" checked class="rounded">
+<span class="text-sm text-secondary">Lección activa</span></label>
+<div class="flex gap-3 justify-end">
+<button type="button" class="admin-catalog-cancel px-4 py-2 rounded-xl text-sm font-semibold border border-surface-container">Cancelar</button>
+<button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-primary">Guardar cambios</button>
+</div>
+</form>
+</dialog>
+
+<dialog id="admin-modal-eval" class="admin-catalog-modal rounded-2xl border-0 p-0 max-w-lg w-[calc(100%-2rem)] shadow-xl backdrop:bg-black/40">
+<form id="admin-form-eval" class="p-6">
+<h3 class="font-title-lg text-on-surface mb-4" id="admin-modal-eval-titulo">Nueva evaluación</h3>
+<input type="hidden" name="eval_id">
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Curso</span>
+<select name="curso_slug" required class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm" id="admin-eval-curso-select"></select></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Tipo</span>
+<select name="tipo" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm">
+<option value="diagnostico">Diagnóstico inicial</option><option value="quiz">Quiz final</option></select></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Título</span>
+<input name="titulo" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">% mínimo aprobación</span>
+<input name="porcentaje_aprobacion" type="number" min="0" max="100" value="70" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block mb-3 admin-eval-leccion-wrap hidden"><span class="text-xs font-semibold text-outline uppercase">Lección (quiz final)</span>
+<select name="leccion_id" id="admin-eval-leccion-select" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></select></label>
+<label class="flex items-center gap-2 mb-4"><input type="checkbox" name="activo" value="1" class="rounded">
+<span class="text-sm text-secondary">Evaluación activa (requiere al menos una pregunta)</span></label>
+<div class="flex gap-3 justify-end">
+<button type="button" class="admin-catalog-cancel px-4 py-2 rounded-xl text-sm font-semibold border border-surface-container">Cancelar</button>
+<button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-primary">Guardar</button>
+</div>
+</form>
+</dialog>
+
+<dialog id="admin-modal-pregunta" class="admin-catalog-modal rounded-2xl border-0 p-0 max-w-xl w-[calc(100%-2rem)] shadow-xl backdrop:bg-black/40">
+<form id="admin-form-pregunta" class="p-6 max-h-[90vh] overflow-y-auto">
+<h3 class="font-title-lg text-on-surface mb-1">Pregunta</h3>
+<p class="text-sm text-outline mb-4" id="admin-pregunta-eval-label"></p>
+<input type="hidden" name="pregunta_id">
+<input type="hidden" name="eval_id">
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Enunciado</span>
+<textarea name="enunciado" required rows="3" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></textarea></label>
+<div class="grid grid-cols-2 gap-3 mb-3">
+<label class="block"><span class="text-xs font-semibold text-outline uppercase">Opción A</span>
+<input name="opcion_a" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block"><span class="text-xs font-semibold text-outline uppercase">Opción B</span>
+<input name="opcion_b" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block"><span class="text-xs font-semibold text-outline uppercase">Opción C</span>
+<input name="opcion_c" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block"><span class="text-xs font-semibold text-outline uppercase">Opción D</span>
+<input name="opcion_d" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+</div>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Respuesta correcta</span>
+<select name="respuesta_correcta" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm">
+<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></label>
+<label class="block mb-3"><span class="text-xs font-semibold text-outline uppercase">Explicación</span>
+<textarea name="explicacion" rows="2" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></textarea></label>
+<div class="grid grid-cols-2 gap-3 mb-4">
+<label class="block"><span class="text-xs font-semibold text-outline uppercase">Tema / habilidad</span>
+<input name="tema" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm"></label>
+<label class="block"><span class="text-xs font-semibold text-outline uppercase">Dificultad</span>
+<select name="dificultad" class="mt-1 w-full rounded-xl border border-surface-container px-3 py-2 text-sm">
+<option value="baja">Baja</option><option value="media" selected>Media</option><option value="alta">Alta</option></select></label>
+</div>
+<div class="flex gap-3 justify-end">
+<button type="button" class="admin-catalog-cancel px-4 py-2 rounded-xl text-sm font-semibold border border-surface-container">Cancelar</button>
+<button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-primary">Guardar pregunta</button>
+</div>
+</form>
+</dialog>
+
+<dialog id="admin-modal-eval-preguntas" class="admin-catalog-modal rounded-2xl border-0 p-0 max-w-2xl w-[calc(100%-2rem)] shadow-xl backdrop:bg-black/40">
+<div class="p-6 max-h-[90vh] overflow-y-auto">
+<h3 class="font-title-lg text-on-surface mb-1">Preguntas de la evaluación</h3>
+<p class="text-sm text-outline mb-4" id="admin-eval-preguntas-subtitulo"></p>
+<input type="hidden" id="admin-eval-preguntas-ev-id" value="">
+<div class="overflow-x-auto mb-4 border border-surface-container rounded-xl">
+<table class="w-full admin-data-table text-sm">
+<thead><tr class="bg-surface-container-low text-left">
+<th class="px-4 py-2 font-label-md text-outline">#</th>
+<th class="px-4 py-2 font-label-md text-outline">Enunciado</th>
+<th class="px-4 py-2 font-label-md text-outline text-right">Acciones</th>
+</tr></thead>
+<tbody id="admin-eval-preguntas-list" class="divide-y divide-surface-container"></tbody>
+</table></div>
+<button type="button" id="admin-btn-agregar-pregunta-eval" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-primary">Agregar pregunta</button>
+<div class="flex gap-3 justify-end mt-4">
+<button type="button" class="admin-catalog-cancel px-4 py-2 rounded-xl text-sm font-semibold border border-surface-container">Cerrar</button>
+</div>
+</div>
+</dialog>

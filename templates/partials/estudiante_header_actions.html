@@ -1,7 +1,10 @@
-{# Campana + avatar (sin icono de configuración) #}
+{# Configuración + notificaciones + menú de usuario #}
+{% with trigger_class=settings_trigger_class|default('') %}
+{% include 'partials/estudiante_settings_menu.html' %}
+{% endwith %}
 {% with clase_boton=clase_boton|default('flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors'), icono_clase=icono_clase|default('') %}
 {% include 'partials/notificaciones_dropdown.html' %}
 {% endwith %}
-{% with link_class=avatar_link_class|default('block shrink-0 rounded-full ring-2 ring-primary p-0.5'), img_class=avatar_img_class|default('size-10 rounded-full object-cover') %}
-{% include 'partials/estudiante_nav_avatar.html' %}
+{% with trigger_class=avatar_trigger_class|default('nb-user-menu__trigger--nav'), avatar_class=avatar_img_class|default('aspect-square rounded-full size-9 object-cover nb-user-menu__avatar') %}
+{% include 'partials/estudiante_user_menu.html' %}
 {% endwith %}

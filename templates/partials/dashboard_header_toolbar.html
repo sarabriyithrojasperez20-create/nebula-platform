@@ -1,0 +1,24 @@
+{# Barra superior derecha: notificaciones · herramientas · racha diaria #}
+<div class="dash-header-toolbar" role="group" aria-label="Acciones rápidas del panel">
+    <div class="dash-header-toolbar__actions" aria-label="Accesos rápidos">
+        <div class="dash-header-toolbar__slot">
+            {% with clase_boton='dash-toolbar-btn notificaciones-toggle', icono_clase='dash-toolbar-btn__icon' %}
+            {% include 'partials/notificaciones_dropdown.html' %}
+            {% endwith %}
+        </div>
+        <div class="dash-header-toolbar__slot dash-header-toolbar__slot--tools">
+            {% with trigger_class='dash-toolbar-btn nb-user-menu__trigger--dash' %}
+            {% include 'partials/estudiante_settings_menu.html' %}
+            {% endwith %}
+        </div>
+    </div>
+    <article class="dash-streak-card dashboard-card" aria-label="Racha diaria">
+        <div class="dash-streak-card__icon" aria-hidden="true">
+            <span class="material-symbols-outlined">local_fire_department</span>
+        </div>
+        <div class="dash-streak-card__body">
+            <p class="dash-streak-card__label">Racha diaria</p>
+            <p class="dash-streak-card__value">{{ racha_actual }} días</p>
+        </div>
+    </article>
+</div>

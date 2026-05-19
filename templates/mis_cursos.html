@@ -15,6 +15,7 @@
         rel="stylesheet">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mis-cursos-modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/curso-materia-selector.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
        
 </head>
@@ -79,6 +80,9 @@
                     </div>
                 </div>
             </div>
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4 mb-6 w-full">
+                {% include 'partials/curso_materia_selector.html' %}
+            </div>
             <!-- Filter Controls -->
             <div class="flex flex-wrap gap-4 mb-8 items-center justify-between w-full">
                 <div class="flex gap-3 flex-wrap items-center">
@@ -116,6 +120,13 @@
                     Mostrando {{ cursos_catalogo|length }} cursos activos
                 </div>
             </div>
+            {% if not cursos_catalogo %}
+            <div class="mb-6 rounded-lg border border-primary/20 bg-primary/5 px-6 py-8 text-center">
+                <span class="material-symbols-outlined text-4xl text-primary mb-3">library_add</span>
+                <p class="text-slate-600 dark:text-slate-300 font-semibold">Aún no tienes cursos asignados.</p>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Usa «Añadir cursos» para comenzar tu plan de aprendizaje.</p>
+            </div>
+            {% endif %}
             <div id="mis-cursos-empty" class="hidden mb-8 rounded-lg border border-primary/20 bg-primary/5 px-6 py-10 text-center">
                 <span class="material-symbols-outlined text-4xl text-primary mb-3">search_off</span>
                 <p class="text-slate-600 dark:text-slate-300 font-semibold">No hay cursos disponibles para esta selección</p>
@@ -186,11 +197,15 @@
         </footer>
     </div>
     <script>
-        window.MIS_CURSOS_META = { userId: {{ id_usuario | tojson }} };
+        window.MIS_CURSOS_META = {
+            userId: {{ id_usuario | tojson }},
+            cursosActivos: {{ cursos_activos | tojson }}
+        };
     </script>
-    <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-cursos-activos.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-progreso.js') }}" defer></script>
     <script src="{{ url_for('static', filename='mis-cursos.js') }}"></script>
-    {% include 'partials/nebula_user_boot.html' %}
+    {% include 'partials/estudiante_shell_assets.html' %}
 </body>
 
 </html>

@@ -1,0 +1,461 @@
+/**
+ * Nébula — Responsive global (móvil ≤640px, tablet ≤1024px, escritorio >1024px)
+ * No altera colores ni tipografías; adapta layout y contenedores.
+ */
+
+/* ——— Base ——— */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.nebula-responsive-root,
+body.bg-background-light,
+body.bg-background-dark,
+body.plan-estudios-page,
+body.tutor-ai-page,
+.nb-admin {
+  overflow-x: clip;
+}
+
+/* ——— Tipografía fluida en móvil ——— */
+@media (max-width: 640px) {
+  .text-4xl {
+    font-size: 1.75rem !important;
+    line-height: 2rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.5rem !important;
+    line-height: 1.75rem !important;
+  }
+}
+
+/* ——— Botones táctiles ——— */
+@media (max-width: 640px) {
+  button,
+  .nb-btn-primary,
+  .nb-btn-ghost,
+  .admin-metric-card,
+  a.nb-kpi-card,
+  [role='button'] {
+    min-height: 2.75rem;
+  }
+
+  .nav-modulo-link {
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* ——— Mis cursos: 1 / 2 / 3 columnas ——— */
+.mis-cursos-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+@media (min-width: 641px) {
+  .mis-cursos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mis-cursos-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+.mis-cursos-filtros-wrap,
+.mis-cursos-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ——— Headers estudiante ——— */
+@media (max-width: 640px) {
+  header.sticky .px-6,
+  header .px-6.lg\:px-20 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  header h2.text-xl {
+    font-size: 1.125rem !important;
+  }
+}
+
+/* ——— Dashboard estudiante ——— */
+body.nb-dashboard-layout {
+  overflow: hidden;
+}
+
+body.nb-drawer-open {
+  overflow: hidden;
+}
+
+@media (max-width: 1023px) {
+  body.nb-dashboard-layout {
+    overflow: auto;
+  }
+
+  body.nb-dashboard-layout .dashboard-shell {
+    min-height: 100vh;
+    height: auto;
+  }
+}
+
+.nb-est-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.nb-est-sidebar-overlay--visible {
+  display: block;
+}
+
+.nb-est-mobile-bar {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 1023px) {
+  .nb-est-mobile-bar {
+    display: flex;
+  }
+}
+
+.nb-est-mobile-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(106, 75, 216, 0.2);
+  background: #fff;
+  color: #6a4bd8;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.dark .nb-est-mobile-toggle {
+  background: #1e293b;
+  border-color: rgba(106, 75, 216, 0.35);
+}
+
+@media (max-width: 1023px) {
+  .nb-est-sidebar {
+    display: flex !important;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 60;
+    width: min(18rem, 88vw);
+    max-width: 88vw;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .nb-est-sidebar.nb-est-sidebar--open {
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 1024px) {
+  .nb-est-sidebar {
+    position: relative;
+    transform: none !important;
+    box-shadow: none;
+  }
+}
+
+.dashboard-main__inner {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .dashboard-main__inner {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .dash-page-header {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 1rem;
+  }
+
+  .dash-page-header__title {
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-classes-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ——— Auth (login / registro) ——— */
+@media (max-width: 640px) {
+  .auth-page-header {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  header.px-10 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* ——— Tutor IA ——— */
+@media (max-width: 1023px) {
+  .tutor-ai-page .flex.h-screen {
+    height: auto;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  .tutor-ai-page .tutor-ai-sidebar {
+    width: 100% !important;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid #e8edf5;
+  }
+
+  .tutor-ai-page .tutor-ai-panel-right {
+    width: 100% !important;
+    max-height: none;
+    border-left: none;
+    border-top: 1px solid #e8edf5;
+    order: 3;
+  }
+
+  .tutor-ai-page .tutor-ai-main {
+    order: 2;
+    min-height: 50vh;
+  }
+
+  .tutor-ai-page .flex.h-screen > .flex-1.flex.flex-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tutor-ai-page #tutor-chat-scroll {
+    padding: 1rem !important;
+  }
+
+  .tutor-ai-page .tutor-ai-input-bar {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tutor-ai-page .flex.h-screen {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .tutor-ai-page .tutor-ai-sidebar {
+    width: 14rem !important;
+    min-height: 100vh;
+  }
+
+  .tutor-ai-page .tutor-ai-panel-right {
+    width: 100% !important;
+    flex: 1 1 100%;
+    border-left: none;
+    border-top: 1px solid #e8edf5;
+  }
+
+  .tutor-ai-page .tutor-ai-main {
+    flex: 1 1 calc(100% - 14rem);
+    min-width: 0;
+  }
+}
+
+/* ——— Plan de estudios / calendario ——— */
+@media (max-width: 640px) {
+  .plan-estudios-shell main {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .plan-estudios-calendar-scroll,
+  #cal-week-grid,
+  .plan-estudios-week-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+
+  #cal-week-grid {
+    min-width: 280px;
+  }
+}
+
+/* ——— Lección / quiz / detalle curso ——— */
+@media (max-width: 1023px) {
+  .leccion-layout-grid,
+  .quiz-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ——— Modales ——— */
+dialog.admin-catalog-modal,
+.admin-catalog-modal {
+  width: calc(100% - 1.5rem) !important;
+  max-width: calc(100vw - 1.5rem) !important;
+  max-height: 90vh;
+  margin: auto;
+}
+
+.nb-modal__panel,
+.nb-modal__panel--sm {
+  width: calc(100% - 1.5rem) !important;
+  max-width: 28rem;
+  margin: 1rem;
+}
+
+@media (max-width: 640px) {
+  .nb-modal__panel--sm {
+    max-width: calc(100vw - 1.5rem);
+  }
+
+  #modal-anadir-cursos .mis-cursos-modal-panel,
+  .mis-cursos-modal-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    max-height: 92vh;
+  }
+}
+
+/* ——— Admin: tablas y paneles ——— */
+@media (max-width: 1024px) {
+  .nb-topbar {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .nb-search {
+    flex: 1 1 100%;
+    order: 3;
+    min-width: 0;
+  }
+
+  .nb-quick-action span:not(.material-symbols-outlined) {
+    display: none;
+  }
+
+  .nb-widget-grid--2-1,
+  .nb-widget-grid--1-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .nb-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .nb-panels .overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+
+  .nb-panels .admin-data-table {
+    min-width: 640px;
+  }
+}
+
+@media (max-width: 640px) {
+  .nb-kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .nb-canvas {
+    padding: 12px !important;
+  }
+
+  .nb-hero h2 {
+    font-size: 1.35rem !important;
+  }
+
+  .nb-hero-badges {
+    flex-wrap: wrap;
+  }
+
+  .admin-activity-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .nb-panels .admin-data-table {
+    min-width: 520px;
+  }
+
+  /* Tablas admin: vista compacta opcional en móvil muy estrecho */
+  .nb-admin-table-cards .admin-data-table thead {
+    display: none;
+  }
+}
+
+/* Admin modales catálogo: grids a 1 columna */
+@media (max-width: 640px) {
+  #admin-form-curso .grid-cols-2,
+  #admin-form-pregunta .grid-cols-2,
+  #admin-form-eval .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ——— Perfil ——— */
+@media (max-width: 768px) {
+  .perfil-hero-grid,
+  .profile-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ——— Utilidades ——— */
+.nb-min-w-0 {
+  min-width: 0;
+}
+
+.nb-break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.w-full-max {
+  width: 100%;
+  max-width: 100%;
+}

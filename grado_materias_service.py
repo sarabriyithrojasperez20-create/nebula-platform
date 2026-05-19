@@ -133,7 +133,9 @@ _TEMA_COLORES = ("violet", "indigo", "sky", "emerald", "amber", "rose")
 
 def _metadata_clase(materia: dict, porcentaje: int, indice: int) -> dict:
     slug = materia["slug"]
-    if porcentaje >= 70:
+    if porcentaje >= 100:
+        dificultad, estado, badge = "Completado", "Curso completado", "completado"
+    elif porcentaje >= 70:
         dificultad, estado, badge = "Avanzado", "Dominio sólido", "avanzado"
     elif porcentaje >= 40:
         dificultad, estado, badge = "Intermedio", "En progreso", "proceso"
@@ -156,26 +158,43 @@ def _metadata_clase(materia: dict, porcentaje: int, indice: int) -> dict:
 
 
 def clases_activas_desde_materias(usuario):
-    """Estructura enriquecida para tarjetas premium del dashboard."""
+    """
+    DEPRECATED para dashboard: mostraba todas las materias del grado aunque no
+    estuvieran asignadas. Usar clases_activas_desde_cursos_asignados.
+    """
     if not usuario:
-        usuario = {}
-    grado = normalizar_grado(usuario.get("grado") or usuario.get("nivel_academico"))
-    progreso = usuario.get("progreso_materias") or {}
+        return []
+    return []
+
+
+def clases_activas_desde_cursos_asignados(cursos: list) -> list:
+    """Tarjetas del dashboard solo desde cursos asignados al estudiante."""
     clases = []
-    for i, materia in enumerate(obtener_materias_por_grado(grado)):
-        slug = materia["slug"]
+    for i, curso in enumerate((cursos or [])[:6]):
+        slug = (curso.get("slug") or "").strip()
+        if not slug:
+            continue
+        titulo = curso.get("titulo") or slug
         try:
-            porcentaje = int(progreso.get(slug, 0))
+            porcentaje = int(curso.get("porcentaje", 0))
         except (TypeError, ValueError):
             porcentaje = 0
         porcentaje = max(0, min(100, porcentaje))
+        materia = {"slug": slug, "titulo": titulo}
         meta = _metadata_clase(materia, porcentaje, i)
+        estado_texto = curso.get("estado_texto") or (
+            "Curso completado"
+            if porcentaje >= 100
+            else (f"{porcentaje}% completado" if porcentaje > 0 else "Por comenzar")
+        )
         clases.append(
             {
-                "titulo": materia["titulo"],
+                "titulo": titulo,
                 "slug": slug,
                 "porcentaje": porcentaje,
+                "estado_texto": estado_texto,
+                "estado_curso": curso.get("estado_curso", meta.get("estado_curso", "")),
                 **meta,
             }
         )
-    return clases[:6]
+    return clases

@@ -28,6 +28,7 @@ TIPO_META = {
     "leccion_completada": {"icon": "check_circle", "titulo": "Lección completada"},
     "registro_usuario": {"icon": "person_add", "titulo": "Nuevo usuario"},
     "curso_anadido": {"icon": "bookmark_add", "titulo": "Curso añadido"},
+    "plan_pro": {"icon": "workspace_premium", "titulo": "Plan Pro"},
 }
 
 MAPA_ACTIVIDAD_A_NOTIF = {

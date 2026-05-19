@@ -82,6 +82,8 @@
 
         if (!store || !u) return;
 
+        const ts = u.foto_actualizada_en || String(Date.now());
+
         store.setProfile({
 
             id_usuario: u.id_usuario,
@@ -106,9 +108,11 @@
 
             avatarUrl: u.avatar_url,
 
-            foto_actualizada_en: u.foto_actualizada_en,
+            foto_perfil: u.foto_perfil || u.profile_image,
 
-            foto_version: u.foto_actualizada_en,
+            foto_actualizada_en: ts,
+
+            foto_version: ts,
 
         });
 
@@ -116,23 +120,51 @@
 
 
 
-    function aplicarAvatarGlobal(url) {
+    function aplicarAvatarGlobal(uOrUrl) {
 
-        const store = profileStore();
+        if (uOrUrl && typeof uOrUrl === 'object') {
 
-        if (store && url) {
-
-            store.setProfile({ avatar_url: url, avatarUrl: url });
+            syncGlobalProfile(uOrUrl);
 
             return;
 
         }
 
+        const store = profileStore();
+
+        const url = uOrUrl;
+
+        if (store && url) {
+
+            store.setProfile({
+
+                avatar_url: url,
+
+                avatarUrl: url,
+
+                foto_version: String(Date.now()),
+
+            });
+
+            return;
+
+        }
+
+        const ts = String(Date.now());
+
+        const busted = url ? url.split('?')[0] + '?v=' + ts : '';
+
         document.querySelectorAll('[data-nebula-avatar]').forEach((el) => {
 
-            if (el.tagName === 'IMG' && url) el.src = url;
+            if (el.tagName === 'IMG' && busted) {
 
-            else if (url) el.style.backgroundImage = `url("${url}")`;
+                el.removeAttribute('src');
+
+                void el.offsetHeight;
+
+                el.src = busted;
+
+            } else if (busted) el.style.backgroundImage = `url("${busted}")`;
 
         });
 
@@ -266,15 +298,19 @@
 
             const result = await Upload.upload(file, {
 
-                preview: false,
+                preview: true,
+
+                previewSelectors: ['#perfil-modal-avatar', '#perfil-avatar-main', '[data-nebula-avatar]'],
 
                 onLoading: () => mostrarToast(Upload.MSG.loading, false),
+
+                onError: (msg) => mostrarToast(msg, true),
 
             });
 
             if (!result.ok) throw new Error(result.message);
 
-            return result.data.usuario || result.data;
+            return (result.data && result.data.usuario) || result.data;
 
         }
 
@@ -330,7 +366,13 @@
 
         }
 
-        if (!aplicarPreviewLocal(file)) return;
+        if (!Upload) {
+
+            mostrarToast('Módulo de subida no disponible. Recarga la página.', true);
+
+            return;
+
+        }
 
         try {
 
@@ -342,9 +384,7 @@
 
             revocarPreview();
 
-            if (u && u.avatar_url) {
-
-                aplicarAvatarGlobal(u.avatar_url);
+            if (u) {
 
                 syncGlobalProfile(u);
 
@@ -352,15 +392,7 @@
 
             }
 
-            mostrarToast(
-
-                (global.NebulaAvatarUpload && global.NebulaAvatarUpload.MSG.ok) ||
-
-                    'Imagen subida correctamente',
-
-                false
-
-            );
+            mostrarToast(Upload.MSG.ok, false);
 
         } catch (err) {
 
@@ -497,8 +529,6 @@
             u.preferencias_aprendizaje?.dominante || u.preferencia_dominante || 'visual';
 
         actualizarPreferenciasUI(dom);
-
-        if (u.avatar_url) aplicarAvatarGlobal(u.avatar_url);
 
         syncGlobalProfile(u);
 
@@ -685,6 +715,28 @@
         bindEvents();
 
         if (config.usuario) syncGlobalProfile(config.usuario);
+
+        const params = new URLSearchParams(global.location.search);
+
+        if (params.get('editar') === '1') {
+
+            abrirModal();
+
+            try {
+
+                const url = new URL(global.location.href);
+
+                url.searchParams.delete('editar');
+
+                global.history.replaceState({}, '', url.pathname + url.search + url.hash);
+
+            } catch (e) {
+
+                /* ignore */
+
+            }
+
+        }
 
     }
 

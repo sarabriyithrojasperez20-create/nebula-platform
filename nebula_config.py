@@ -1,4 +1,9 @@
-"""Carga de variables de entorno (desarrollo y producción)."""
+"""
+Carga de variables de entorno (.env) para desarrollo y producción.
+
+Gestiona OPENAI_API_KEY, DATABASE_URL y crea .env desde .env.example si falta.
+Nunca incluyas claves reales en el código: solo en .env (ignorado por git).
+"""
 
 from __future__ import annotations
 
@@ -22,17 +27,43 @@ _ENV_PLACEHOLDER_MARKERS = (
 )
 
 
+def _ensure_database_url_in_env_file() -> None:
+    """Si .env no define DATABASE_URL, añade SQLite local para poder arrancar."""
+    if not ENV_PATH.exists():
+        return
+    text = ENV_PATH.read_text(encoding="utf-8")
+    if "DATABASE_URL=" in text and not text.strip().endswith("DATABASE_URL="):
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("DATABASE_URL=") and len(stripped) > len(
+                "DATABASE_URL="
+            ):
+                val = stripped.split("=", 1)[1].strip()
+                if val and not val.startswith("#"):
+                    return
+    append = (
+        "\n# Base de datos local (SQLite). Para Render/Postgres, comenta esta línea "
+        "y define tu DATABASE_URL externa.\n"
+        "DATABASE_URL=sqlite:///instance/nebula.db\n"
+    )
+    ENV_PATH.write_text(text.rstrip() + append + "\n", encoding="utf-8")
+
+
 def _asegurar_archivo_env() -> Path:
     """Crea `.env` desde `.env.example` si no existe."""
     if ENV_PATH.exists():
         return ENV_PATH
     if ENV_EXAMPLE_PATH.exists():
         shutil.copy(ENV_EXAMPLE_PATH, ENV_PATH)
-        logger.info("Archivo .env creado desde .env.example — completa OPENAI_API_KEY.")
+        _ensure_database_url_in_env_file()
+        logger.info(
+            "Archivo .env creado desde .env.example — revisa DATABASE_URL y OPENAI_API_KEY."
+        )
     else:
         ENV_PATH.write_text(
             "OPENAI_API_KEY=pegar_aqui_la_api_key_real\n"
-            "OPENAI_MODEL=gpt-4o-mini\n",
+            "OPENAI_MODEL=gpt-4o-mini\n"
+            "DATABASE_URL=sqlite:///instance/nebula.db\n",
             encoding="utf-8",
         )
         logger.info("Archivo .env creado — completa OPENAI_API_KEY.")

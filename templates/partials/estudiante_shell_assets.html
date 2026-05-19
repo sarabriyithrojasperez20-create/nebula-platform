@@ -1,0 +1,8 @@
+{# CSS + JS compartidos: menú usuario, avatar, notificaciones #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user-menu.css') }}">
+<div id="nb-user-toast" class="nb-user-toast hidden" role="status" aria-live="polite"></div>
+{% include 'partials/nebula_user_boot.html' %}
+<script src="{{ url_for('static', filename='notificaciones.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/nebula-avatar-upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nebula-user-menu.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/nebula-mobile-shell.js') }}" defer></script>

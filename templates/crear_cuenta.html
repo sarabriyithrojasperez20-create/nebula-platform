@@ -108,9 +108,11 @@
                     class="w-full pl-12 pr-10 py-3.5 bg-background-light dark:bg-slate-800 border border-transparent rounded-xl focus:ring-2 focus:ring-primary text-slate-900 dark:text-white transition"
                     placeholder="••••••••" type="password" autocomplete="new-password" required minlength="6"
                     oninput="calcularFortaleza(this.value)">
-                  <button type="button" onclick="togglePass('password', this)"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition">
-                    <span class="material-symbols-outlined text-xl">visibility</span>
+                  <button type="button" data-toggle-password="password"
+                    onclick="togglePass('password', this)"
+                    aria-label="Mostrar contraseña" aria-pressed="false"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 rounded-full p-0.5">
+                    <span class="material-symbols-outlined text-xl" aria-hidden="true">visibility</span>
                   </button>
                 </div>
 
@@ -128,9 +130,11 @@
                   <input id="confirmar" name="confirmar_password"
                     class="w-full pl-12 pr-10 py-3.5 bg-background-light dark:bg-slate-800 border border-transparent rounded-xl focus:ring-2 focus:ring-primary text-slate-900 dark:text-white transition"
                     placeholder="••••••••" type="password" autocomplete="new-password" required>
-                  <button type="button" onclick="togglePass('confirmar', this)"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition">
-                    <span class="material-symbols-outlined text-xl">visibility</span>
+                  <button type="button" data-toggle-password="confirmar"
+                    onclick="togglePass('confirmar', this)"
+                    aria-label="Mostrar contraseña" aria-pressed="false"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 rounded-full p-0.5">
+                    <span class="material-symbols-outlined text-xl" aria-hidden="true">visibility</span>
                   </button>
                 </div>
                 <span class="field-msg" id="msg-confirmar">Las contraseñas no coinciden.</span>
@@ -198,5 +202,7 @@
   </div>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='auth-password.js') }}"></script>
+  <script src="{{ url_for('static', filename='nebula-api.js') }}"></script>
 </body>
 </html>

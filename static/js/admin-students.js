@@ -5,7 +5,9 @@
     'use strict';
 
     var pendingDeleteId = null;
+    var pendingDeleteNombre = '';
     var usuariosData = [];
+    var deleting = false;
 
     function $(id) { return document.getElementById(id); }
 
@@ -18,14 +20,14 @@
     function toast(msg, err) {
         var t = $('admin-student-toast');
         if (!t) {
-            if (err) alert(msg);
+            if (err) console.error(msg);
             return;
         }
         t.textContent = msg;
         t.className = 'nb-toast' + (err ? ' nb-toast--err' : '');
         t.classList.remove('hidden');
         clearTimeout(toast._tm);
-        toast._tm = setTimeout(function () { t.classList.add('hidden'); }, 3000);
+        toast._tm = setTimeout(function () { t.classList.add('hidden'); }, 3500);
     }
 
     function closeMenus() {
@@ -34,22 +36,51 @@
         });
     }
 
+    function setDeleteModalBusy(on) {
+        deleting = on;
+        var confirm = $('admin-delete-confirm');
+        var modal = $('admin-delete-modal');
+        if (confirm) {
+            confirm.disabled = on;
+            confirm.setAttribute('aria-busy', on ? 'true' : 'false');
+            confirm.textContent = on ? 'Eliminando…' : 'Eliminar';
+        }
+        document.querySelectorAll('[data-delete-close]').forEach(function (btn) {
+            btn.disabled = on;
+        });
+        if (modal) modal.classList.toggle('is-loading', on);
+    }
+
     function openDeleteModal(id, nombre) {
+        if (deleting) return;
         pendingDeleteId = id;
+        pendingDeleteNombre = nombre || '';
         var modal = $('admin-delete-modal');
         var nameEl = $('admin-delete-name');
-        if (nameEl) nameEl.textContent = nombre || '';
+        if (nameEl) nameEl.textContent = pendingDeleteNombre;
         if (modal) {
             modal.classList.remove('hidden');
+            modal.setAttribute('aria-hidden', 'false');
             document.body.classList.add('nb-modal-open');
         }
+        var confirm = $('admin-delete-confirm');
+        if (confirm) confirm.focus();
+    }
+
+    function hideDeleteModal() {
+        pendingDeleteId = null;
+        pendingDeleteNombre = '';
+        var modal = $('admin-delete-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        document.body.classList.remove('nb-modal-open');
     }
 
     function closeDeleteModal() {
-        pendingDeleteId = null;
-        var modal = $('admin-delete-modal');
-        if (modal) modal.classList.add('hidden');
-        document.body.classList.remove('nb-modal-open');
+        if (deleting) return;
+        hideDeleteModal();
     }
 
     function removeRowFromTable(id) {
@@ -62,38 +93,59 @@
         if (jsonEl) jsonEl.textContent = JSON.stringify(usuariosData);
         var count = document.querySelector('#admin-panel-usuarios .text-body-md.text-outline');
         if (count) count.textContent = usuariosData.length + ' usuarios en el sistema';
+        var detalle = document.getElementById('admin-usuario-detalle');
+        if (detalle && detalle.getAttribute('data-usuario-id') === String(id)) {
+            detalle.classList.add('hidden');
+        }
+    }
+
+    async function parseJsonResponse(res) {
+        var ct = (res.headers.get('content-type') || '').toLowerCase();
+        if (ct.indexOf('application/json') >= 0) {
+            return res.json();
+        }
+        var text = await res.text();
+        console.error('[admin-students] Respuesta no JSON', res.status, text.slice(0, 300));
+        if (res.status === 401 || res.status === 403) {
+            throw new Error('Sesión expirada o sin permisos de administrador.');
+        }
+        throw new Error('El servidor devolvió una respuesta inesperada (código ' + res.status + ').');
     }
 
     async function confirmDelete() {
-        if (!pendingDeleteId) return;
-        var btn = $('admin-delete-confirm');
-        if (btn) btn.disabled = true;
+        if (!pendingDeleteId || deleting) return;
+        var id = pendingDeleteId;
+        setDeleteModalBusy(true);
         try {
-            var res = await fetch('/api/admin/estudiantes/' + pendingDeleteId, {
+            var res = await fetch('/api/admin/estudiantes/' + encodeURIComponent(id), {
                 method: 'DELETE',
                 credentials: 'same-origin',
+                headers: { Accept: 'application/json' },
             });
-            var data = await res.json().catch(function () { return {}; });
-            if (!res.ok || !data.ok) throw new Error(data.mensaje || 'No se pudo eliminar.');
-            removeRowFromTable(pendingDeleteId);
-            closeDeleteModal();
-            toast('Estudiante eliminado correctamente.');
+            var data = await parseJsonResponse(res);
+            if (!res.ok || !data.ok) {
+                throw new Error(data.mensaje || 'No se pudo eliminar el estudiante.');
+            }
+            removeRowFromTable(id);
+            hideDeleteModal();
+            toast(data.mensaje || 'Estudiante eliminado correctamente.', false);
         } catch (err) {
-            toast(err.message, true);
+            console.error('[admin-students] Error al eliminar estudiante id=' + id + ':', err);
+            toast(err.message || 'No se pudo eliminar el estudiante.', true);
         } finally {
-            if (btn) btn.disabled = false;
+            setDeleteModalBusy(false);
         }
     }
 
     async function toggleSuspend(id, activo) {
         try {
-            var res = await fetch('/api/admin/estudiantes/' + id + '/suspender', {
+            var res = await fetch('/api/admin/estudiantes/' + encodeURIComponent(id) + '/suspender', {
                 method: 'POST',
                 credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
                 body: JSON.stringify({ activo: activo }),
             });
-            var data = await res.json().catch(function () { return {}; });
+            var data = await parseJsonResponse(res);
             if (!res.ok || !data.ok) throw new Error(data.mensaje || 'Error al actualizar estado.');
             var row = document.querySelector('tr[data-usuario-id="' + id + '"]');
             if (row) {
@@ -107,6 +159,7 @@
             if (u) u.activo = activo;
             toast(activo ? 'Estudiante reactivado.' : 'Estudiante suspendido.');
         } catch (err) {
+            console.error('[admin-students] suspender:', err);
             toast(err.message, true);
         }
     }
@@ -151,8 +204,14 @@
         });
         var confirm = $('admin-delete-confirm');
         if (confirm) confirm.addEventListener('click', confirmDelete);
+        var modal = $('admin-delete-modal');
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal.querySelector('.nb-modal__backdrop')) closeDeleteModal();
+            });
+        }
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && $('admin-delete-modal') && !$('admin-delete-modal').classList.contains('hidden')) {
+            if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
                 closeDeleteModal();
             }
         });

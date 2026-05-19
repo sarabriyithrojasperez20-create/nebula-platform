@@ -47,14 +47,8 @@
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
                     {% with clase_boton='flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors' %}
-                    {% include 'partials/notificaciones_dropdown.html' %}
+                    {% include 'partials/estudiante_header_actions.html' %}
                     {% endwith %}
-                    <a href="{{ url_for('perfil') }}" class="perfil-avatar-link block shrink-0 rounded-full ring-2 ring-primary p-0.5"
-                        aria-label="Perfil actual">
-                        {% with avatar_class='size-10 rounded-full object-cover', avatar_alt='Avatar de ' ~ nombre %}
-                        {% include 'partials/estudiante_avatar.html' %}
-                        {% endwith %}
-                    </a>
                 </div>
             </div>
             <div class="px-6 lg:px-10 pb-3 nav-modulos-estudiante--bar">
@@ -160,7 +154,7 @@
                     </div>
                 </article>
 
-                <article class="perfil-card p-6 sm:p-7">
+                <article id="preferencias" class="perfil-card p-6 sm:p-7 scroll-mt-24">
                     <h2 class="perfil-card__title">
                         <span class="material-symbols-outlined text-primary">psychology</span>
                         Preferencias de aprendizaje
@@ -310,12 +304,11 @@
             'sobre_mi': usuario.sobre_mi,
             'nivel_academico': usuario.nivel_academico,
             'preferencia_dominante': pref_dom,
-            'avatar_url': avatar_src
+            'avatar_url': avatar_src,
+            'foto_actualizada_en': usuario.foto_actualizada_en or ''
         }
     } | tojson }}</script>
-    <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
-    {% include 'partials/nebula_user_boot.html' %}
-    <script src="{{ url_for('static', filename='js/nebula-avatar-upload.js') }}"></script>
+    {% include 'partials/estudiante_shell_assets.html' %}
     <script src="{{ url_for('static', filename='js/nebula-perfil.js') }}"></script>
 </body>
 

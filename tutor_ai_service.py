@@ -213,9 +213,12 @@ def diagnosticar_tutor_ia() -> dict:
 def es_usuario_pro(usuario: Optional[dict]) -> bool:
     if not usuario:
         return False
-    if usuario.get("plan") in ("pro", "premium"):
+    if usuario.get("id_rol") == 1:
         return True
-    return usuario.get("id_rol") == 1
+    plan = usuario.get("plan")
+    if not plan:
+        plan = (usuario.get("preferencias_aprendizaje") or {}).get("plan")
+    return str(plan or "").strip().lower() in ("pro", "premium")
 
 
 def obtener_limites(usuario: Optional[dict]) -> dict:

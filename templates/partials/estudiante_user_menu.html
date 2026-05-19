@@ -1,0 +1,76 @@
+{# Menú desplegable de usuario (avatar + acciones) #}
+{% set _nombre = menu_nombre|default(nombre|default(session.get('nombre', 'Estudiante'))) %}
+{% set _username = menu_username|default(nebula_menu_username|default(session.get('username', ''))) %}
+{% set _trigger = trigger_class|default('nb-user-menu__trigger--md') %}
+{% set _sidebar_compact = menu_sidebar_compact|default(false) %}
+<div class="nb-user-menu{% if _sidebar_compact %} nb-user-menu--sidebar-compact{% endif %}" data-nb-user-menu>
+    {% if _sidebar_compact %}
+    <button type="button"
+        class="dash-sidebar-profile__menu-btn"
+        data-nb-user-menu-toggle
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-label="Opciones de cuenta">
+        <span class="material-symbols-outlined">more_vert</span>
+    </button>
+    {% else %}
+    <button type="button"
+        class="nb-user-menu__trigger {{ _trigger }}"
+        data-nb-user-menu-toggle
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-label="Menú de cuenta">
+        <span class="nb-user-menu__ring">
+            {% if menu_avatar_inner %}
+            {{ menu_avatar_inner|safe }}
+            {% else %}
+            {% with avatar_class=avatar_class|default('nb-user-menu__avatar') %}
+            {% include 'partials/estudiante_avatar.html' %}
+            {% endwith %}
+            {% endif %}
+            <span class="nb-user-menu__loader" data-nb-avatar-loader hidden aria-hidden="true">
+                <span class="nb-user-menu__spinner"></span>
+            </span>
+        </span>
+    </button>
+    {% endif %}
+    <div class="nb-user-menu__panel" data-nb-user-menu-panel hidden role="menu" aria-label="Opciones de cuenta">
+        <div class="nb-user-menu__header">
+            <div class="nb-user-menu__header-avatar">
+                {% with avatar_class='nb-user-menu__header-img' %}
+                {% include 'partials/estudiante_avatar.html' %}
+                {% endwith %}
+            </div>
+            <div class="nb-user-menu__header-text">
+                <p class="nb-user-menu__name">{{ _nombre }}</p>
+                {% if _username %}<p class="nb-user-menu__handle">@{{ _username }}</p>{% endif %}
+            </div>
+        </div>
+        <ul class="nb-user-menu__list">
+            <li><a href="{{ url_for('perfil') }}" class="nb-user-menu__item" role="menuitem">
+                <span class="material-symbols-outlined">person</span> Ver perfil
+            </a></li>
+            <li><button type="button" class="nb-user-menu__item" role="menuitem" data-nb-menu-action="edit-profile">
+                <span class="material-symbols-outlined">edit</span> Editar perfil
+            </button></li>
+            <li><button type="button" class="nb-user-menu__item" role="menuitem" data-nb-menu-action="upload-photo">
+                <span class="material-symbols-outlined">photo_camera</span> Cambiar foto
+            </button></li>
+            <li><button type="button" class="nb-user-menu__item nb-user-menu__item--muted" role="menuitem" data-nb-menu-action="remove-photo">
+                <span class="material-symbols-outlined">delete</span> Eliminar foto
+            </button></li>
+            <li><a href="{{ url_for('perfil') }}#preferencias" class="nb-user-menu__item" role="menuitem">
+                <span class="material-symbols-outlined">settings</span> Configuración
+            </a></li>
+            <li><button type="button" class="nb-user-menu__item" role="menuitem" data-nb-menu-action="change-password">
+                <span class="material-symbols-outlined">lock</span> Cambiar contraseña
+            </button></li>
+        </ul>
+        <div class="nb-user-menu__footer">
+            <a href="{{ url_for('logout') }}" class="nb-user-menu__logout" role="menuitem">
+                <span class="material-symbols-outlined">logout</span> Cerrar sesión
+            </a>
+        </div>
+    </div>
+    <input type="file" class="nb-user-menu__file-input" data-nb-avatar-file accept="image/jpeg,image/jpg,image/png,image/webp" hidden>
+</div>

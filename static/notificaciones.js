@@ -8,10 +8,23 @@
     dropdown.classList.remove("is-open");
   }
 
+  window.cerrarPanelNotificaciones = cerrarPanel;
+
+  function cerrarMenusUsuario() {
+    document.querySelectorAll(".nb-user-menu.is-open").forEach(function (menu) {
+      menu.classList.remove("is-open");
+      var t = menu.querySelector("[data-nb-user-menu-toggle]");
+      var p = menu.querySelector("[data-nb-user-menu-panel]");
+      if (t) t.setAttribute("aria-expanded", "false");
+      if (p) p.setAttribute("hidden", "");
+    });
+  }
+
   function abrirPanel(dropdown) {
     const toggle = dropdown.querySelector(".notificaciones-toggle");
     const panel = dropdown.querySelector(".notificaciones-panel");
     if (!toggle || !panel) return;
+    cerrarMenusUsuario();
     document.querySelectorAll(".notificaciones-dropdown.is-open").forEach(cerrarPanel);
     panel.hidden = false;
     toggle.setAttribute("aria-expanded", "true");

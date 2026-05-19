@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Banco de preguntas de evaluación por curso (quiz de lección).
+
+Complementa lecciones_contenido.py; las claves coinciden con los slugs de curso en el catálogo.
+"""
+
+# Preguntas agrupadas por slug de curso.
 QUIZ_POR_CURSO = {
     "fundamentos-algebra": {
         "titulo_tema": "Álgebra y funciones",
@@ -498,6 +506,14 @@ def _quiz_generico(curso, leccion):
 
 
 def obtener_quiz_curso(slug, curso, leccion):
+    from catalog_service import get_quiz
+
+    leccion_id = (leccion or {}).get("id")
+    quiz = get_quiz(slug, leccion_id)
+    if quiz:
+        quiz = dict(quiz)
+        quiz["titulo_tema"] = leccion.get("titulo", quiz.get("titulo_tema", ""))
+        return quiz
     if slug in QUIZ_POR_CURSO:
         quiz = dict(QUIZ_POR_CURSO[slug])
         quiz["titulo_tema"] = leccion.get("titulo", quiz["titulo_tema"])

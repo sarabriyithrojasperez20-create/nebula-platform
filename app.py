@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Aplicación principal de Nébula (Flask).
+
+Registra rutas HTTP, sesiones de usuario, panel de estudiante y administrador,
+APIs JSON y la integración con catálogo académico, progreso, tutor IA y datos locales.
+Punto de entrada local: ``python app.py`` (o ``py app.py`` en Windows).
+"""
+
 import logging
 
 import nebula_config
@@ -10,7 +19,7 @@ import os
 import urllib.error
 import urllib.request
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 
 from lecciones_contenido import obtener_contenido_leccion
 from diagnosticos_contenido import (
@@ -22,7 +31,6 @@ from diagnosticos_contenido import (
     MENSAJES_NIVEL,
 )
 from grado_materias_service import (
-    clases_activas_desde_materias,
     etiqueta_grado,
     resolver_grado_registro,
 )
@@ -36,17 +44,29 @@ from racha_diaria_service import (
     sincronizar_y_validar_hoy,
 )
 
+# Inicializa Flask y la clave de sesión (SECRET_KEY / FLASK_SECRET_KEY en .env).
 app = Flask(__name__)
-app.secret_key = "clave_secreta_nebula"
+app.secret_key = (
+    os.getenv("SECRET_KEY") or os.getenv("FLASK_SECRET_KEY") or "dev-nebula-cambiar-en-produccion"
+)
 
-# PostgreSQL — DATABASE_URL en .env; si falta o está vacía → fallback Render (db.py)
+# Motor SQLAlchemy: SQLite local o PostgreSQL según DATABASE_URL (ver db.py).
 from db import RENDER_DATABASE_DEFAULT, apply_sqlalchemy_config
 
-apply_sqlalchemy_config(app, default_url=RENDER_DATABASE_DEFAULT)
+apply_sqlalchemy_config(app, default_url=RENDER_DATABASE_DEFAULT or None)
 
 from nebula_data import cargar_datos, guardar_datos, generar_id, init_data_layer
 
 init_data_layer(app)
+
+
+# Antes de cada petición: normaliza claves de rol en cookies de sesión antiguas.
+@app.before_request
+def _nebula_repair_session():
+    from session_auth import repair_session_role_keys
+
+    repair_session_role_keys()
+
 
 AVATAR_ESTUDIANTE_DEFAULT = (
     "https://lh3.googleusercontent.com/aida-public/AB6AXuBlwoGAr4OcQHRwHR-lcqSiVtRczHOqU4jSeFWxNy7vEHCCeSC_b1mKIRSSHlj-Uah3OA6pbCC0gL6OOi-k9lVNngXgPGI8SMaNT5qfa2MvmU_9BDlAs2sFfycz7MTtG1JhdpkytvtTvG0qlm796rX77xURSs3c0qR1vFJfRms9-GFoWgsllXenDXJ4WbdK-n98_bzU82KSmO2gh53b7AdV-AawOUYUnwE3qSGyNOAiyNmiNSUmRB79gyWgUowkW0vRWKOHp2m4EFo"
@@ -65,7 +85,9 @@ def inyectar_perfil_estudiante():
             "nebula_avatar_url": "",
             "nebula_profile_boot": None,
         }
-    rol = session.get("rol")
+    from session_auth import session_rol
+
+    rol = session_rol()
     if rol not in (1, 2):
         return {
             "nebula_avatar_url": "",
@@ -88,6 +110,7 @@ def inyectar_perfil_estudiante():
     return {
         "nebula_avatar_url": avatar_url,
         "nebula_avatar_default": default_avatar,
+        "nebula_menu_username": usuario.get("username", ""),
         "nebula_profile_boot": {
             "avatarDefault": default_avatar,
             "avatarUrl": avatar_url,
@@ -203,6 +226,14 @@ def guardar_resultado_quiz(
             "Quiz final no aprobado",
             f"{nombre} obtuvo {porcentaje}% en {registro['titulo_leccion']}",
         )
+    if aprobado:
+        from progreso_service import (
+            persistir_fecha_progreso,
+            sincronizar_progreso_materias_usuario,
+        )
+
+        persistir_fecha_progreso(id_usuario, slug)
+        sincronizar_progreso_materias_usuario(id_usuario)
     return registro
 
 
@@ -404,7 +435,17 @@ CURSOS_CATALOGO = {
 
 
 def obtener_curso_catalogo(slug):
-    return CURSOS_CATALOGO.get(slug)
+    curso = CURSOS_CATALOGO.get(slug)
+    if not curso:
+        return None
+    try:
+        from catalog_service import curso_activo
+
+        if not curso_activo(slug):
+            return None
+    except Exception:
+        pass
+    return curso
 
 
 def obtener_slugs_cursos_asignados(id_usuario):
@@ -421,7 +462,7 @@ def usuario_tiene_curso_asignado(id_usuario, slug):
 
 
 def asignar_curso_a_usuario(id_usuario, slug):
-    if slug not in CURSOS_CATALOGO:
+    if not obtener_curso_catalogo(slug):
         return False
 
     asignaciones = cargar_datos("cursos_asignados")
@@ -446,6 +487,23 @@ def asignar_curso_a_usuario(id_usuario, slug):
         f"{session.get('nombre', 'Estudiante')} añadió el curso {titulo}",
     )
     return True
+
+
+def serializar_curso_activo(curso: dict) -> dict:
+    """Payload JSON para selector CURSO / MATERIA y APIs de cursos activos."""
+    slug = (curso.get("slug") or "").strip()
+    return {
+        "slug": slug,
+        "titulo": curso.get("titulo") or slug,
+        "materia": curso.get("materia") or MATERIA_POR_SLUG.get(slug, "todas"),
+        "nivel": curso.get("nivel") or "",
+        "imagen": curso.get("imagen") or "",
+        "url": url_for("detalle_curso", slug=slug) if slug else "",
+    }
+
+
+def listar_cursos_activos_serializados(id_usuario: int) -> list[dict]:
+    return [serializar_curso_activo(c) for c in listar_cursos_catalogo_usuario(id_usuario)]
 
 
 def listar_cursos_catalogo_usuario(id_usuario):
@@ -522,6 +580,9 @@ def guardar_diagnostico_usuario(id_usuario, slug, resultado_evaluacion):
         "evaluacion",
         {"slug": slug, "nivel": payload.get("nivel"), "porcentaje": payload.get("porcentaje")},
     )
+    from progreso_service import sincronizar_progreso_materias_usuario
+
+    sincronizar_progreso_materias_usuario(id_usuario)
     return payload
 
 
@@ -546,7 +607,7 @@ def preparar_curso_para_tarjeta(curso_base, id_usuario):
 def listar_catalogo_general():
     catalogo = []
     for slug in ORDEN_CURSOS_CATALOGO:
-        base = CURSOS_CATALOGO.get(slug)
+        base = obtener_curso_catalogo(slug)
         if base:
             catalogo.append(copy.deepcopy(base))
     return catalogo
@@ -571,18 +632,83 @@ def obtener_usuario_por_id(id_usuario):
     return None
 
 
+def _cursos_calendario_para_usuario(id_usuario):
+    return [
+        {"slug": c["slug"], "titulo": c.get("titulo") or c["slug"]}
+        for c in listar_cursos_catalogo_usuario(id_usuario)
+    ]
+
+
+def _slugs_cursos_asignados_set(id_usuario):
+    return set(obtener_slugs_cursos_asignados(id_usuario))
+
+
+def _resolver_leccion_evento(id_usuario, slug, curso_base):
+    curso = preparar_curso_para_tarjeta(curso_base, id_usuario)
+    if not curso:
+        return None
+    leccion = resolver_leccion_actual(curso)
+    return leccion.get("id") if leccion else None
+
+
+def _json_destino_evento(id_usuario, evento):
+    from calendario_service import enriquecer_eventos_con_cursos, resolver_destino_curso
+
+    slugs = _slugs_cursos_asignados_set(id_usuario)
+    catalogo = {s: CURSOS_CATALOGO[s] for s in slugs if s in CURSOS_CATALOGO}
+    enriquecer_eventos_con_cursos([evento], {s: {"titulo": catalogo[s].get("titulo")} for s in catalogo})
+    destino = resolver_destino_curso(
+        evento,
+        slugs,
+        catalogo,
+        lambda slug, curso: _resolver_leccion_evento(id_usuario, slug, curso),
+    )
+    if not destino.get("disponible"):
+        return {
+            "ok": True,
+            "disponible": False,
+            "mensaje": destino.get("mensaje") or "Curso no disponible",
+            "evento": evento,
+        }
+    slug = destino["curso_slug"]
+    leccion_id = destino.get("leccion_id")
+    fragment = destino.get("fragment") or ""
+    query = destino.get("query") or {}
+    if leccion_id:
+        url = url_for("ver_leccion", slug=slug, leccion_id=leccion_id)
+    else:
+        url = url_for("detalle_curso", slug=slug)
+    if query:
+        url += "?" + urlencode(query)
+    url += fragment
+    return {
+        "ok": True,
+        "disponible": True,
+        "url": url,
+        "curso_slug": slug,
+        "curso_titulo": destino.get("curso_titulo"),
+        "leccion_id": leccion_id,
+        "evento": evento,
+        "mensaje": None,
+    }
+
+
 def obtener_datos_dashboard(id_usuario):
     from calendario_service import (
+        enriquecer_eventos_con_cursos,
         eventos_proximos_evaluaciones,
         listar_eventos_usuario,
     )
-    from grado_materias_service import obtener_materias_por_grado, normalizar_grado
+    from progreso_service import obtener_resumen_progreso_usuario
 
-    usuario = obtener_usuario_por_id(id_usuario)
-    clases_activas = clases_activas_desde_materias(usuario)
+    resumen_prog = obtener_resumen_progreso_usuario(id_usuario)
     cursos = listar_cursos_catalogo_usuario(id_usuario)
+    clases_activas = resumen_prog.get("clases_activas") or []
+    cursos_cal = _cursos_calendario_para_usuario(id_usuario)
+    cursos_map = {c["slug"]: c for c in cursos_cal}
     actividades = cargar_datos("actividades")
     eventos_cal = listar_eventos_usuario(actividades, id_usuario)
+    enriquecer_eventos_con_cursos(eventos_cal, cursos_map)
     evaluaciones = obtener_actividades_usuario(id_usuario, "evaluacion")
     eval_cal = eventos_proximos_evaluaciones(eventos_cal)
     if eval_cal:
@@ -590,32 +716,39 @@ def obtener_datos_dashboard(id_usuario):
             e for e in evaluaciones
             if not any(x.get("titulo") == e.get("titulo") for x in eval_cal)
         ]
-    grado = normalizar_grado(
-        (usuario or {}).get("grado") or (usuario or {}).get("nivel_academico")
-    )
-    materias_calendario = [
-        {"slug": m["slug"], "titulo": m["titulo"]} for m in obtener_materias_por_grado(grado)
-    ]
+    for ev in evaluaciones:
+        if isinstance(ev, dict) and ev.get("fecha"):
+            from calendario_service import etiqueta_countdown, etiqueta_tipo_evento
+
+            ev.setdefault("countdown", etiqueta_countdown(ev.get("fecha")))
+            ev.setdefault(
+                "tipo_label",
+                etiqueta_tipo_evento(ev.get("categoria") or "evaluacion"),
+            )
+    materias_calendario = cursos_cal
     return {
         "clases_activas": clases_activas,
         "evaluaciones": evaluaciones[:6],
         "tiene_cursos": len(cursos) > 0,
         "eventos_calendario": eventos_cal,
         "materias_calendario": materias_calendario,
+        "cursos_calendario": cursos_cal,
+        "progreso_resumen": resumen_prog,
     }
 
 
 def obtener_datos_progreso_usuario(id_usuario):
+    from progreso_service import obtener_resumen_progreso_usuario
+
+    resumen = obtener_resumen_progreso_usuario(id_usuario)
     cursos = listar_cursos_catalogo_usuario(id_usuario)
-    lecciones_completadas = 0
-    for curso in cursos:
-        lecciones_completadas += sum(
-            1 for leccion in curso.get("lecciones", []) if leccion.get("estado") == "completado"
-        )
     return {
         "cursos": cursos,
-        "lecciones_completadas": lecciones_completadas,
+        "lecciones_completadas": resumen.get("lecciones_completadas", 0),
         "tiene_cursos": len(cursos) > 0,
+        "promedio_general": resumen.get("promedio_general", 0),
+        "cursos_completados": resumen.get("cursos_completados", 0),
+        "tendencia": resumen.get("tendencia", []),
     }
 
 
@@ -655,30 +788,9 @@ def obtener_lecciones_completadas_usuario(id_usuario, slug):
 
 
 def aplicar_progreso_a_curso(curso, id_usuario):
-    curso = copy.deepcopy(curso)
-    for leccion in curso["lecciones"]:
-        leccion["estado"] = "pendiente"
+    from progreso_service import aplicar_progreso_calculado
 
-    completadas_extra = obtener_lecciones_completadas_usuario(id_usuario, curso["slug"])
-    for leccion in curso["lecciones"]:
-        if leccion["id"] in completadas_extra:
-            leccion["estado"] = "completado"
-
-    en_progreso_asignado = False
-    for leccion in curso["lecciones"]:
-        if leccion["estado"] == "completado":
-            continue
-        if not en_progreso_asignado:
-            leccion["estado"] = "en_progreso"
-            en_progreso_asignado = True
-
-    total = len(curso["lecciones"])
-    if total:
-        completados = sum(1 for l in curso["lecciones"] if l["estado"] == "completado")
-        curso["porcentaje"] = round((completados / total) * 100)
-    else:
-        curso["porcentaje"] = 0
-    return curso
+    return aplicar_progreso_calculado(curso, id_usuario)
 
 
 def obtener_siguiente_leccion(curso, leccion_id):
@@ -717,6 +829,11 @@ def marcar_leccion_catalogo_completada(id_usuario, slug, leccion_id):
 
     guardar_datos("progreso_catalogo", registros)
 
+    from progreso_service import persistir_fecha_progreso, sincronizar_progreso_materias_usuario
+
+    persistir_fecha_progreso(id_usuario, slug)
+    sincronizar_progreso_materias_usuario(id_usuario)
+
     leccion = obtener_leccion_curso(curso, leccion_id)
     registrar_actividad_sistema(
         "leccion_completada",
@@ -744,9 +861,13 @@ def marcar_leccion_catalogo_completada(id_usuario, slug, leccion_id):
         except Exception:
             pass
     siguiente = obtener_siguiente_leccion(curso_actualizado, leccion_id)
+    from progreso_service import calcular_progreso_curso
+
+    stats = calcular_progreso_curso(curso_actualizado, id_usuario)
     return {
         "curso": curso_actualizado,
         "siguiente_leccion": siguiente,
+        "progreso": stats,
     }
 
 
@@ -762,28 +883,29 @@ def inicio():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
+    """
+    Gestiona el inicio de sesión: valida credenciales, crea la sesión Flask
+    y redirige al panel de administrador (rol 1) o al dashboard del estudiante (rol 2).
+    """
     if request.method == "POST":
 
         correo = request.form["correo"]
         password = request.form["password"]
 
-        usuarios = cargar_datos("usuarios")
+        from auth_service import autenticar_por_correo
 
-        for usuario in usuarios:
+        usuario = autenticar_por_correo(correo, password)
+        if usuario:
+            from session_auth import sync_session_roles
 
-            if usuario["correo"] == correo and usuario["password"] == password:
+            session["id_usuario"] = usuario["id_usuario"]
+            session["nombre"] = usuario["nombre_completo"]
+            session["username"] = usuario.get("username", "")
+            sync_session_roles(int(usuario["id_rol"]))
 
-                # Guardar sesión
-                session["id_usuario"] = usuario["id_usuario"]
-                session["nombre"] = usuario["nombre_completo"]
-                session["rol"] = usuario["id_rol"]
-
-                # Redirección según rol
-                if usuario["id_rol"] == 1:
-                    return redirect(url_for("admin"))
-
-                return redirect(url_for("dashboard"))
+            if usuario["id_rol"] == 1:
+                return redirect(url_for("admin"))
+            return redirect(url_for("dashboard"))
 
         return "Correo o contraseña incorrectos"
 
@@ -798,12 +920,14 @@ def crear_cuenta():
         if not grado:
             return render_template("crear_cuenta.html"), 400
 
+        from password_security import hash_password
+
         nuevo_usuario = {
             "id_usuario": generar_id(usuarios, "id_usuario"),
             "nombre_completo": request.form["nombre_completo"],
             "correo": request.form["correo"],
             "username": request.form["username"],
-            "password": request.form["password"],
+            "password": hash_password(request.form["password"]),
             "grado": grado,
             "nivel_academico": etiqueta_grado(grado),
             "id_rol": 2,
@@ -841,6 +965,18 @@ def dashboard():
         app.logger.exception("Error en /dashboard (id_usuario=%s)", id_usuario)
         raise
 
+    usuario = obtener_usuario_por_id(id_usuario)
+    try:
+        from tutor_ai_service import es_usuario_pro
+        from nebula_data import plan_de_usuario_dict
+
+        es_pro = es_usuario_pro(usuario)
+        plan_actual = plan_de_usuario_dict(usuario)
+    except Exception:
+        app.logger.exception("plan flags dashboard id=%s", id_usuario)
+        es_pro = False
+        plan_actual = "free"
+
     return render_template(
         "dashboard.html",
         nombre=session["nombre"],
@@ -849,8 +985,12 @@ def dashboard():
         tiene_cursos=datos_dashboard["tiene_cursos"],
         eventos_calendario=datos_dashboard["eventos_calendario"],
         materias_calendario=datos_dashboard["materias_calendario"],
+        cursos_calendario=datos_dashboard.get("cursos_calendario")
+        or datos_dashboard["materias_calendario"],
         racha_actual=resumen_racha.get("racha_actual", 0),
         racha_actividad_hoy=resumen_racha.get("actividad_hoy", False),
+        es_plan_pro=es_pro,
+        plan_usuario=plan_actual,
     )
 
 
@@ -865,18 +1005,50 @@ def api_calendario_eventos():
     actividades = cargar_datos("actividades")
 
     if request.method == "GET":
+        from calendario_service import enriquecer_eventos_con_cursos
+
         eventos = listar_eventos_usuario(actividades, id_usuario)
+        cursos_map = {c["slug"]: c for c in _cursos_calendario_para_usuario(id_usuario)}
+        enriquecer_eventos_con_cursos(eventos, cursos_map)
         return jsonify({"ok": True, "eventos": eventos})
 
     payload = request.get_json(silent=True) or request.form.to_dict()
+    slugs = _slugs_cursos_asignados_set(id_usuario)
     try:
         evento = guardar_evento(
-            actividades, id_usuario, payload, lambda arr, k: generar_id(arr, k)
+            actividades,
+            id_usuario,
+            payload,
+            lambda arr, k: generar_id(arr, k),
+            slugs_asignados=slugs,
         )
         guardar_datos("actividades", actividades)
+        if not (payload.get("id_actividad") or payload.get("id")):
+            registrar_actividad_sistema(
+                "evento_creado",
+                id_usuario,
+                "Evento en calendario",
+                f"{session.get('nombre', 'Estudiante')} creó el evento «{evento.get('titulo', 'Sin título')}»",
+            )
         return jsonify({"ok": True, "evento": evento, "mensaje": "Actividad guardada."})
     except ValueError as exc:
         return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/evento/<int:id_actividad>/curso")
+@app.route("/api/calendario/eventos/<int:id_actividad>/curso")
+def evento_curso_destino(id_actividad):
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+
+    from calendario_service import obtener_evento_usuario
+
+    id_usuario = session["id_usuario"]
+    actividades = cargar_datos("actividades")
+    evento = obtener_evento_usuario(actividades, id_usuario, id_actividad)
+    if not evento:
+        return jsonify({"ok": False, "mensaje": "Evento no encontrado."}), 404
+    return jsonify(_json_destino_evento(id_usuario, evento))
 
 
 @app.route("/api/calendario/eventos/<int:id_actividad>", methods=["PUT", "DELETE"])
@@ -888,6 +1060,7 @@ def api_calendario_evento(id_actividad):
 
     id_usuario = session["id_usuario"]
     actividades = cargar_datos("actividades")
+    slugs = _slugs_cursos_asignados_set(id_usuario)
 
     if request.method == "DELETE":
         if not eliminar_evento(actividades, id_usuario, id_actividad):
@@ -899,7 +1072,11 @@ def api_calendario_evento(id_actividad):
     payload["id_actividad"] = id_actividad
     try:
         evento = guardar_evento(
-            actividades, id_usuario, payload, lambda arr, k: generar_id(arr, k)
+            actividades,
+            id_usuario,
+            payload,
+            lambda arr, k: generar_id(arr, k),
+            slugs_asignados=slugs,
         )
         guardar_datos("actividades", actividades)
         return jsonify({"ok": True, "evento": evento, "mensaje": "Actividad actualizada."})
@@ -909,7 +1086,9 @@ def api_calendario_evento(id_actividad):
 
 @app.route("/crear_curso", methods=["POST"])
 def crear_curso():
-    if "id_usuario" not in session or session["id_rol"] != 1:
+    from session_auth import is_admin_session
+
+    if "id_usuario" not in session or not is_admin_session():
         return redirect(url_for("login"))
 
     cursos = cargar_datos("cursos")
@@ -944,7 +1123,9 @@ def crear_curso():
 
 @app.route("/crear_leccion", methods=["POST"])
 def crear_leccion():
-    if "id_usuario" not in session or session["id_rol"] != 1:
+    from session_auth import is_admin_session
+
+    if "id_usuario" not in session or not is_admin_session():
         return redirect(url_for("login"))
 
     lecciones = cargar_datos("lecciones")
@@ -990,6 +1171,7 @@ def mis_cursos():
         "mis_cursos.html",
         nombre=session["nombre"],
         cursos_catalogo=cursos_catalogo,
+        cursos_activos=listar_cursos_activos_serializados(id_usuario),
         id_usuario=id_usuario,
     )
 
@@ -1050,6 +1232,16 @@ def api_mis_cursos_catalogo():
     return jsonify({"catalogo": catalogo})
 
 
+@app.route("/api/mis-cursos/activos")
+def api_mis_cursos_activos():
+    if "id_usuario" not in session:
+        return jsonify({"error": "No autorizado"}), 401
+
+    id_usuario = session["id_usuario"]
+    cursos = listar_cursos_activos_serializados(id_usuario)
+    return jsonify({"ok": True, "cursos": cursos, "total": len(cursos)})
+
+
 @app.route("/api/asignar-curso/<slug>", methods=["POST"])
 def api_asignar_curso(slug):
     if "id_usuario" not in session:
@@ -1064,6 +1256,7 @@ def api_asignar_curso(slug):
     curso = preparar_curso_para_tarjeta(base, id_usuario)
     html_tarjeta = render_template("partials/mis_cursos_tarjeta.html", curso=curso)
 
+    curso_activo = serializar_curso_activo(curso)
     return jsonify(
         {
             "ok": True,
@@ -1073,6 +1266,7 @@ def api_asignar_curso(slug):
                 "nivel": curso["nivel"],
                 "porcentaje": curso.get("porcentaje", 0),
             },
+            "curso_activo": curso_activo,
             "html": html_tarjeta,
             "total": len(listar_cursos_catalogo_usuario(id_usuario)),
         }
@@ -1098,7 +1292,10 @@ def api_guardar_diagnostico(slug):
         return jsonify({"ok": False, "mensaje": "No se pudo evaluar."}), 400
 
     registro = guardar_diagnostico_usuario(id_usuario, slug, resultado)
-    # guardar_diagnostico_usuario ya registra racha tipo evaluacion
+    from progreso_service import calcular_progreso_curso
+
+    curso = obtener_curso_catalogo(slug)
+    progreso = calcular_progreso_curso(curso, id_usuario) if curso else None
 
     return jsonify(
         {
@@ -1107,6 +1304,8 @@ def api_guardar_diagnostico(slug):
             "titulo_nivel": registro["titulo_nivel"],
             "porcentaje": registro["porcentaje"],
             "mensaje": MENSAJES_NIVEL.get(registro["nivel"], ""),
+            "progreso_curso": (progreso or {}).get("porcentaje"),
+            "progreso": progreso,
         }
     )
 
@@ -1248,12 +1447,30 @@ def api_guardar_quiz_leccion(slug, leccion_id):
     porcentaje = int(data.get("porcentaje", 0))
     correctas = int(data.get("correctas", 0))
     total = int(data.get("total", 0))
-    aprobado = bool(data.get("aprobado", porcentaje >= 60))
+    from catalog_service import umbral_aprobacion_quiz
+
+    umbral = umbral_aprobacion_quiz(slug, leccion_id)
+    aprobado = bool(data.get("aprobado", porcentaje >= umbral))
 
     registro = guardar_resultado_quiz(
         id_usuario, slug, leccion_id, porcentaje, correctas, total, aprobado
     )
-    return jsonify({"ok": True, "intento": registro["intento"], "aprobado": aprobado})
+    progreso = None
+    if aprobado:
+        from progreso_service import calcular_progreso_curso
+
+        curso = obtener_curso_catalogo(slug)
+        if curso:
+            progreso = calcular_progreso_curso(curso, id_usuario)
+    return jsonify(
+        {
+            "ok": True,
+            "intento": registro["intento"],
+            "aprobado": aprobado,
+            "progreso": progreso,
+            "porcentaje_curso": (progreso or {}).get("porcentaje"),
+        }
+    )
 
 
 @app.route("/curso/<slug>/leccion/<leccion_id>/completar", methods=["POST"])
@@ -1275,6 +1492,7 @@ def completar_leccion_catalogo(slug, leccion_id):
     else:
         continuar_url = url_for("detalle_curso", slug=slug)
 
+    progreso = resultado.get("progreso") or {}
     return jsonify(
         {
             "ok": True,
@@ -1282,8 +1500,36 @@ def completar_leccion_catalogo(slug, leccion_id):
             "continuar_url": continuar_url,
             "siguiente_leccion_id": siguiente["id"] if siguiente else None,
             "porcentaje_curso": resultado["curso"]["porcentaje"],
+            "progreso": progreso,
+            "curso_completado": progreso.get("completado", False),
         }
     )
+
+
+@app.route("/api/progreso/resumen", methods=["GET"])
+def api_progreso_resumen():
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+    from progreso_service import obtener_resumen_progreso_usuario
+
+    return jsonify({"ok": True, **obtener_resumen_progreso_usuario(session["id_usuario"])})
+
+
+@app.route("/api/progreso/curso/<slug>", methods=["GET"])
+def api_progreso_curso(slug):
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+    id_usuario = session["id_usuario"]
+    if not usuario_tiene_curso_asignado(id_usuario, slug):
+        return jsonify({"ok": False, "mensaje": "Curso no asignado."}), 403
+    base = obtener_curso_catalogo(slug)
+    if not base:
+        return jsonify({"ok": False, "mensaje": "Curso no encontrado."}), 404
+    from progreso_service import calcular_progreso_curso, aplicar_progreso_calculado
+
+    curso = aplicar_progreso_calculado(base, id_usuario)
+    stats = calcular_progreso_curso(curso, id_usuario)
+    return jsonify({"ok": True, "curso": curso, "progreso": stats})
 
 
 @app.route("/plan_estudios")
@@ -1291,15 +1537,26 @@ def plan_estudios():
     if "id_usuario" not in session:
         return redirect(url_for("login"))
 
+    from calendario_service import enriquecer_eventos_con_cursos, listar_eventos_usuario
+    from metas_service import listar_metas_usuario
+
     id_usuario = session["id_usuario"]
-    eventos_calendario = obtener_actividades_usuario(id_usuario, "calendario")
+    actividades = cargar_datos("actividades")
+    eventos_calendario = listar_eventos_usuario(actividades, id_usuario)
+    cursos_cal = _cursos_calendario_para_usuario(id_usuario)
+    enriquecer_eventos_con_cursos(
+        eventos_calendario, {c["slug"]: c for c in cursos_cal}
+    )
     cursos = listar_cursos_catalogo_usuario(id_usuario)
     estado_racha = preparar_racha_plan_estudios(id_usuario)
+    metas_personales = listar_metas_usuario(actividades, id_usuario)
 
     return render_template(
         "plan_estudios.html",
         nombre=session["nombre"],
         eventos_calendario=eventos_calendario,
+        cursos_calendario=cursos_cal,
+        metas_personales=metas_personales,
         tiene_cursos=len(cursos) > 0,
         estado_racha=estado_racha,
     )
@@ -1320,6 +1577,9 @@ def progreso():
         tiene_cursos=datos["tiene_cursos"],
         lecciones_completadas=datos["lecciones_completadas"],
         cursos=datos["cursos"],
+        promedio_general=datos.get("promedio_general", 0),
+        cursos_completados=datos.get("cursos_completados", 0),
+        tendencia=datos.get("tendencia", []),
         racha_actual=resumen_racha.get("racha_actual", 0),
         racha_mejor=resumen_racha.get("mejor_racha", 0),
         racha_nivel=resumen_racha.get("nivel", "Explorador"),
@@ -1587,6 +1847,36 @@ def api_tutor_limites():
         return jsonify({"ok": False, "mensaje": mensaje_error_amigable(exc)}), 500
 
 
+@app.route("/api/usuario/plan/mejorar", methods=["POST"])
+def api_mejorar_plan_pro():
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+    from session_auth import is_estudiante_session
+
+    if not is_estudiante_session():
+        return jsonify({"ok": False, "mensaje": "Esta acción es solo para estudiantes."}), 403
+
+    try:
+        from nebula_data import activar_plan_pro_usuario
+
+        resultado = activar_plan_pro_usuario(session["id_usuario"])
+        return jsonify(
+            {
+                "ok": resultado.get("ok", True),
+                "ya_activo": resultado.get("ya_activo", False),
+                "plan": resultado.get("plan", "pro"),
+                "mensaje": resultado.get("mensaje", "Plan Pro activado."),
+            }
+        )
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+    except Exception as exc:
+        app.logger.exception("api_mejorar_plan_pro")
+        return jsonify(
+            {"ok": False, "mensaje": "No se pudo activar el plan. Intenta de nuevo."}
+        ), 500
+
+
 def _avatar_url_usuario(usuario: dict, *, default: str = "") -> str:
     from perfil_service import resolve_avatar_url
 
@@ -1618,8 +1908,10 @@ def _serializar_usuario_perfil_api(usuario: dict) -> dict:
         "sobre_mi": usuario.get("sobre_mi", ""),
         "nivel_academico": usuario.get("nivel_academico", ""),
         "grado": usuario.get("grado", ""),
-        "foto_perfil": usuario.get("foto_perfil", ""),
+        "foto_perfil": usuario.get("foto_perfil") or usuario.get("profile_image", ""),
+        "profile_image": usuario.get("profile_image") or usuario.get("foto_perfil", ""),
         "foto_actualizada_en": usuario.get("foto_actualizada_en", ""),
+        "updated_at": usuario.get("updated_at", ""),
         "preferencias_aprendizaje": prefs,
         "preferencia_dominante": prefs.get("dominante", "visual"),
         "avatar_url": _avatar_url_usuario(usuario) or AVATAR_ESTUDIANTE_DEFAULT,
@@ -1720,7 +2012,9 @@ def api_perfil_actualizar():
     usuario = normalizar_usuario_perfil(usuario)
     session["nombre"] = usuario.get("nombre_completo", session.get("nombre"))
 
-    if session.get("rol") == 2:
+    from session_auth import is_estudiante_session
+
+    if is_estudiante_session():
         try:
             from notificaciones_admin_service import crear_notificacion_admin
 
@@ -1742,6 +2036,7 @@ def api_perfil_actualizar():
     )
 
 
+@app.route("/upload-profile-image", methods=["POST"])
 @app.route("/api/perfil/foto", methods=["POST"])
 def api_perfil_foto():
     """Sube solo la foto de perfil (vista previa + guardar)."""
@@ -1749,7 +2044,6 @@ def api_perfil_foto():
         return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
 
     from perfil_service import (
-        actualizar_usuario_en_lista,
         asegurar_carpeta_fotos,
         guardar_foto_perfil,
         normalizar_usuario_perfil,
@@ -1773,20 +2067,23 @@ def api_perfil_foto():
         if err:
             return jsonify({"ok": False, "mensaje": err}), 400
 
-        usuarios = cargar_datos("usuarios")
-        foto_ts = datetime.now().strftime("%Y%m%d%H%M%S")
-        usuario = actualizar_usuario_en_lista(
-            usuarios,
-            session["id_usuario"],
-            {"foto_perfil": ruta_foto, "foto_actualizada_en": foto_ts},
-        )
-        if not usuario:
+        from nebula_data import actualizar_campos_usuario
+        from perfil_service import marca_foto_actualizada
+
+        try:
+            usuario = actualizar_campos_usuario(
+                session["id_usuario"],
+                marca_foto_actualizada({"foto_perfil": ruta_foto}),
+            )
+        except ValueError:
             return jsonify({"ok": False, "mensaje": "No se pudo actualizar el usuario."}), 500
 
-        guardar_datos("usuarios", usuarios)
         usuario = normalizar_usuario_perfil(usuario)
+        foto_ts = usuario.get("foto_actualizada_en", "")
 
-        if session.get("rol") == 2:
+        from session_auth import is_estudiante_session
+
+        if is_estudiante_session():
             try:
                 from notificaciones_admin_service import crear_notificacion_admin
 
@@ -1813,6 +2110,96 @@ def api_perfil_foto():
     except Exception:
         app.logger.exception("api_perfil_foto")
         return jsonify({"ok": False, "mensaje": "Error al subir la imagen."}), 500
+
+
+@app.route("/api/profile-image", methods=["GET"])
+@app.route("/api/perfil/imagen", methods=["GET"])
+def api_profile_image():
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+
+    usuario = obtener_usuario_sesion()
+    if not usuario:
+        return jsonify({"ok": False, "mensaje": "Usuario no encontrado."}), 404
+
+    from perfil_service import normalizar_usuario_perfil
+
+    usuario = normalizar_usuario_perfil(usuario)
+    avatar_url = _avatar_url_usuario(usuario) or (
+        AVATAR_ADMIN_DEFAULT if usuario.get("id_rol") == 1 else AVATAR_ESTUDIANTE_DEFAULT
+    )
+    return jsonify(
+        {
+            "ok": True,
+            "avatar_url": avatar_url,
+            "profile_image": usuario.get("foto_perfil", ""),
+            "foto_perfil": usuario.get("foto_perfil", ""),
+            "foto_actualizada_en": usuario.get("foto_actualizada_en", ""),
+            "updated_at": usuario.get("updated_at", ""),
+        }
+    )
+
+
+@app.route("/api/perfil/foto", methods=["DELETE"])
+def api_perfil_foto_eliminar():
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+
+    from perfil_service import eliminar_foto_perfil_usuario, normalizar_usuario_perfil
+
+    usuarios = cargar_datos("usuarios")
+    usuario, err = eliminar_foto_perfil_usuario(usuarios, session["id_usuario"])
+    if err:
+        return jsonify({"ok": False, "mensaje": err}), 400
+    guardar_datos("usuarios", usuarios)
+    usuario = normalizar_usuario_perfil(usuario)
+    default = AVATAR_ESTUDIANTE_DEFAULT
+    return jsonify(
+        {
+            "ok": True,
+            "mensaje": "Foto eliminada.",
+            "usuario": _serializar_usuario_perfil_api(usuario),
+            "avatar_url": default,
+        }
+    )
+
+
+@app.route("/api/perfil/password", methods=["POST"])
+def api_perfil_password():
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+
+    data = request.get_json(silent=True) or {}
+    actual = (data.get("password_actual") or data.get("current_password") or "").strip()
+    nueva = (data.get("password_nueva") or data.get("new_password") or "").strip()
+    confirmar = (data.get("password_confirmar") or data.get("confirm_password") or "").strip()
+
+    if len(nueva) < 6:
+        return jsonify({"ok": False, "mensaje": "La nueva contraseña debe tener al menos 6 caracteres."}), 400
+    if nueva != confirmar:
+        return jsonify({"ok": False, "mensaje": "Las contraseñas no coinciden."}), 400
+
+    usuario = obtener_usuario_sesion()
+    if not usuario:
+        return jsonify({"ok": False, "mensaje": "Usuario no encontrado."}), 404
+
+    from password_security import hash_password, verify_password
+
+    if not verify_password(actual, usuario.get("password")):
+        return jsonify({"ok": False, "mensaje": "La contraseña actual no es correcta."}), 400
+
+    usuarios = cargar_datos("usuarios")
+    from perfil_service import actualizar_usuario_en_lista
+
+    actualizado = actualizar_usuario_en_lista(
+        usuarios,
+        session["id_usuario"],
+        {"password": hash_password(nueva)},
+    )
+    if not actualizado:
+        return jsonify({"ok": False, "mensaje": "No se pudo actualizar la contraseña."}), 500
+    guardar_datos("usuarios", usuarios)
+    return jsonify({"ok": True, "mensaje": "Contraseña actualizada correctamente."})
 
 
 @app.route("/api/perfil/me", methods=["GET"])
@@ -1867,11 +2254,9 @@ def logout():
 
 def _requiere_admin():
     """Redirige si no hay sesión de administrador (rol 1)."""
-    if "id_usuario" not in session:
-        return redirect(url_for("login"))
-    if session.get("rol") != 1:
-        return redirect(url_for("dashboard"))
-    return None
+    from session_auth import require_admin_redirect
+
+    return require_admin_redirect()
 
 
 @app.route("/admin")
@@ -1897,6 +2282,7 @@ def admin():
         cursos_populares=datos["cursos_populares"],
         distribucion_roles=datos["distribucion_roles"],
         actividad_reciente=datos["actividad_reciente"],
+        resumen_actividad=datos.get("resumen_actividad"),
     )
 
 
@@ -1954,11 +2340,203 @@ def admin_profile():
 
 
 def _requiere_admin_json():
+    from session_auth import is_admin_session, repair_session_role_keys
+
+    repair_session_role_keys()
     if "id_usuario" not in session:
         return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
-    if session.get("rol") != 1:
+    if not is_admin_session():
         return jsonify({"ok": False, "mensaje": "Acceso denegado."}), 403
     return None
+
+
+@app.route("/api/admin/catalogo/cursos", methods=["GET", "POST"])
+def api_admin_catalogo_cursos():
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from catalog_service import crear_curso, listar_cursos_admin_db
+
+    if request.method == "GET":
+        return jsonify({"ok": True, "cursos": listar_cursos_admin_db()})
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(crear_curso(data))
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/admin/catalogo/cursos/<slug>", methods=["GET", "PUT", "DELETE"])
+def api_admin_catalogo_curso(slug):
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from catalog_service import (
+        actualizar_curso,
+        eliminar_curso,
+        obtener_curso_admin,
+    )
+
+    if request.method == "GET":
+        curso = obtener_curso_admin(slug)
+        if not curso:
+            return jsonify({"ok": False, "mensaje": "Curso no encontrado."}), 404
+        return jsonify({"ok": True, "curso": curso})
+
+    if request.method == "DELETE":
+        try:
+            return jsonify(eliminar_curso(slug))
+        except ValueError as exc:
+            return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(actualizar_curso(slug, data))
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/admin/catalogo/lecciones", methods=["GET", "POST"])
+def api_admin_catalogo_lecciones():
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from catalog_service import crear_leccion, listar_lecciones_db
+
+    if request.method == "GET":
+        return jsonify({"ok": True, "lecciones": listar_lecciones_db()})
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(crear_leccion(data))
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/admin/catalogo/lecciones/<int:lesson_id>", methods=["GET", "PUT", "DELETE"])
+def api_admin_catalogo_leccion(lesson_id):
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from catalog_service import (
+        actualizar_leccion,
+        eliminar_leccion,
+        obtener_leccion_admin,
+    )
+
+    if request.method == "GET":
+        lec = obtener_leccion_admin(lesson_id)
+        if not lec:
+            return jsonify({"ok": False, "mensaje": "Lección no encontrada."}), 404
+        return jsonify({"ok": True, "leccion": lec})
+
+    if request.method == "DELETE":
+        try:
+            return jsonify(eliminar_leccion(lesson_id))
+        except ValueError as exc:
+            return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(actualizar_leccion(lesson_id, data))
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/admin/catalogo/evaluaciones", methods=["GET", "POST"])
+def api_admin_catalogo_evaluaciones():
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from catalog_service import crear_evaluacion, listar_evaluaciones_catalogo
+
+    if request.method == "GET":
+        return jsonify({"ok": True, "evaluaciones": listar_evaluaciones_catalogo()})
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(crear_evaluacion(data))
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/admin/catalogo/evaluaciones/<int:ev_id>", methods=["GET", "PUT", "DELETE"])
+def api_admin_catalogo_evaluacion(ev_id):
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from catalog_service import (
+        actualizar_evaluacion,
+        eliminar_evaluacion,
+        obtener_evaluacion_completa,
+    )
+
+    if request.method == "GET":
+        ev = obtener_evaluacion_completa(ev_id)
+        if not ev:
+            return jsonify({"ok": False, "mensaje": "Evaluación no encontrada."}), 404
+        return jsonify({"ok": True, "evaluacion": ev})
+
+    if request.method == "DELETE":
+        try:
+            return jsonify(eliminar_evaluacion(ev_id))
+        except ValueError as exc:
+            return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(actualizar_evaluacion(ev_id, data))
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/admin/catalogo/evaluaciones/<int:ev_id>/preguntas", methods=["POST"])
+def api_admin_catalogo_preguntas(ev_id):
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from catalog_service import crear_pregunta
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(crear_pregunta(ev_id, data))
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/admin/catalogo/preguntas/<int:pregunta_id>", methods=["PUT", "DELETE"])
+def api_admin_catalogo_pregunta(pregunta_id):
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from catalog_service import actualizar_pregunta, eliminar_pregunta
+
+    if request.method == "DELETE":
+        try:
+            return jsonify(eliminar_pregunta(pregunta_id))
+        except ValueError as exc:
+            return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(actualizar_pregunta(pregunta_id, data))
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/admin/resumen-actividad", methods=["GET"])
+def api_admin_resumen_actividad():
+    err = _requiere_admin_json()
+    if err:
+        return err
+    from admin_servicio import obtener_resumen_actividad_dashboard
+
+    periodo = request.args.get("periodo", "30")
+    if request.args.get("dias") == "7":
+        periodo = "7"
+    data = obtener_resumen_actividad_dashboard(periodo)
+    return jsonify({"ok": True, "resumen": data})
 
 
 @app.route("/api/admin/analytics", methods=["GET"])
@@ -2007,21 +2585,58 @@ def api_admin_eliminar_estudiante(id_usuario):
     err = _requiere_admin_json()
     if err:
         return err
-    from admin_servicio import eliminar_estudiante
+
+    id_admin = session["id_usuario"]
+    if id_usuario == id_admin:
+        return jsonify({"ok": False, "mensaje": "No puedes eliminar tu propia cuenta."}), 400
+
+    from extensions import db
+    from models import User
+    from nebula_data import eliminar_usuario_completo
+
+    estudiante = db.session.get(User, id_usuario)
+    if estudiante is None:
+        return jsonify({"ok": False, "mensaje": "Estudiante no encontrado."}), 400
+    if estudiante.id_rol != 2:
+        return jsonify(
+            {"ok": False, "mensaje": "Solo se pueden eliminar cuentas de estudiante."}
+        ), 400
 
     try:
-        eliminar_estudiante(id_usuario, session["id_usuario"])
-        return jsonify({"ok": True, "mensaje": "Estudiante eliminado correctamente."})
+        eliminar_usuario_completo(id_usuario)
+        app.logger.info(
+            "Estudiante id=%s eliminado por admin id=%s", id_usuario, id_admin
+        )
+        return jsonify(
+            {"ok": True, "mensaje": "Estudiante eliminado correctamente.", "id_usuario": id_usuario}
+        )
     except ValueError as exc:
+        app.logger.warning(
+            "api_admin_eliminar_estudiante id=%s: %s", id_usuario, exc
+        )
         return jsonify({"ok": False, "mensaje": str(exc)}), 400
+    except RuntimeError as exc:
+        if "usuarios" in str(exc).lower():
+            app.logger.error(
+                "api_admin_eliminar_estudiante: código antiguo (guardar_datos usuarios). "
+                "Redespliega la última versión en Render."
+            )
+            return jsonify(
+                {
+                    "ok": False,
+                    "mensaje": "El servidor usa una versión antigua. Redespliega el proyecto en Render.",
+                }
+            ), 500
+        raise
     except Exception as exc:
         app.logger.exception("api_admin_eliminar_estudiante id=%s", id_usuario)
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "No se pudo eliminar. Intenta de nuevo o revisa los logs del servidor.",
-            }
-        ), 500
+        detalle = str(exc).strip()
+        mensaje = (
+            f"No se pudo eliminar el estudiante: {detalle}"
+            if detalle
+            else "No se pudo eliminar el estudiante. Revisa los logs del servidor."
+        )
+        return jsonify({"ok": False, "mensaje": mensaje}), 500
 
 
 @app.route("/api/admin/notificaciones", methods=["GET"])
@@ -2242,6 +2857,71 @@ def api_recurso_proxy():
 
 
 # ——— API Racha diaria ———
+@app.route("/api/plan_estudios/metas", methods=["GET", "POST"])
+def api_plan_metas():
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+
+    from metas_service import guardar_meta, listar_metas_usuario
+
+    id_usuario = session["id_usuario"]
+    actividades = cargar_datos("actividades")
+
+    if request.method == "GET":
+        return jsonify({"ok": True, "metas": listar_metas_usuario(actividades, id_usuario)})
+
+    payload = request.get_json(silent=True) or request.form.to_dict()
+    try:
+        meta = guardar_meta(
+            actividades,
+            id_usuario,
+            payload,
+            lambda arr, k: generar_id(arr, k),
+        )
+        guardar_datos("actividades", actividades)
+        if not (payload.get("id_actividad") or payload.get("id")):
+            registrar_actividad_sistema(
+                "meta_creada",
+                id_usuario,
+                "Meta personalizada creada",
+                f"{session.get('nombre', 'Estudiante')} creó la meta «{meta.get('titulo', 'Sin título')}»",
+            )
+        return jsonify({"ok": True, "meta": meta, "mensaje": "Meta guardada."})
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
+@app.route("/api/plan_estudios/metas/<int:id_actividad>", methods=["PUT", "DELETE"])
+def api_plan_meta(id_actividad):
+    if "id_usuario" not in session:
+        return jsonify({"ok": False, "mensaje": "Debes iniciar sesión."}), 401
+
+    from metas_service import eliminar_meta, guardar_meta, listar_metas_usuario
+
+    id_usuario = session["id_usuario"]
+    actividades = cargar_datos("actividades")
+
+    if request.method == "DELETE":
+        if not eliminar_meta(actividades, id_usuario, id_actividad):
+            return jsonify({"ok": False, "mensaje": "Meta no encontrada."}), 404
+        guardar_datos("actividades", actividades)
+        return jsonify({"ok": True, "mensaje": "Meta eliminada."})
+
+    payload = request.get_json(silent=True) or {}
+    payload["id_actividad"] = id_actividad
+    try:
+        meta = guardar_meta(
+            actividades,
+            id_usuario,
+            payload,
+            lambda arr, k: generar_id(arr, k),
+        )
+        guardar_datos("actividades", actividades)
+        return jsonify({"ok": True, "meta": meta, "mensaje": "Meta actualizada."})
+    except ValueError as exc:
+        return jsonify({"ok": False, "mensaje": str(exc)}), 400
+
+
 @app.route("/api/plan_estudios/racha", methods=["GET"])
 def api_racha_estado():
     if "id_usuario" not in session:
@@ -2293,13 +2973,25 @@ def api_racha_registrar_legacy():
 
 @app.errorhandler(500)
 def manejar_error_interno(error):
-    app.logger.exception("Error 500: %s", error)
+    app.logger.exception(
+        "Error 500 %s %s: %s",
+        request.method,
+        request.path,
+        error,
+    )
     if request.path.startswith("/api/"):
         return jsonify({"ok": False, "mensaje": "Error interno del servidor."}), 500
     return (
         "Error interno. Revisa los logs en Render o contacta al administrador.",
         500,
     )
+
+
+@app.errorhandler(404)
+def manejar_no_encontrado(error):
+    if request.path.startswith("/api/"):
+        return jsonify({"ok": False, "mensaje": "Recurso no encontrado."}), 404
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":

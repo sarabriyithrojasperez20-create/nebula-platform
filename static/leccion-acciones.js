@@ -59,7 +59,7 @@
             })
         );
         if (meta.guardarQuizUrl) {
-            fetch(meta.guardarQuizUrl, {
+            return fetch(meta.guardarQuizUrl, {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {
@@ -73,9 +73,21 @@
                     total: total || 0,
                     aprobado: passed,
                 }),
-            }).catch(function () {
-                /* ignore */
-            });
+            })
+                .then(function (r) {
+                    return r.json();
+                })
+                .then(function (data) {
+                    if (data && data.ok && passed && window.NebulaProgreso && meta.slug) {
+                        window.NebulaProgreso.onCursoUpdated(meta.slug, data.progreso || {
+                            porcentaje: data.porcentaje_curso,
+                        });
+                    }
+                    return data;
+                })
+                .catch(function () {
+                    /* ignore */
+                });
         }
     }
 
@@ -231,6 +243,16 @@
                     } catch (e) {
                         /* ignore */
                     }
+                }
+
+                if (window.NebulaProgreso && meta.slug) {
+                    window.NebulaProgreso.onCursoUpdated(
+                        meta.slug,
+                        result.data.progreso || {
+                            porcentaje: result.data.porcentaje_curso,
+                            completado: result.data.curso_completado,
+                        }
+                    );
                 }
 
                 btnContinuar.classList.remove('is-locked');

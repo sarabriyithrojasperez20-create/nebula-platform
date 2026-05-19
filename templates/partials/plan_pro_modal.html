@@ -1,0 +1,54 @@
+<div id="nb-plan-modal" class="nb-plan-modal hidden" aria-hidden="true" role="dialog" aria-labelledby="nb-plan-modal-title" aria-modal="true">
+    <div class="nb-plan-modal__backdrop" data-plan-modal-close tabindex="-1"></div>
+    <div class="nb-plan-modal__panel" role="document">
+        <button type="button" class="nb-plan-modal__x" data-plan-modal-close aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="nb-plan-modal__hero">
+            <span class="nb-plan-modal__badge">Recomendado</span>
+            <h2 id="nb-plan-modal-title" class="nb-plan-modal__title">Plan Pro</h2>
+            <p class="nb-plan-modal__tagline">Potencia tu aprendizaje con el tutor IA sin límites prácticos.</p>
+            <div class="nb-plan-modal__price">
+                <span class="nb-plan-modal__price-amount">$149</span>
+                <span class="nb-plan-modal__price-period">/ mes</span>
+            </div>
+            <p class="nb-plan-modal__price-note">Activación inmediata en tu cuenta de estudiante.</p>
+        </div>
+        <div class="nb-plan-modal__body">
+            <p class="nb-plan-modal__desc">
+                Ideal si usas el tutor a diario, haces diagnósticos frecuentes y quieres respuestas más completas sin esperas.
+            </p>
+            <ul class="nb-plan-modal__benefits" aria-label="Beneficios del Plan Pro">
+                <li>
+                    <span class="material-symbols-outlined" aria-hidden="true">bolt</span>
+                    <span><strong>500 mensajes</strong> al tutor IA por día (vs. 40 en plan gratuito)</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined" aria-hidden="true">quiz</span>
+                    <span><strong>50 cuestionarios</strong> generados por día</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined" aria-hidden="true">timer_off</span>
+                    <span>Sin tiempo de espera entre preguntas</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>
+                    <span>Respuestas más extensas y contexto académico ampliado</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined" aria-hidden="true">verified</span>
+                    <span>Acceso prioritario a nuevas funciones del tutor</span>
+                </li>
+            </ul>
+        </div>
+        <footer class="nb-plan-modal__footer">
+            <button type="button" class="nb-plan-modal__btn nb-plan-modal__btn--ghost" data-plan-modal-close>
+                Cancelar
+            </button>
+            <button type="button" id="nb-plan-pay-btn" class="nb-plan-modal__btn nb-plan-modal__btn--primary">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">payments</span>
+                Confirmar y activar
+            </button>
+        </footer>
+    </div>
+</div>

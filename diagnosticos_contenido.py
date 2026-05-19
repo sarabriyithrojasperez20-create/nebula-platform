@@ -468,6 +468,11 @@ DIAGNOSTICO_POR_CURSO = {
 
 
 def obtener_diagnostico_curso(slug):
+    from catalog_service import get_diagnostico
+
+    data = get_diagnostico(slug)
+    if data:
+        return data
     if slug not in DIAGNOSTICO_POR_CURSO:
         return None
     return copy.deepcopy(DIAGNOSTICO_POR_CURSO[slug])
@@ -483,7 +488,7 @@ def calcular_nivel_diagnostico(porcentaje):
 
 def evaluar_respuestas_diagnostico(slug, respuestas):
     """respuestas: lista de {indice, elegida}. Devuelve dict con puntaje y errores."""
-    quiz = DIAGNOSTICO_POR_CURSO.get(slug)
+    quiz = obtener_diagnostico_curso(slug)
     if not quiz:
         return None
 
@@ -536,7 +541,9 @@ def aplicar_ruta_diagnostico_a_curso(curso, diagnostico):
     slug = curso.get("slug")
     nivel = diagnostico.get("nivel", "intermedio")
     errores = diagnostico.get("errores_por_leccion", {})
-    niveles_leccion = NIVEL_LECCION_POR_CURSO.get(slug, {})
+    from catalog_service import get_nivel_lecciones
+
+    niveles_leccion = get_nivel_lecciones(slug) or NIVEL_LECCION_POR_CURSO.get(slug, {})
 
     lecciones = [copy.deepcopy(l) for l in curso.get("lecciones", [])]
     orden_original = {l["id"]: i for i, l in enumerate(lecciones)}

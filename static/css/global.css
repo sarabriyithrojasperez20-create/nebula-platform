@@ -1,6 +1,8 @@
 /**
  * global.css — Estilos compartidos de la plataforma estudiante (Nébula)
  */
+@import url('responsive.css');
+
 body {
     font-family: 'Lexend', sans-serif;
 }

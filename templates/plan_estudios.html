@@ -248,8 +248,8 @@
                     <div id="metas-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
                     <div id="metas-empty" class="plan-estudios-card hidden flex-col p-12 text-center items-center rounded-2xl">
                         <span class="material-symbols-outlined text-5xl text-primary mb-4">flag</span>
-                        <p class="text-lg font-semibold text-slate-900">Aún no tienes metas</p>
-                        <p class="text-sm text-slate-500 mt-2">Crea tu primera meta académica para empezar a medir tu progreso.</p>
+                        <p class="text-lg font-semibold text-slate-900">Aún no has creado metas personalizadas</p>
+                        <p class="text-sm text-slate-500 mt-2">Usa «Nueva meta» para definir tus objetivos académicos.</p>
                     </div>
                 </div>
 
@@ -381,7 +381,8 @@
                 </label>
                 <label class="block">
                     <span class="text-xs font-semibold text-slate-500 uppercase">Fecha</span>
-                    <input name="fecha" type="date" required class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                    <input name="fecha" id="form-evento-fecha" type="date" required class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                    <p id="form-evento-countdown" class="text-xs font-bold text-primary mt-1.5" aria-live="polite"></p>
                 </label>
                 <label class="block">
                     <span class="text-xs font-semibold text-slate-500 uppercase">Horario (opcional)</span>
@@ -389,21 +390,24 @@
                 </label>
                 <label class="block">
                     <span class="text-xs font-semibold text-slate-500 uppercase">Tipo</span>
-                    <select name="tipo" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                    <select name="tipo" id="form-evento-tipo" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
                         <option value="quiz">Quiz</option>
+                        <option value="examen">Examen</option>
                         <option value="tarea">Tarea</option>
-                        <option value="importante">Evento importante</option>
-                        <option value="tutoria">Tutoría</option>
+                        <option value="clase">Clase</option>
                     </select>
                 </label>
                 <label class="block">
-                    <span class="text-xs font-semibold text-slate-500 uppercase">Materia</span>
-                    <select name="materia" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-                        <option value="math">Matemáticas</option>
-                        <option value="science">Ciencia</option>
-                        <option value="history">Historia</option>
-                        <option value="lang">Lenguaje</option>
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Curso / materia</span>
+                    <select name="curso_slug" id="form-evento-curso" required
+                        class="mt-1 w-full rounded-xl border-slate-200 text-sm dark:bg-primary/10 dark:border-primary/25 dark:text-slate-100"
+                        data-nebula-curso-select data-navigate="false"
+                        data-placeholder="Añade cursos en Mis cursos">
+                        {% for c in cursos_calendario|default([]) %}
+                        <option value="{{ c.slug }}">{{ c.titulo }}</option>
+                        {% endfor %}
                     </select>
+                    <p class="text-[11px] text-slate-400 mt-1">Solo aparecen los cursos que añadiste en «Mis cursos».</p>
                 </label>
                 <label class="block">
                     <span class="text-xs font-semibold text-slate-500 uppercase">Descripción</span>
@@ -439,12 +443,15 @@
             <ul class="space-y-2 text-sm text-slate-600 mb-6">
                 <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">calendar_today</span><span id="detalle-evento-fecha">—</span></li>
                 <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">schedule</span><span id="detalle-evento-hora">—</span></li>
-                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">category</span><span id="detalle-evento-materia">—</span></li>
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">school</span><span id="detalle-evento-curso">—</span></li>
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">category</span><span id="detalle-evento-tipo">—</span></li>
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-slate-400">hourglass_top</span><span id="detalle-evento-countdown" class="font-bold text-primary">—</span></li>
             </ul>
+            <p id="detalle-curso-no-disponible" class="hidden text-sm text-center text-rose-600 bg-rose-50 rounded-xl py-2.5 mb-3 font-semibold">Curso no disponible</p>
             <div class="flex flex-col gap-2">
                 <button type="button" id="btn-detalle-ir-vista"
                     class="w-full py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">
-                    Abrir actividad
+                    Ir al curso
                 </button>
                 <button type="button" id="btn-detalle-editar"
                     class="w-full py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
@@ -536,6 +543,8 @@
 
     <!-- Eventos del servidor (Jinja) para fusionar con datos locales -->
     <script type="application/json" id="server-eventos">{{ eventos_calendario | tojson }}</script>
+    <script type="application/json" id="server-metas">{{ metas_personales | default([]) | tojson }}</script>
+    <script type="application/json" id="server-cursos">{{ cursos_calendario | default([]) | tojson }}</script>
     <!-- Rutas de navegación (Flask) para eventos del calendario -->
     <script type="application/json" id="nebula-routes">{
         "quiz": "{{ url_for('mis_cursos') }}",
@@ -545,7 +554,10 @@
         "importante": "{{ url_for('progreso') }}",
         "detalle": "{{ url_for('dashboard') }}",
         "leccionPattern": "/curso/__SLUG__/leccion/__ID__",
-        "deleteEvento": "/api/plan_estudios/eventos/__ID__",
+        "deleteEvento": "/api/calendario/eventos/__ID__",
+        "saveEvento": "/api/calendario/eventos",
+        "metasApi": "/api/plan_estudios/metas",
+        "eventoCurso": "/evento/__ID__/curso",
         "registrarRacha": "/api/plan_estudios/racha/registrar",
         "rachaEstado": "/api/plan_estudios/racha",
         "rachaSincronizar": "/api/plan_estudios/racha/sincronizar",
@@ -556,6 +568,7 @@
     <script type="application/json" id="nebula-racha-inicial">{{ estado_racha | tojson }}</script>
 
     <script src="{{ url_for('static', filename='notificaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-cursos-activos.js') }}"></script>
     <script src="{{ url_for('static', filename='js/nebula-racha.js') }}"></script>
     <script src="{{ url_for('static', filename='js/nebula-recursos.js') }}"></script>
     <script>
@@ -566,7 +579,18 @@
     const NebulaPlan = (() => {
         'use strict';
 
-        const STORAGE_KEY = 'nebula_plan_estudios_v1';
+        const SESSION_DATA = (() => {
+            try {
+                return JSON.parse(document.getElementById('nebula-session')?.textContent || '{}');
+            } catch {
+                return {};
+            }
+        })();
+
+        function storageKey() {
+            const uid = SESSION_DATA.user_id || 0;
+            return 'nebula_plan_estudios_v1_u' + uid;
+        }
         const MATERIA_MAP = {
             math: { label: 'Matemáticas', class: 'plan-estudios-class--math', color: 'bg-nebula-math' },
             science: { label: 'Ciencia', class: 'plan-estudios-class--science', color: 'bg-nebula-science' },
@@ -581,11 +605,12 @@
         };
 
         const TIPO_EVENTO = {
-            quiz: { label: 'Quiz', icon: 'quiz', accion: 'Abrir quiz' },
-            tarea: { label: 'Tarea', icon: 'assignment', accion: 'Abrir tarea' },
-            importante: { label: 'Evento importante', icon: 'star', accion: 'Ver detalles' },
-            tutoria: { label: 'Tutoría', icon: 'school', accion: 'Ir a tutoría' },
-            clase: { label: 'Tutoría', icon: 'school', accion: 'Ir a tutoría' },
+            quiz: { label: 'Quiz', icon: 'quiz', accion: 'Ir al curso' },
+            examen: { label: 'Examen', icon: 'school', accion: 'Ir al curso' },
+            tarea: { label: 'Tarea', icon: 'assignment', accion: 'Ir al curso' },
+            importante: { label: 'Examen', icon: 'star', accion: 'Ir al curso' },
+            tutoria: { label: 'Clase', icon: 'school', accion: 'Ir al curso' },
+            clase: { label: 'Clase', icon: 'school', accion: 'Ir al curso' },
         };
 
         const APP_ROUTES = (() => {
@@ -596,13 +621,37 @@
             }
         })();
 
-        const SESSION_DATA = (() => {
+        const CURSOS_CAL = (() => {
             try {
-                return JSON.parse(document.getElementById('nebula-session')?.textContent || '{}');
+                return JSON.parse(document.getElementById('server-cursos')?.textContent || '[]');
             } catch {
-                return {};
+                return [];
             }
         })();
+
+        function countdownLabel(fecha) {
+            if (!fecha) return '';
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const obj = new Date(fecha + 'T12:00:00');
+            const delta = Math.round((obj - hoy) / 86400000);
+            if (delta < 0) return 'Pasado';
+            if (delta === 0) return 'Hoy';
+            if (delta === 1) return 'Mañana';
+            return `Faltan ${delta} días`;
+        }
+
+        function cursoLabel(ev) {
+            const slug = ev.curso_slug || ev.materia;
+            const c = CURSOS_CAL.find((x) => x.slug === slug);
+            return ev.curso_titulo || (c ? c.titulo : (slug || '—'));
+        }
+
+        function updateFormFechaCountdown() {
+            const inp = document.getElementById('form-evento-fecha');
+            const out = document.getElementById('form-evento-countdown');
+            if (out && inp) out.textContent = inp.value ? countdownLabel(inp.value) : '';
+        }
 
         // Estado de la aplicación
         let state = loadState();
@@ -615,87 +664,133 @@
         let pendingDeleteId = null;
         let contextMenuEventId = null;
 
-        // ——— Persistencia ———
+        // ——— Persistencia (por usuario; eventos/metas en servidor) ———
         function loadState() {
             const defaults = {
-                eventos: seedEventos(),
-                metas: seedMetas(),
+                eventos: [],
+                metas: [],
                 racha: { dias: [], record: 0, ultimaActividad: null },
-                horasSemanales: { completadas: 13, meta: 20 },
+                horasSemanales: { completadas: 0, meta: 20 },
             };
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
+                const raw = localStorage.getItem(storageKey());
                 if (!raw) return defaults;
-                return { ...defaults, ...JSON.parse(raw) };
+                const parsed = JSON.parse(raw);
+                return {
+                    ...defaults,
+                    racha: { ...defaults.racha, ...(parsed.racha || {}) },
+                    horasSemanales: { ...defaults.horasSemanales, ...(parsed.horasSemanales || {}) },
+                };
             } catch {
                 return defaults;
             }
         }
 
         function saveState() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            try {
+                localStorage.setItem(
+                    storageKey(),
+                    JSON.stringify({
+                        racha: state.racha,
+                        horasSemanales: state.horasSemanales,
+                    })
+                );
+            } catch (_) { /* quota */ }
         }
 
-        function mergeServerEventos() {
+        function mapServerEvento(ev) {
+            const id = ev.id_actividad ? String(ev.id_actividad) : ('srv-' + (ev.titulo || '') + (ev.fecha || ''));
+            const fecha = ev.fecha || new Date().toISOString().slice(0, 10);
+            return {
+                id,
+                id_actividad: ev.id_actividad,
+                titulo: ev.titulo || 'Evento',
+                fecha,
+                horario: ev.horario || ev.hora || '',
+                tipo: normalizeTipo(ev.categoria || ev.tipo || 'clase'),
+                materia: ev.materia || ev.curso_slug || '',
+                curso_slug: ev.curso_slug || ev.materia || '',
+                curso_titulo: ev.curso_titulo || '',
+                descripcion: ev.descripcion || '',
+                favorito: !!ev.favorito,
+                fromServer: true,
+            };
+        }
+
+        function loadEventosFromServer() {
             const el = document.getElementById('server-eventos');
-            if (!el) return;
+            if (!el) {
+                state.eventos = [];
+                return;
+            }
             try {
                 const server = JSON.parse(el.textContent || '[]');
-                server.forEach((ev, i) => {
-                    const id = 'srv-' + i;
-                    if (state.eventos.some((e) => e.id === id)) return;
-                    const fecha = ev.fecha || new Date().toISOString().slice(0, 10);
-                    state.eventos.push({
-                        id,
-                        titulo: ev.titulo || 'Evento',
-                        fecha,
-                        horario: ev.horario || '',
-                        tipo: normalizeTipo(ev.tipo || 'clase'),
-                        materia: ev.materia || 'math',
-                        descripcion: ev.descripcion || '',
-                        favorito: !!ev.favorito,
-                        fromServer: true,
-                    });
-                });
-                saveState();
-            } catch (_) { /* sin eventos del servidor */ }
+                state.eventos = Array.isArray(server) ? server.map(mapServerEvento) : [];
+            } catch (_) {
+                state.eventos = [];
+            }
+        }
+
+        function loadMetasFromServer() {
+            const el = document.getElementById('server-metas');
+            if (!el) {
+                state.metas = [];
+                return;
+            }
+            try {
+                const server = JSON.parse(el.textContent || '[]');
+                state.metas = Array.isArray(server)
+                    ? server.map((m) => ({
+                          id: String(m.id || m.id_actividad),
+                          id_actividad: m.id_actividad,
+                          titulo: m.titulo || '',
+                          descripcion: m.descripcion || '',
+                          progreso: Number(m.progreso) || 0,
+                          estado: m.estado || 'pendiente',
+                      }))
+                    : [];
+            } catch (_) {
+                state.metas = [];
+            }
         }
 
         function normalizeTipo(tipo) {
-            return tipo === 'clase' ? 'tutoria' : tipo;
+            const t = (tipo || 'clase').toLowerCase();
+            if (t === 'evaluacion' || t === 'examen' || t === 'importante') return 'examen';
+            if (t === 'quiz') return 'quiz';
+            if (t === 'tarea') return 'tarea';
+            if (t === 'clase' || t === 'estudio' || t === 'tutoria') return 'clase';
+            return t;
         }
 
-        function seedEventos() {
-            const today = new Date();
-            const mon = getMonday(today);
-            const d = (offset) => formatDate(addDays(mon, offset));
-            return [
-                { id: 'e1', titulo: 'Quiz: Ecuaciones lineales', fecha: d(1), horario: '10:00', tipo: 'quiz', materia: 'math', descripcion: 'Evaluación de ecuaciones lineales y sistemas.', favorito: true },
-                { id: 'e2', titulo: 'Entregar informe de laboratorio', fecha: d(2), horario: '23:59', tipo: 'tarea', materia: 'science', descripcion: 'Informe final del experimento de reacciones químicas.' },
-                { id: 'e3', titulo: 'Examen parcial Historia', fecha: d(4), horario: '09:00', tipo: 'importante', materia: 'history', descripcion: 'Evaluación de civilizaciones antiguas y edad media.' },
-                { id: 'e4', titulo: 'Quiz vocabulario inglés', fecha: d(3), horario: '14:00', tipo: 'quiz', materia: 'lang', descripcion: 'Repaso de unidades 4 y 5 del módulo de vocabulario.' },
-                { id: 'e5', titulo: 'Sesión tutoría Nébula AI', fecha: d(0), horario: '16:00', tipo: 'tutoria', materia: 'math', descripcion: 'Sesión de refuerzo personalizado con Nébula AI.' },
-            ];
+        function tipoLabelPlan(tipo) {
+            const map = { quiz: 'Quiz', examen: 'Examen', tarea: 'Tarea', clase: 'Clase', importante: 'Examen', tutoria: 'Clase' };
+            return map[normalizeTipo(tipo)] || 'Actividad';
         }
 
         function getEventById(id) {
             return state.eventos.find((e) => e.id === id);
         }
 
-        /** URL de destino según tipo de evento (compatible con rutas Flask) */
-        function getEventTargetUrl(ev) {
-            if (ev.targetUrl) return ev.targetUrl;
-            const tipo = normalizeTipo(ev.tipo);
-            if (tipo === 'quiz' && ev.slug && ev.leccionId) {
-                return (APP_ROUTES.leccionPattern || '/curso/__SLUG__/leccion/__ID__')
-                    .replace('__SLUG__', ev.slug)
-                    .replace('__ID__', ev.leccionId);
+        async function fetchDestinoCurso(ev) {
+            if (ev.id_actividad) {
+                const pattern = APP_ROUTES.eventoCurso || '/evento/__ID__/curso';
+                const url = pattern.replace('__ID__', encodeURIComponent(ev.id_actividad));
+                try {
+                    const res = await fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+                    return await res.json();
+                } catch {
+                    return { disponible: false, mensaje: 'Curso no disponible' };
+                }
             }
-            const base = APP_ROUTES[tipo] || APP_ROUTES.detalle || '/';
-            const params = new URLSearchParams({ evento: ev.id, tipo });
-            if (tipo === 'quiz') return `${base}?${params}#quiz`;
-            if (tipo === 'tarea') return `${base}?${params}#tarea`;
-            return base;
+            const slug = ev.curso_slug || ev.materia;
+            if (slug && CURSOS_CAL.some((c) => c.slug === slug)) {
+                return {
+                    disponible: true,
+                    url: '/curso/' + encodeURIComponent(slug),
+                };
+            }
+            return { disponible: false, mensaje: 'Curso no disponible' };
         }
 
         function escapeHtml(str) {
@@ -704,14 +799,6 @@
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;');
-        }
-
-        function seedMetas() {
-            return [
-                { id: 'm1', titulo: 'Completar módulo de álgebra', descripcion: 'Terminar lecciones 5 a 8', progreso: 70, estado: 'en_progreso' },
-                { id: 'm2', titulo: 'Leer capítulo de biología', descripcion: 'Células y metabolismo', progreso: 30, estado: 'en_progreso' },
-                { id: 'm3', titulo: 'Ensayo de literatura', descripcion: 'Borrador final 500 palabras', progreso: 100, estado: 'completada' },
-            ];
         }
 
         // Catálogo de recursos (URLs reales) — lógica en NebulaRecursos
@@ -899,7 +986,8 @@
             const meta = TIPO_EVENTO[tipo] || TIPO_EVENTO.quiz;
             const selected = selectedEventId === ev.id ? ' is-selected' : '';
             const favorito = ev.favorito ? ' is-favorito' : '';
-            const hora = ev.horario ? `<span class="text-[10px] opacity-70">${escapeHtml(ev.horario)}</span>` : '';
+            const hora = ev.horario ? `<span class="text-[10px] opacity-70 block">${escapeHtml(ev.horario)}</span>` : '';
+            const cd = countdownLabel(ev.fecha);
             const starBadge = ev.favorito
                 ? '<span class="material-symbols-outlined evento-favorito-badge" title="Favorito">star</span>'
                 : '';
@@ -917,6 +1005,8 @@
                     ${starBadge}
                     <span class="material-symbols-outlined text-sm">${meta.icon}</span>${escapeHtml(ev.titulo)}
                 </p>
+                <span class="text-[9px] opacity-80 block">${escapeHtml(cursoLabel(ev))} · ${escapeHtml(tipoLabelPlan(ev.tipo))}</span>
+                ${cd ? `<span class="text-[9px] font-bold text-primary block mt-0.5">${escapeHtml(cd)}</span>` : ''}
                 ${hora}
             </article>`;
         }
@@ -929,11 +1019,11 @@
 
             ulT.innerHTML = tareas.length
                 ? tareas.map((e) => `<li class="cal-list-item-link flex justify-between items-center py-2 border-b border-slate-50 last:border-0" data-id="${escapeHtml(e.id)}" data-event-id="${escapeHtml(e.id)}" role="button" tabindex="0"><span>${escapeHtml(e.titulo)}</span><span class="text-xs text-slate-400">${escapeHtml(e.fecha)}</span></li>`).join('')
-                : '<li class="text-slate-400 italic">No hay tareas pendientes</li>';
+                : '<li class="text-slate-400 italic">No tienes actividades programadas.</li>';
 
             ulI.innerHTML = importantes.length
                 ? importantes.map((e) => `<li class="cal-list-item-link flex justify-between items-center py-2 border-b border-slate-50" data-id="${escapeHtml(e.id)}" data-event-id="${escapeHtml(e.id)}" role="button" tabindex="0"><span class="font-medium">${escapeHtml(e.titulo)}</span><span class="text-xs text-amber-600">${escapeHtml(e.fecha)}</span></li>`).join('')
-                : '<li class="text-slate-400 italic">Sin fechas importantes próximas</li>';
+                : '<li class="text-slate-400 italic">No tienes eventos registrados en el calendario.</li>';
         }
 
         function highlightSelectedEvent() {
@@ -953,39 +1043,65 @@
             const meta = TIPO_EVENTO[tipo] || TIPO_EVENTO.quiz;
             const mat = MATERIA_MAP[ev.materia] || MATERIA_MAP.math;
 
-            document.getElementById('detalle-evento-badge').textContent = meta.label;
+            document.getElementById('detalle-evento-badge').textContent = tipoLabelPlan(ev.tipo);
             document.getElementById('detalle-evento-titulo').textContent = ev.titulo;
-            document.getElementById('detalle-evento-descripcion').textContent =
-                ev.descripcion || 'Sin descripción adicional.';
+            const desc = (ev.descripcion || '').trim();
+            document.getElementById('detalle-evento-descripcion').textContent = desc || 'Sin notas para este evento.';
             document.getElementById('detalle-evento-fecha').textContent = ev.fecha;
             document.getElementById('detalle-evento-hora').textContent = ev.horario || 'Sin horario definido';
-            document.getElementById('detalle-evento-materia').textContent = mat.label;
-            document.getElementById('btn-detalle-ir-vista').textContent = meta.accion;
+            document.getElementById('detalle-evento-curso').textContent = cursoLabel(ev);
+            document.getElementById('detalle-evento-tipo').textContent = tipoLabelPlan(ev.tipo);
+            document.getElementById('detalle-evento-countdown').textContent = countdownLabel(ev.fecha);
+            const slug = ev.curso_slug || ev.materia;
+            const tieneCurso = slug && CURSOS_CAL.some((c) => c.slug === slug);
+            document.getElementById('btn-detalle-ir-vista').classList.toggle('hidden', !tieneCurso);
+            document.getElementById('detalle-curso-no-disponible').classList.toggle('hidden', !!tieneCurso);
 
             openModal('modal-evento-detalle');
         }
 
-        function navigateToEvent(ev) {
-            const url = getEventTargetUrl(ev);
-            showToast(`Redirigiendo: ${ev.titulo}`, 'info');
-            setTimeout(() => { window.location.href = url; }, 350);
+        async function navigateToEvent(ev) {
+            showToast(`Abriendo curso: ${ev.titulo}`, 'info');
+            const data = await fetchDestinoCurso(ev);
+            if (data.disponible && data.url) {
+                window.location.href = data.url;
+                return;
+            }
+            showToast(data.mensaje || 'Curso no disponible', 'info');
         }
 
-        function addEvento(data) {
+        async function addEvento(data) {
             const esFavorito = data.favorito === '1' || data.favorito === true;
-            state.eventos.push({
-                id: 'ev-' + Date.now(),
+            const cursoSlug = data.curso_slug || data.materia || '';
+            const curso = CURSOS_CAL.find((c) => c.slug === cursoSlug);
+            const payload = {
                 titulo: data.titulo,
                 fecha: data.fecha,
+                hora: data.horario || '',
                 horario: data.horario || '',
-                tipo: normalizeTipo(data.tipo),
-                materia: data.materia,
+                categoria: normalizeTipo(data.tipo),
+                tipo: 'calendario',
+                curso_slug: cursoSlug,
+                materia: cursoSlug,
                 descripcion: data.descripcion || '',
                 favorito: esFavorito,
-            });
-            saveState();
-            renderCalendar();
-            showToast(esFavorito ? 'Evento favorito agregado al calendario' : 'Evento agregado al calendario');
+            };
+            try {
+                const res = await fetch(APP_ROUTES.saveEvento || '/api/calendario/eventos', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok || !body.ok) throw new Error(body.mensaje || 'No se pudo guardar el evento.');
+                const ev = mapServerEvento(body.evento || payload);
+                state.eventos.push(ev);
+                renderCalendar();
+                showToast(esFavorito ? 'Evento favorito agregado al calendario' : 'Evento agregado al calendario');
+            } catch (err) {
+                showToast(err.message || 'No se pudo guardar el evento', 'error');
+            }
         }
 
         function updateEvento(id, patch) {
@@ -1028,13 +1144,16 @@
             const eventId = id || pendingDeleteId;
             if (!eventId) return;
 
+            const ev = getEventById(eventId);
+            const apiId = ev && ev.id_actividad ? ev.id_actividad : eventId;
+
             const cards = document.querySelectorAll(`[data-event-id="${eventId}"]`);
             cards.forEach((card) => {
                 if (card.classList.contains('calendar-event-card')) card.classList.add('is-removing');
             });
             if (cards.length) await new Promise((r) => setTimeout(r, 280));
 
-            await deleteEventoApi(eventId);
+            if (ev && ev.id_actividad) await deleteEventoApi(ev.id_actividad);
 
             state.eventos = state.eventos.filter((e) => e.id !== eventId);
             if (selectedEventId === eventId) {
@@ -1139,6 +1258,7 @@
             form?.reset();
             const fecha = form?.querySelector('[name="fecha"]');
             if (fecha) fecha.value = formatDate(new Date());
+            updateFormFechaCountdown();
             resetEventoFavoritoToggle();
             openModal('modal-evento');
         }
@@ -1191,26 +1311,56 @@
         function updateWidgetProgreso() {
             const avg = state.metas.length
                 ? Math.round(state.metas.reduce((s, m) => s + m.progreso, 0) / state.metas.length)
-                : 65;
-            const horas = state.horasSemanales || { completadas: 13, meta: 20 };
+                : 0;
+            const horas = state.horasSemanales || { completadas: 0, meta: 20 };
             document.getElementById('widget-progreso-pct').textContent = avg + '%';
             document.getElementById('widget-progreso-bar').style.width = avg + '%';
             document.getElementById('widget-progreso-text').textContent =
                 `${horas.completadas} de ${horas.meta} horas de estudio · ${state.metas.filter((m) => m.estado === 'completada').length} metas completadas`;
         }
 
-        function addMeta(data) {
-            const progreso = Number(data.progreso) || 0;
-            state.metas.push({
-                id: 'm-' + Date.now(),
-                titulo: data.titulo,
-                descripcion: data.descripcion,
-                progreso,
-                estado: data.estado,
+        async function persistMeta(meta) {
+            const id = meta.id_actividad || meta.id;
+            const url = (APP_ROUTES.metasApi || '/api/plan_estudios/metas') + (id ? '/' + encodeURIComponent(id) : '');
+            const res = await fetch(url, {
+                method: id ? 'PUT' : 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({
+                    id_actividad: meta.id_actividad,
+                    titulo: meta.titulo,
+                    descripcion: meta.descripcion,
+                    progreso: meta.progreso,
+                    estado: meta.estado,
+                }),
             });
-            saveState();
-            renderMetas();
-            showToast('Meta académica creada');
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok || !body.ok) throw new Error(body.mensaje || 'No se pudo guardar la meta.');
+            return body.meta;
+        }
+
+        async function addMeta(data) {
+            const progreso = Number(data.progreso) || 0;
+            try {
+                const saved = await persistMeta({
+                    titulo: data.titulo,
+                    descripcion: data.descripcion,
+                    progreso,
+                    estado: data.estado,
+                });
+                state.metas.push({
+                    id: String(saved.id || saved.id_actividad),
+                    id_actividad: saved.id_actividad,
+                    titulo: saved.titulo,
+                    descripcion: saved.descripcion,
+                    progreso: saved.progreso,
+                    estado: saved.estado,
+                });
+                renderMetas();
+                showToast('Meta académica creada');
+            } catch (err) {
+                showToast(err.message || 'No se pudo crear la meta', 'error');
+            }
         }
 
         // ——— Racha ———
@@ -1349,15 +1499,18 @@
                 btn.addEventListener('click', () => closeModal(btn.dataset.modal));
             });
 
-            document.getElementById('form-evento')?.addEventListener('submit', (e) => {
+            document.getElementById('form-evento-fecha')?.addEventListener('change', updateFormFechaCountdown);
+            document.getElementById('form-evento-fecha')?.addEventListener('input', updateFormFechaCountdown);
+
+            document.getElementById('form-evento')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const fd = new FormData(e.target);
-                addEvento({
+                await addEvento({
                     titulo: fd.get('titulo'),
                     fecha: fd.get('fecha'),
                     horario: fd.get('horario'),
                     tipo: fd.get('tipo'),
-                    materia: fd.get('materia'),
+                    curso_slug: fd.get('curso_slug'),
                     descripcion: fd.get('descripcion'),
                     favorito: fd.get('favorito'),
                 });
@@ -1366,7 +1519,7 @@
             });
 
             // Clic en eventos del calendario
-            document.getElementById('cal-week-grid')?.addEventListener('click', (e) => {
+            document.getElementById('cal-week-grid')?.addEventListener('click', async (e) => {
                 if (e.target.closest('.cal-event-delete-btn')) {
                     e.stopPropagation();
                     requestDeleteEvento(e.target.closest('.cal-event-delete-btn').dataset.eventId);
@@ -1374,7 +1527,14 @@
                 }
                 const card = e.target.closest('.calendar-event-card[data-event-id]');
                 if (!card) return;
-                openEventDetail(card.dataset.eventId);
+                const ev = getEventById(card.dataset.eventId);
+                if (!ev) return;
+                const slug = ev.curso_slug || ev.materia;
+                if (slug && CURSOS_CAL.some((c) => c.slug === slug)) {
+                    await navigateToEvent(ev);
+                } else {
+                    openEventDetail(card.dataset.eventId);
+                }
             });
             document.getElementById('cal-week-grid')?.addEventListener('keydown', (e) => {
                 if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -1433,10 +1593,10 @@
             });
 
             // Modal detalle: navegar o editar
-            document.getElementById('btn-detalle-ir-vista')?.addEventListener('click', () => {
+            document.getElementById('btn-detalle-ir-vista')?.addEventListener('click', async () => {
                 if (!eventoDetalleActual) return;
                 closeModal('modal-evento-detalle');
-                navigateToEvent(eventoDetalleActual);
+                await navigateToEvent(eventoDetalleActual);
             });
 
             document.getElementById('btn-detalle-editar')?.addEventListener('click', () => {
@@ -1468,10 +1628,10 @@
                 }
             });
 
-            document.getElementById('form-meta')?.addEventListener('submit', (e) => {
+            document.getElementById('form-meta')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const fd = new FormData(e.target);
-                addMeta({
+                await addMeta({
                     titulo: fd.get('titulo'),
                     descripcion: fd.get('descripcion'),
                     progreso: fd.get('progreso'),
@@ -1488,7 +1648,7 @@
             });
 
             // Delegación: metas progreso y estado
-            document.getElementById('metas-grid')?.addEventListener('change', (e) => {
+            document.getElementById('metas-grid')?.addEventListener('change', async (e) => {
                 const id = e.target.dataset.id;
                 if (!id) return;
                 const meta = state.metas.find((m) => m.id === id);
@@ -1499,23 +1659,32 @@
                         meta.progreso = 100;
                         window.NebulaRacha?.hookMetaCompletada?.(meta);
                     }
-                    saveState();
-                    renderMetas();
-                    showToast('Estado de meta actualizado', 'info');
+                    try {
+                        await persistMeta(meta);
+                        renderMetas();
+                        showToast('Estado de meta actualizado', 'info');
+                    } catch (err) {
+                        showToast(err.message || 'No se pudo actualizar', 'error');
+                    }
                 }
             });
+            let metaProgressTimer = null;
             document.getElementById('metas-grid')?.addEventListener('input', (e) => {
                 if (!e.target.classList.contains('meta-progress-range')) return;
                 const meta = state.metas.find((m) => m.id === e.target.dataset.id);
-                if (meta) {
-                    meta.progreso = Number(e.target.value);
-                    if (meta.progreso === 100) {
-                        meta.estado = 'completada';
-                        window.NebulaRacha?.hookMetaCompletada?.(meta);
-                    } else if (meta.progreso > 0 && meta.estado === 'pendiente') meta.estado = 'en_progreso';
-                    saveState();
-                    renderMetas();
-                }
+                if (!meta) return;
+                meta.progreso = Number(e.target.value);
+                if (meta.progreso === 100) {
+                    meta.estado = 'completada';
+                    window.NebulaRacha?.hookMetaCompletada?.(meta);
+                } else if (meta.progreso > 0 && meta.estado === 'pendiente') meta.estado = 'en_progreso';
+                renderMetas();
+                clearTimeout(metaProgressTimer);
+                metaProgressTimer = setTimeout(async () => {
+                    try {
+                        await persistMeta(meta);
+                    } catch (_) { /* silencioso en slider */ }
+                }, 400);
             });
 
             // Recursos
@@ -1542,10 +1711,38 @@
         }
 
         // ——— Inicialización ———
+        async function initCursosActivos() {
+            if (!window.NebulaCursosActivos) return;
+            let userId = 0;
+            try {
+                userId = JSON.parse(document.getElementById('nebula-session')?.textContent || '{}').user_id || 0;
+            } catch { /* ignore */ }
+            const initial = CURSOS_CAL.map((c) => ({
+                slug: c.slug,
+                titulo: c.titulo,
+                url: '/curso/' + encodeURIComponent(c.slug),
+            }));
+            await window.NebulaCursosActivos.init({
+                userId,
+                initial,
+                select: document.getElementById('form-evento-curso'),
+                navigateOnSelect: false,
+                syncDom: false,
+                fetch: true,
+            });
+            window.addEventListener(window.NebulaCursosActivos.EVENT, (ev) => {
+                const list = ev.detail?.cursos || [];
+                while (CURSOS_CAL.length) CURSOS_CAL.pop();
+                list.forEach((c) => CURSOS_CAL.push({ slug: c.slug, titulo: c.titulo }));
+            });
+        }
+
         async function init() {
+            loadEventosFromServer();
+            loadMetasFromServer();
             migrateEventosLegacy();
-            mergeServerEventos();
             bindEvents();
+            await initCursosActivos();
             switchPanel('calendario');
             await showLoader(700);
             renderCalendar();
@@ -1572,7 +1769,7 @@
 
     document.addEventListener('DOMContentLoaded', () => NebulaPlan.init());
     </script>
-    {% include 'partials/nebula_user_boot.html' %}
+    {% include 'partials/estudiante_shell_assets.html' %}
 </body>
 
 </html>

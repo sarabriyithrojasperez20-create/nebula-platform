@@ -1,5 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Contenido estático de lecciones por curso y tema.
+
+Los datos se combinan con quizzes_contenido y el catálogo en BD cuando el admin
+publica cursos nuevos. ``obtener_contenido_leccion`` es el punto de entrada usado por app.py.
+"""
+
 from quizzes_contenido import obtener_quiz_curso
 
+# Diccionario maestro: clave "curso-id:leccion-id" → bloques de video, teoría y práctica.
 CONTENIDO_LECCIONES = {
     "fundamentos-algebra:funciones-cuadraticas": {
         "video_tiempo_actual": "22:15",
@@ -279,8 +288,19 @@ def _contenido_por_defecto(curso, leccion):
 
 
 def obtener_contenido_leccion(slug, leccion_id, curso, leccion):
+    """
+    Devuelve el diccionario de contenido para una lección concreta.
+
+    Busca en CONTENIDO_LECCIONES; si no hay entrada, genera contenido por defecto
+    a partir de los metadatos del curso y la lección.
+    """
+    from catalog_service import get_leccion_contenido
+
     clave = f"{slug}:{leccion_id}"
-    if clave in CONTENIDO_LECCIONES:
+    custom = get_leccion_contenido(slug, leccion_id)
+    if custom:
+        contenido = dict(custom)
+    elif clave in CONTENIDO_LECCIONES:
         contenido = dict(CONTENIDO_LECCIONES[clave])
     else:
         contenido = _contenido_por_defecto(curso, leccion)

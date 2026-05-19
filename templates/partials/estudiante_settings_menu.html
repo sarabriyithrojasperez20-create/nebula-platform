@@ -1,0 +1,27 @@
+{# Menú de configuración (icono engranaje) #}
+<div class="nb-user-menu nb-user-menu--settings" data-nb-user-menu data-nb-menu-kind="settings">
+    <button type="button"
+        class="nb-user-menu__trigger nb-user-menu__trigger--icon {{ trigger_class|default('') }}"
+        data-nb-user-menu-toggle
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-label="Configuración">
+        <span class="material-symbols-outlined">settings</span>
+    </button>
+    <div class="nb-user-menu__panel nb-user-menu__panel--compact" data-nb-user-menu-panel hidden role="menu" aria-label="Configuración">
+        <ul class="nb-user-menu__list">
+            <li><a href="{{ url_for('perfil') }}#preferencias" class="nb-user-menu__item" role="menuitem">
+                <span class="material-symbols-outlined">tune</span> Preferencias
+            </a></li>
+            <li><a href="{{ url_for('plan_estudios') }}" class="nb-user-menu__item" role="menuitem">
+                <span class="material-symbols-outlined">calendar_month</span> Plan de estudios
+            </a></li>
+            <li><a href="{{ url_for('progreso') }}" class="nb-user-menu__item" role="menuitem">
+                <span class="material-symbols-outlined">insights</span> Mi progreso
+            </a></li>
+            <li><button type="button" class="nb-user-menu__item" role="menuitem" data-nb-menu-action="notifications-prefs">
+                <span class="material-symbols-outlined">notifications</span> Notificaciones
+            </button></li>
+        </ul>
+    </div>
+</div>

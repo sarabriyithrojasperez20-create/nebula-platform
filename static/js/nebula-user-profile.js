@@ -1,11 +1,13 @@
 /**
  * Estado global del perfil del estudiante (Context + localStorage + eventos).
- * Equivalente a useUserProfile() / Zustand para la app Flask multi-página.
  */
 (function (global) {
     'use strict';
 
-    var STORAGE_KEY = 'nebula_user_profile_v1';
+    function storageKey() {
+        var uid = state.id_usuario || 0;
+        return 'nebula_user_profile_v1_u' + uid;
+    }
     var listeners = new Set();
     var state = {
         id_usuario: null,
@@ -32,7 +34,7 @@
 
     function loadStorage() {
         try {
-            var raw = localStorage.getItem(STORAGE_KEY);
+            var raw = localStorage.getItem(storageKey());
             return raw ? JSON.parse(raw) : null;
         } catch (e) {
             return null;
@@ -41,19 +43,27 @@
 
     function saveStorage() {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            localStorage.setItem(storageKey(), JSON.stringify(state));
         } catch (e) {
             /* quota */
         }
     }
 
-    function bustUrl(url) {
+    /**
+     * Añade ?v= o &v= para evitar caché del navegador.
+     * @param {string} url
+     * @param {string|number} [forceVersion] — timestamp explícito tras subida
+     */
+    function bustUrl(url, forceVersion) {
         if (!url || url.indexOf('data:') === 0 || url.indexOf('blob:') === 0) {
             return url;
         }
-        var v = state.foto_version || Date.now();
-        var sep = url.indexOf('?') >= 0 ? '&' : '?';
-        return url.split('?')[0] + sep + 'v=' + encodeURIComponent(String(v));
+        var v =
+            forceVersion != null && forceVersion !== ''
+                ? String(forceVersion)
+                : state.foto_version || String(Date.now());
+        var base = url.split('?')[0].split('#')[0];
+        return base + '?v=' + encodeURIComponent(v);
     }
 
     function getState() {
@@ -86,21 +96,39 @@
         });
     }
 
-    function applyAvatarToDom(url) {
-        var src = bustUrl(url || state.avatarUrl || state.avatarDefault);
+    function assignImgSrc(img, src, opts) {
+        if (!img || img.tagName !== 'IMG' || !src) return;
+        opts = opts || {};
+        var next = bustUrl(src, opts.forceVersion);
+        var prevBase = (img.dataset.nebulaAvatarApplied || '').split('?')[0];
+        var nextBase = next.split('?')[0];
+
+        if (opts.force || prevBase !== nextBase || img.src !== next) {
+            if (opts.force && img.src && prevBase === nextBase) {
+                img.removeAttribute('src');
+                void img.offsetHeight;
+            }
+            img.src = next;
+            img.dataset.nebulaAvatarApplied = next;
+            bindAvatarFallback(img);
+        }
+    }
+
+    function applyAvatarToDom(url, opts) {
+        opts = opts || {};
+        var forceVersion = opts.force ? opts.forceVersion || String(Date.now()) : null;
+        var src = bustUrl(url || state.avatarUrl || state.avatarDefault, forceVersion);
         if (!src) return;
-        var safeSrc = src;
-        var fallback = state.avatarDefault || '';
 
         document.querySelectorAll('[data-nebula-avatar]').forEach(function (el) {
             if (el.tagName === 'IMG') {
-                if (!el.getAttribute('data-avatar-fallback') && fallback) {
-                    el.setAttribute('data-avatar-fallback', fallback);
+                if (!el.getAttribute('data-avatar-fallback') && state.avatarDefault) {
+                    el.setAttribute('data-avatar-fallback', state.avatarDefault);
                 }
-                el.src = safeSrc;
-                bindAvatarFallback(el);
+                assignImgSrc(el, src, { force: opts.force, forceVersion: forceVersion });
             } else {
-                el.style.backgroundImage = 'url("' + safeSrc.replace(/"/g, '\\"') + '")';
+                el.style.backgroundImage =
+                    'url("' + src.replace(/"/g, '\\"') + '")';
                 el.style.backgroundSize = 'cover';
                 el.style.backgroundPosition = 'center';
             }
@@ -108,12 +136,14 @@
 
         document.querySelectorAll('.perfil-avatar-link').forEach(function (el) {
             if (el.tagName === 'IMG') {
-                el.src = src;
+                assignImgSrc(el, src, { force: opts.force, forceVersion: forceVersion });
             } else {
                 var inner = el.querySelector('[data-nebula-avatar], img');
-                if (inner && inner.tagName === 'IMG') inner.src = src;
-                else {
-                    el.style.backgroundImage = 'url("' + src.replace(/"/g, '\\"') + '")';
+                if (inner && inner.tagName === 'IMG') {
+                    assignImgSrc(inner, src, { force: opts.force, forceVersion: forceVersion });
+                } else {
+                    el.style.backgroundImage =
+                        'url("' + src.replace(/"/g, '\\"') + '")';
                     el.style.backgroundSize = 'cover';
                     el.style.backgroundPosition = 'center';
                 }
@@ -121,36 +151,75 @@
         });
 
         document.querySelectorAll('.nb-avatar, .nb-admin-avatar').forEach(function (img) {
-            if (img && img.tagName === 'IMG') img.src = src;
+            assignImgSrc(img, src, { force: opts.force, forceVersion: forceVersion });
         });
 
         [
             '#perfil-avatar-main',
             '#perfil-modal-avatar',
+            '#admin-perfil-avatar',
             '.perfil-edit-aside__avatar',
             '.perfil-header img',
             '.perfil-avatar-link img',
         ].forEach(function (sel) {
             document.querySelectorAll(sel).forEach(function (img) {
-                if (img && img.tagName === 'IMG') img.src = src;
+                assignImgSrc(img, src, { force: opts.force, forceVersion: forceVersion });
             });
         });
     }
 
-    function setProfile(patch) {
-        if (!patch || typeof patch !== 'object') return getState();
-        if (patch.avatar_url) {
+    function setAvatarLoading(on) {
+        document.querySelectorAll('[data-nebula-avatar]').forEach(function (el) {
+            if (el.tagName === 'IMG') {
+                el.classList.toggle('nebula-avatar--loading', !!on);
+                el.setAttribute('aria-busy', on ? 'true' : 'false');
+            }
+        });
+    }
+
+    function normalizePatch(data) {
+        if (!data || typeof data !== 'object') return {};
+        var patch = Object.assign({}, data);
+        if (patch.avatar_url && !patch.avatarUrl) {
             patch.avatarUrl = patch.avatar_url;
+        }
+        if (patch.profile_image && !patch.foto_perfil) {
+            patch.foto_perfil = patch.profile_image;
         }
         if (patch.foto_actualizada_en) {
             patch.foto_version = patch.foto_actualizada_en;
+        } else if (patch.avatarUrl || patch.avatar_url) {
+            patch.foto_version = String(Date.now());
         }
+        return patch;
+    }
+
+    function setProfile(patch) {
+        if (!patch || typeof patch !== 'object') return getState();
+        patch = normalizePatch(patch);
+
+        var avatarChanged = !!(patch.avatarUrl || patch.avatar_url);
+        var prevAvatarBase = (state.avatarUrl || '').split('?')[0];
+
         Object.assign(state, patch);
         if (patch.avatarUrl || patch.avatar_url) {
             state.avatarUrl = patch.avatarUrl || patch.avatar_url;
         }
+        if (avatarChanged) {
+            if (!patch.foto_version && !patch.foto_actualizada_en) {
+                state.foto_version = String(Date.now());
+            }
+        }
+
         saveStorage();
-        applyAvatarToDom(state.avatarUrl);
+
+        var force =
+            avatarChanged &&
+            state.avatarUrl.split('?')[0] !== prevAvatarBase;
+        applyAvatarToDom(state.avatarUrl, {
+            force: force || avatarChanged,
+            forceVersion: state.foto_version,
+        });
         emit();
         return getState();
     }
@@ -164,7 +233,6 @@
 
     function init() {
         var boot = parseBoot();
-        var stored = loadStorage();
 
         if (boot) {
             state.avatarDefault = boot.avatarDefault || '';
@@ -182,6 +250,8 @@
             state.avatarUrl = boot.avatarUrl || u.avatar_url || '';
             state.foto_version = boot.foto_version || u.foto_actualizada_en || '';
         }
+
+        var stored = loadStorage();
 
         if (stored && stored.id_usuario === state.id_usuario && stored.avatarUrl) {
             if (!boot || !boot.avatarUrl) {
@@ -219,6 +289,7 @@
         subscribe: subscribe,
         applyAvatarToDom: applyAvatarToDom,
         bustUrl: bustUrl,
+        setAvatarLoading: setAvatarLoading,
         refreshFromServer: refreshFromServer,
     };
 

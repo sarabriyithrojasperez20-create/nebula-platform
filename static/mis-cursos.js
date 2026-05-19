@@ -350,7 +350,7 @@
 
                 (asignado
 
-                    ? '<span class="mis-cursos-modal__btn-anadir mis-cursos-modal__btn-asignado">Ya asignado</span>'
+                    ? '<span class="mis-cursos-modal__btn-anadir mis-cursos-modal__btn-asignado"><span class="material-symbols-outlined text-[18px]">check</span> Agregado</span>'
 
                     : '<button type="button" class="mis-cursos-modal__btn-anadir" data-slug="' +
 
@@ -456,9 +456,9 @@
 
         var span = document.createElement('span');
 
-        span.className = 'mis-cursos-modal__btn-anadir mis-cursos-modal__btn-asignado';
+        span.className = 'mis-cursos-modal__btn-anadir mis-cursos-modal__btn-asignado mis-cursos-modal__btn-anadir--success';
 
-        span.textContent = 'Ya asignado';
+        span.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span> Agregado';
 
         btn.replaceWith(span);
 
@@ -536,6 +536,12 @@
 
                 }
 
+                if (window.NebulaCursosActivos && data.curso_activo) {
+
+                    window.NebulaCursosActivos.add(data.curso_activo, { highlightSelect: true });
+
+                }
+
                 sincronizarDesdeLocalStorage();
 
                 aplicarFiltros();
@@ -599,6 +605,24 @@
     aplicarFiltros();
 
     sincronizarDesdeLocalStorage();
+
+    if (window.NebulaCursosActivos) {
+
+        window.NebulaCursosActivos.init({
+
+            userId: userId,
+
+            initial: meta.cursosActivos || [],
+
+            syncDom: true,
+
+            root: grid,
+
+            fetch: true,
+
+        });
+
+    }
 
 })();
 

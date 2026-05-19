@@ -17,6 +17,9 @@
          <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/calendario-modal.css') }}">
+    {% if not (es_plan_pro|default(false)) %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/plan-pro-modal.css') }}">
+    {% endif %}
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -46,10 +49,11 @@
     
 </head>
 
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden">
-    <div class="flex h-screen overflow-hidden">
+<body class="nb-dashboard-layout bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden">
+    <div id="nb-est-sidebar-overlay" class="nb-est-sidebar-overlay" aria-hidden="true"></div>
+    <div class="dashboard-shell flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
-        <aside class="w-64 flex-shrink-0 border-r border-primary/10 bg-white dark:bg-slate-900 hidden lg:flex flex-col h-full min-h-0 overflow-hidden">
+        <aside id="nb-estudiante-sidebar" class="nb-est-sidebar w-64 flex-shrink-0 border-r border-primary/10 bg-white dark:bg-slate-900 flex flex-col h-full min-h-0 overflow-hidden">
             <div class="p-6">
                 <div class="flex items-center gap-3">
                     <div class="size-10 rounded-xl bg-primary flex items-center justify-center text-white">
@@ -95,24 +99,25 @@
                 </a>
             </nav>
             <div class="p-4 flex-shrink-0 pb-5">
-                <div class="bg-primary/10 rounded-2xl p-4 border border-primary/20">
-                    <p class="text-xs font-semibold text-primary uppercase tracking-wider mb-2" >Plan Pro</p>
+                <div id="nb-plan-pro-widget" class="bg-primary/10 rounded-2xl p-4 border border-primary/20" data-plan="{{ plan_usuario }}">
+                    <p class="text-xs font-semibold text-primary uppercase tracking-wider mb-2">Plan Pro</p>
+                    {% if es_plan_pro|default(false) %}
+                    <p class="text-xs text-slate-600 mb-3">Tienes acceso ampliado al tutor con IA.</p>
+                    <div class="w-full py-2 text-center bg-white/80 text-primary text-xs font-bold rounded-lg border border-primary/25">
+                        Plan activo
+                    </div>
+                    {% else %}
                     <p class="text-xs text-slate-600 mb-3">Acceso ilimitado al tutor con IA.</p>
                     <button
-                        class="w-full py-2 bg-primary text-white text-xs font-bold rounded-lg shadow-lg shadow-primary/20"
-                       >Mejorar plan</button>
+                        id="nb-plan-upgrade-btn"
+                        type="button"
+                        class="w-full py-2 bg-primary text-white text-xs font-bold rounded-lg shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                    >Mejorar plan</button>
+                    {% endif %}
                 </div>
 
-                <div class="flex items-center gap-3 mt-6 px-2">
-                    <a href="{{ url_for('perfil') }}" class="perfil-avatar-link block shrink-0" aria-label="Ir al perfil">
-                        {% with avatar_class='size-10 rounded-full object-cover', avatar_alt='Avatar de ' ~ nombre %}
-                        {% include 'partials/estudiante_avatar.html' %}
-                        {% endwith %}
-                    </a>
-                    <div class="flex-1">
-                        <p class="text-sm font-bold truncate">{{ nombre }}</p>
-                        <p class="text-[10px] text-slate-500">Estudiante ID: #{{ session.id_usuario }}</p>
-                    </div>
+                <div class="mt-6">
+                    {% include 'partials/sidebar_user_profile_card.html' %}
                 </div>
                 <a href="{{ url_for('logout') }}"
                     class="flex items-center gap-2 mt-4 px-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
@@ -124,22 +129,19 @@
         <!-- Main Content -->
         <main class="dashboard-main flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
             <div class="dashboard-main__inner mx-auto w-full px-6 lg:px-8 py-6 lg:py-8">
-                <header class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
-                    <div class="min-w-0 flex-1">
-                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">¡Hola, {{ nombre }}!
-                        </h2>
-                        <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-xl leading-relaxed">¿Listo para
-                            continuar tu recorrido de aprendizaje hoy? Tu mente es una nebulosa de posibilidades.</p>
+                <div class="nb-est-mobile-bar">
+                    <button type="button" class="nb-est-mobile-toggle" id="nb-est-sidebar-toggle" aria-label="Abrir menú de navegación">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Menú</span>
+                </div>
+                <header class="dash-page-header">
+                    <div class="dash-page-header__greeting">
+                        <h2 class="dash-page-header__title">¡Hola, {{ nombre }}!</h2>
+                        <p class="dash-page-header__subtitle">¿Listo para continuar tu recorrido de aprendizaje hoy?
+                            Tu mente es una nebulosa de posibilidades.</p>
                     </div>
-                    <div class="dashboard-card flex items-center gap-3 px-4 py-3 shrink-0 self-start sm:self-center">
-                        <div class="size-11 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
-                            <span class="material-symbols-outlined">local_fire_department</span>
-                        </div>
-                        <div>
-                            <p class="text-xs font-medium text-slate-500">Racha diaria</p>
-                            <p class="text-base font-bold text-slate-900">{{ racha_actual }} días</p>
-                        </div>
-                    </div>
+                    {% include 'partials/dashboard_header_toolbar.html' %}
                 </header>
 
                 <div class="space-y-6 lg:space-y-8">
@@ -152,7 +154,8 @@
                             <div class="dashboard-classes-grid">
                                 {% if clases_activas %}
                                 {% for item in clases_activas %}
-                                <article class="dash-class-card dash-class-card--{{ item.color_theme }}">
+                                <article class="dash-class-card dash-class-card--{{ item.color_theme }}"
+                                    data-slug="{{ item.slug }}" data-porcentaje="{{ item.porcentaje }}">
                                     <div class="dash-class-card__top">
                                         <div class="dash-class-card__icon">
                                             <span class="material-symbols-outlined text-2xl">{{ item.icono }}</span>
@@ -169,7 +172,7 @@
                                     </div>
                                     <div class="dash-class-card__body">
                                         <h4 class="dash-class-card__title">{{ item.titulo }}</h4>
-                                        <p class="dash-class-card__meta">{{ item.estado_curso }} · {{ item.proxima_leccion }}</p>
+                                        <p class="dash-class-card__meta">{{ item.estado_texto|default(item.estado_curso) }} · {{ item.proxima_leccion }}</p>
                                         <div class="dash-class-card__stats">
                                             <div class="dash-class-stat">
                                                 <span>Progreso</span>
@@ -199,8 +202,8 @@
                                 {% else %}
                                 <div class="sm:col-span-2 dashboard-card p-8 text-center">
                                     <span class="material-symbols-outlined text-4xl text-primary mb-3">school</span>
-                                    <p class="text-sm font-semibold text-slate-700">No tienes clases activas</p>
-                                    <p class="text-xs text-slate-500 mt-1">Asigna cursos desde Mis cursos para ver tu progreso aquí.</p>
+                                    <p class="text-sm font-semibold text-slate-700">Aún no tienes cursos asignados</p>
+                                    <p class="text-xs text-slate-500 mt-1">Añade cursos desde Mis cursos para ver tu progreso aquí.</p>
                                 </div>
                                 {% endif %}
                             </div>
@@ -217,17 +220,24 @@
                             <ul id="dashboard-eval-list" class="space-y-3">
                                 {% for ev in evaluaciones %}
                                 <li>
-                                    <div class="dashboard-eval-row flex items-center gap-3 p-3 rounded-xl transition-colors">
+                                    <button type="button"
+                                        class="dashboard-eval-row w-full text-left flex items-center gap-3 p-3 rounded-xl transition-colors hover:bg-violet-50/80"
+                                        data-event-id="{{ ev.id_actividad }}"
+                                        {% if ev.curso_slug %}data-curso-slug="{{ ev.curso_slug }}"{% endif %}>
                                         <div class="bg-white px-2.5 py-2 rounded-lg text-center shadow-sm border border-slate-100 shrink-0 min-w-[3rem]">
                                             <p class="text-[10px] font-bold text-primary uppercase leading-none">{{ ev.mes|default('â€”') }}</p>
                                             <p class="text-lg font-black text-slate-900 leading-tight mt-0.5">{{ ev.dia|default('â€”') }}</p>
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <h5 class="text-sm font-bold text-slate-900 truncate">{{ ev.titulo }}</h5>
-                                            <p class="text-[11px] text-slate-500 truncate">{{ ev.descripcion|default('') }}</p>
+                                            <p class="text-[11px] text-slate-500 truncate">
+                                                {{ ev.curso_titulo or ev.materia or 'General' }}
+                                                · {{ ev.tipo_label|default('Evaluación') }}
+                                                {% if ev.countdown %} · <span class="text-primary font-semibold">{{ ev.countdown }}</span>{% endif %}
+                                            </p>
                                         </div>
                                         <span class="material-symbols-outlined text-slate-400 text-xl shrink-0">chevron_right</span>
-                                    </div>
+                                    </button>
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -266,9 +276,15 @@
 
     </div>
     {% include 'partials/calendario_modal.html' %}
-    <script type="application/json" id="nebula-calendario-boot">{{ {'eventos': eventos_calendario, 'materias': materias_calendario} | tojson }}</script>
-    {% include 'partials/nebula_user_boot.html' %}
+    {% if not (es_plan_pro|default(false)) %}
+    {% include 'partials/plan_pro_modal.html' %}
+    {% endif %}
+    <script type="application/json" id="nebula-calendario-boot">{{ {'eventos': eventos_calendario, 'materias': materias_calendario, 'cursos': cursos_calendario} | tojson }}</script>
+    {% include 'partials/estudiante_shell_assets.html' %}
+    <div id="nb-plan-toast" class="hidden" role="status" aria-live="polite"></div>
     <script src="{{ url_for('static', filename='js/nebula-calendario.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/nebula-plan.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/nebula-progreso.js') }}" defer></script>
 </body>
 
 </html>
