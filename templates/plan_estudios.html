@@ -571,6 +571,8 @@
     <script src="{{ url_for('static', filename='js/nebula-cursos-activos.js') }}"></script>
     <script src="{{ url_for('static', filename='js/nebula-racha.js') }}"></script>
     <script src="{{ url_for('static', filename='js/nebula-recursos.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-search-utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-search.js') }}"></script>
     <script>
     /**
      * Nébula Plan de Estudios — módulo interactivo
@@ -659,6 +661,32 @@
         let calFilter = 'all';
         let metaFilter = 'all';
         let activePanel = 'calendario';
+        let planSearchQuery = '';
+
+        function normalizePlanSearch(text) {
+            if (window.NebulaSearchUtils && window.NebulaSearchUtils.normalize) {
+                return window.NebulaSearchUtils.normalize(text);
+            }
+            return String(text || '').toLowerCase().trim();
+        }
+
+        function planSearchMatches(blob) {
+            if (!planSearchQuery) return true;
+            return normalizePlanSearch(blob).indexOf(planSearchQuery) !== -1;
+        }
+
+        window.setPlanSearchQuery = function (raw) {
+            planSearchQuery = normalizePlanSearch(raw);
+            if (activePanel === 'calendario') {
+                renderCalendar();
+            } else if (activePanel === 'metas') {
+                renderMetas();
+            } else if (activePanel === 'recursos') {
+                const rb = document.getElementById('recursos-busqueda');
+                if (rb && raw !== rb.value) rb.value = raw || '';
+                renderRecursos();
+            }
+        };
         let selectedEventId = null;
         let eventoDetalleActual = null;
         let pendingDeleteId = null;
@@ -899,12 +927,29 @@
             });
             const fab = document.getElementById('fab-editar-plan');
             if (fab) fab.style.display = panelId === 'calendario' ? '' : 'none';
+            if (planSearchQuery) {
+                if (panelId === 'calendario') renderCalendar();
+                else if (panelId === 'metas') renderMetas();
+                else if (panelId === 'recursos') renderRecursos();
+            }
         }
 
         // ——— Calendario ———
         function getEventosForDay(dateStr) {
             const list = state.eventos.filter((e) => {
                 if (e.fecha !== dateStr) return false;
+                if (!planSearchMatches([
+                    e.titulo,
+                    e.descripcion,
+                    e.fecha,
+                    e.horario,
+                    e.tipo,
+                    e.materia,
+                    e.estado,
+                    e.prioridad,
+                    cursoLabel(e),
+                    tipoLabelPlan(e.tipo),
+                ].join(' '))) return false;
                 if (calFilter === 'all') return true;
                 if (calFilter === 'favorito') return !!e.favorito;
                 return normalizeTipo(e.tipo) === calFilter;
@@ -970,7 +1015,9 @@
                 col.className = `plan-estudios-day-col rounded-xl sm:rounded-none p-3 min-h-[140px] flex flex-col gap-2 ${isToday ? 'plan-estudios-day-col--today' : ''} ${isWeekend ? 'plan-estudios-day-col--weekend' : ''}`;
 
                 if (eventos.length === 0) {
-                    col.innerHTML = `<p class="text-[10px] text-slate-400 text-center mt-4">Sin eventos</p>`;
+                    col.innerHTML = planSearchQuery
+                        ? `<p class="text-[10px] text-slate-400 text-center mt-4">Sin coincidencias</p>`
+                        : `<p class="text-[10px] text-slate-400 text-center mt-4">Sin eventos</p>`;
                 } else {
                     col.innerHTML = eventos.map((ev) => renderEventCard(ev)).join('');
                 }
@@ -1012,8 +1059,8 @@
         }
 
         function renderListasCalendario() {
-            const tareas = state.eventos.filter((e) => e.tipo === 'tarea').slice(0, 5);
-            const importantes = state.eventos.filter((e) => e.tipo === 'importante').slice(0, 5);
+            const tareas = state.eventos.filter((e) => e.tipo === 'tarea' && planSearchMatches([e.titulo, e.descripcion, e.fecha, e.tipo, cursoLabel(e)].join(' '))).slice(0, 5);
+            const importantes = state.eventos.filter((e) => (e.tipo === 'importante' || e.favorito) && planSearchMatches([e.titulo, e.descripcion, e.fecha, e.tipo, cursoLabel(e)].join(' '))).slice(0, 5);
             const ulT = document.getElementById('lista-tareas-pendientes');
             const ulI = document.getElementById('lista-fechas-importantes');
 
@@ -1274,11 +1321,25 @@
             const empty = document.getElementById('metas-empty');
             let metas = state.metas;
             if (metaFilter !== 'all') metas = metas.filter((m) => m.estado === metaFilter);
+            if (planSearchQuery) {
+                metas = metas.filter((m) =>
+                    planSearchMatches([m.titulo, m.descripcion, m.estado, m.progreso, m.fecha, m.fecha_limite].join(' '))
+                );
+            }
 
             if (metas.length === 0) {
                 grid.innerHTML = '';
                 empty.classList.remove('hidden');
                 empty.classList.add('flex');
+                const msg = empty.querySelector('p.text-lg');
+                const sub = empty.querySelector('p.text-sm');
+                if (planSearchQuery && msg) {
+                    msg.textContent = 'No se encontraron metas con tu búsqueda';
+                    if (sub) sub.textContent = 'Prueba otro término o borra el buscador del encabezado.';
+                } else if (msg) {
+                    msg.textContent = 'Aún no has creado metas personalizadas';
+                    if (sub) sub.textContent = 'Usa «Nueva meta» para definir tus objetivos académicos.';
+                }
             } else {
                 empty.classList.add('hidden');
                 empty.classList.remove('flex');
@@ -1394,14 +1455,18 @@
 
         // ——— Recursos ———
         function renderRecursos() {
-            const q = (document.getElementById('recursos-busqueda')?.value || '').toLowerCase();
+            const headerQ = document.getElementById('header-search')?.value || '';
+            const localQ = document.getElementById('recursos-busqueda')?.value || '';
+            const qRaw = localQ || headerQ || '';
+            const q = normalizePlanSearch(qRaw);
             const materia = document.getElementById('recursos-materia')?.value || 'all';
             const grid = document.getElementById('recursos-grid');
             const empty = document.getElementById('recursos-empty');
 
             let items = RECURSOS_DATA.filter((r) => {
                 const matchMateria = materia === 'all' || r.materia === materia;
-                const matchQ = !q || r.titulo.toLowerCase().includes(q) || r.descripcion.toLowerCase().includes(q);
+                const blob = [r.titulo, r.descripcion, r.category, r.materia, r.type].join(' ');
+                const matchQ = !q || normalizePlanSearch(blob).indexOf(q) !== -1;
                 return matchMateria && matchQ;
             });
 
@@ -1698,13 +1763,10 @@
                 }
             });
 
-            // Búsqueda header → ir a recursos
-            document.getElementById('header-search')?.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && e.target.value.trim()) {
-                    switchPanel('recursos');
-                    document.getElementById('recursos-busqueda').value = e.target.value;
-                    renderRecursos();
-                    showToast('Buscando en recursos académicos', 'info');
+            document.getElementById('header-search')?.addEventListener('input', (e) => {
+                const val = e.target.value || '';
+                if (typeof window.setPlanSearchQuery === 'function') {
+                    window.setPlanSearchQuery(val);
                 }
             });
 

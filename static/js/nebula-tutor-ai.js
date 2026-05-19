@@ -132,7 +132,8 @@
 
     function crearMensajeUsuario(texto, createdAt) {
         const wrap = document.createElement('div');
-        wrap.className = 'flex gap-4 flex-row-reverse tutor-chat-msg';
+        wrap.className = 'flex gap-4 flex-row-reverse tutor-chat-msg tutor-ai-msg-row';
+        wrap.setAttribute('data-search', texto || '');
         wrap.innerHTML = `
             <div class="size-10 rounded-full bg-slate-300 shrink-0 border-2 border-white shadow-sm"
                 style="background-image: ${USER_AVATAR}; background-size: cover;"></div>
@@ -147,7 +148,8 @@
 
     function crearMensajeIA(texto, createdAt, esError) {
         const wrap = document.createElement('div');
-        wrap.className = 'flex gap-4 tutor-chat-msg';
+        wrap.className = 'flex gap-4 tutor-chat-msg tutor-ai-msg-row';
+        wrap.setAttribute('data-search', texto || '');
         const cardClass = esError
             ? 'tutor-ai-msg-ai tutor-ai-msg-error p-6 rounded-xl rounded-tl-none'
             : 'tutor-ai-msg-ai p-6 rounded-xl rounded-tl-none';

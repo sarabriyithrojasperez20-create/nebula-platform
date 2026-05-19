@@ -42,15 +42,22 @@
                 <h2 class="text-xl font-bold tracking-tight text-slate-900">Nébula AI</h2>
             </div>
             <div class="flex-1 overflow-y-auto px-4 space-y-6 min-h-0">
+                <label class="block px-2">
+                    <div class="flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-2">
+                        <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+                        <input type="search" id="tutor-sidebar-search" placeholder="Buscar chats y temas..."
+                            class="flex-1 bg-transparent border-none focus:ring-0 text-sm text-slate-700 placeholder:text-slate-400" autocomplete="off">
+                    </div>
+                </label>
                 <div>
                     <p class="text-xs font-semibold text-primary uppercase tracking-wider mb-3 px-2">Temas fijados</p>
                     <div class="space-y-1">
-                        <button
+                        <button type="button" data-search="Álgebra lineal algebra matematicas tema fijado"
                             class="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium">
                             <span class="material-symbols-outlined text-sm">push_pin</span>
                             <span class="truncate">Álgebra lineal</span>
                         </button>
-                        <button
+                        <button type="button" data-search="Física I Dinámica ciencia tema fijado"
                             class="tutor-ai-sidebar-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 transition-colors">
                             <span class="material-symbols-outlined text-sm">push_pin</span>
                             <span class="truncate">Física I: Dinámica</span>
@@ -62,7 +69,7 @@
                         recientes</p>
                     <div id="tutor-recientes-list" class="space-y-1">
                         {% for conv in tutor_recientes %}
-                        <button type="button" data-tutor-session-id="{{ conv.session_id }}"
+                        <button type="button" data-tutor-session-id="{{ conv.session_id }}" data-search="{{ conv.titulo }} conversacion chat"
                             class="tutor-ai-sidebar-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 transition-colors">
                             <span class="material-symbols-outlined text-sm">history</span>
                             <span class="truncate">{{ conv.titulo }}</span>

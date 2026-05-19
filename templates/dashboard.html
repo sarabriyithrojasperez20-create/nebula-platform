@@ -140,6 +140,15 @@
                         <h2 class="dash-page-header__title">¡Hola, {{ nombre }}!</h2>
                         <p class="dash-page-header__subtitle">¿Listo para continuar tu recorrido de aprendizaje hoy?
                             Tu mente es una nebulosa de posibilidades.</p>
+                        <label class="dash-search-wrap hidden md:flex mt-4 max-w-md h-10">
+                            <div class="flex w-full items-stretch rounded-full bg-slate-100 dark:bg-primary/10 border border-transparent focus-within:border-primary/40">
+                                <span class="material-symbols-outlined text-slate-400 flex items-center pl-3 text-[20px]">search</span>
+                                <input id="dashboard-busqueda" type="search" autocomplete="off"
+                                    class="form-input flex-1 border-none bg-transparent focus:ring-0 text-sm placeholder:text-slate-400 px-3"
+                                    placeholder="Buscar cursos, clases, evaluaciones, metas...">
+                            </div>
+                        </label>
+                        <p id="dashboard-busqueda-empty" class="hidden text-sm text-slate-500 dark:text-slate-400 mt-2">No se encontraron resultados en el panel.</p>
                     </div>
                     {% include 'partials/dashboard_header_toolbar.html' %}
                 </header>
@@ -155,7 +164,8 @@
                                 {% if clases_activas %}
                                 {% for item in clases_activas %}
                                 <article class="dash-class-card dash-class-card--{{ item.color_theme }}"
-                                    data-slug="{{ item.slug }}" data-porcentaje="{{ item.porcentaje }}">
+                                    data-slug="{{ item.slug }}" data-porcentaje="{{ item.porcentaje }}"
+                                    data-search="{{ item.titulo }} {{ item.dificultad }} {{ item.estado_texto|default(item.estado_curso) }} {{ item.proxima_leccion }} clase curso progreso {{ item.porcentaje }}%">
                                     <div class="dash-class-card__top">
                                         <div class="dash-class-card__icon">
                                             <span class="material-symbols-outlined text-2xl">{{ item.icono }}</span>
@@ -219,7 +229,7 @@
                             {% if evaluaciones %}
                             <ul id="dashboard-eval-list" class="space-y-3">
                                 {% for ev in evaluaciones %}
-                                <li>
+                                <li data-search="{{ ev.titulo }} {{ ev.curso_titulo or ev.materia }} {{ ev.tipo_label|default('Evaluación') }} {{ ev.countdown|default('') }} evaluacion calendario">
                                     <button type="button"
                                         class="dashboard-eval-row w-full text-left flex items-center gap-3 p-3 rounded-xl transition-colors hover:bg-violet-50/80"
                                         data-event-id="{{ ev.id_actividad }}"

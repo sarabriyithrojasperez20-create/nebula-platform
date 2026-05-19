@@ -20,6 +20,7 @@
     </div>
   </section>
 
+  <p id="admin-search-empty" class="hidden text-sm text-center text-[var(--nb-text-muted)] py-4">No se encontraron resultados para tu búsqueda.</p>
   <section id="admin-dashboard-resumen" class="nb-kpi-grid">
     <button type="button" data-admin-panel="usuarios" class="nb-kpi-card admin-metric-card">
       <div class="nb-kpi-icon"><span class="material-symbols-outlined">group</span></div>
@@ -221,5 +222,7 @@
 {% include 'partials/admin_foot_scripts.html' %}
 <script src="{{ url_for('static', filename='js/admin-nav.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin-shell.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nebula-search-utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nebula-search.js') }}"></script>
 </body>
 </html>

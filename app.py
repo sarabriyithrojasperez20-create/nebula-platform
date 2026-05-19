@@ -752,6 +752,43 @@ def obtener_datos_progreso_usuario(id_usuario):
     }
 
 
+def obtener_items_busqueda_progreso(id_usuario):
+    """Filas de evaluaciones y lecciones del usuario para el buscador de Progreso."""
+    items = []
+    for curso in listar_cursos_catalogo_usuario(id_usuario):
+        items.append(
+            {
+                "tipo": "curso",
+                "titulo": curso.get("titulo", ""),
+                "detalle": f"{curso.get('nivel', '')} · {curso.get('porcentaje', 0)}% avance",
+                "texto": f"{curso.get('descripcion', '')} {curso.get('materia', '')}",
+            }
+        )
+        for lec in curso.get("lecciones") or []:
+            estado = lec.get("estado", "pendiente")
+            items.append(
+                {
+                    "tipo": "leccion",
+                    "titulo": lec.get("titulo", lec.get("id", "")),
+                    "detalle": curso.get("titulo", ""),
+                    "texto": f"leccion {estado} {lec.get('duracion', '')}",
+                }
+            )
+    for reg in cargar_datos("resultados_quiz"):
+        if reg.get("id_usuario") != id_usuario:
+            continue
+        aprob = reg.get("aprobado")
+        items.append(
+            {
+                "tipo": "evaluacion",
+                "titulo": reg.get("titulo_leccion") or reg.get("leccion_id", "Evaluación"),
+                "detalle": f"{reg.get('slug', '')} · {reg.get('porcentaje', 0)}%",
+                "texto": "aprobado" if aprob else "no aprobado",
+            }
+        )
+    return items
+
+
 def obtener_leccion_curso(curso, leccion_id):
     for leccion in curso.get("lecciones", []):
         if leccion.get("id") == leccion_id:
@@ -1580,6 +1617,7 @@ def progreso():
         promedio_general=datos.get("promedio_general", 0),
         cursos_completados=datos.get("cursos_completados", 0),
         tendencia=datos.get("tendencia", []),
+        items_busqueda_progreso=obtener_items_busqueda_progreso(id_usuario),
         racha_actual=resumen_racha.get("racha_actual", 0),
         racha_mejor=resumen_racha.get("mejor_racha", 0),
         racha_nivel=resumen_racha.get("nivel", "Explorador"),

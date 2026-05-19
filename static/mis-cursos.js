@@ -42,6 +42,8 @@
 
     var nivelActivo = 'todas';
 
+    var busquedaActiva = '';
+
     var catalogoCache = null;
 
     var slugsEnPagina = new Set();
@@ -82,11 +84,25 @@
 
 
 
-    function aplicarFiltros() {
+    function textoCoincideBusqueda(card) {
+        if (!busquedaActiva) return true;
+        var blob = card.getAttribute('data-search') || card.textContent || '';
+        if (window.NebulaSearchUtils && window.NebulaSearchUtils.matches) {
+            return window.NebulaSearchUtils.matches(busquedaActiva, blob);
+        }
+        return blob.toLowerCase().indexOf(busquedaActiva.toLowerCase()) !== -1;
+    }
+
+    function aplicarFiltros(query) {
+        if (typeof query === 'string') {
+            busquedaActiva = query.trim();
+        }
 
         var cards = getCards();
 
         var visibles = 0;
+
+        var emptySearch = document.getElementById('mis-cursos-empty-search');
 
         cards.forEach(function (card) {
 
@@ -98,7 +114,9 @@
 
             var coincideNivel = nivelActivo === 'todas' || nivel === nivelActivo;
 
-            var mostrar = coincideMateria && coincideNivel;
+            var coincideBusqueda = textoCoincideBusqueda(card);
+
+            var mostrar = coincideMateria && coincideNivel && coincideBusqueda;
 
             card.style.display = mostrar ? '' : 'none';
 
@@ -109,12 +127,15 @@
         contador.textContent = textoContador(visibles);
 
         if (emptyState) {
-
-            emptyState.classList.toggle('hidden', visibles > 0 || cards.length === 0);
-
+            emptyState.classList.toggle('hidden', visibles > 0 || cards.length === 0 || !!busquedaActiva);
         }
 
+        if (emptySearch) {
+            emptySearch.classList.toggle('hidden', !busquedaActiva || visibles > 0 || cards.length === 0);
+        }
     }
+
+    window.aplicarFiltrosMisCursos = aplicarFiltros;
 
 
 

@@ -58,8 +58,10 @@
                                 <span class="material-symbols-outlined text-[20px]">search</span>
                             </div>
                             <input
+                                id="progreso-busqueda"
+                                type="search"
                                 class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-primary/5 focus:border-none h-full placeholder:text-primary/60 px-4 rounded-l-none pl-2 text-base font-normal"
-                                placeholder="Buscar en la base de conocimiento" value="" />
+                                placeholder="Buscar en la base de conocimiento" value="" autocomplete="off" />
                         </div>
                     </div>
                 </div>
@@ -82,9 +84,10 @@
                     <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Tu progreso</h1>
                     <p class="text-slate-500 dark:text-slate-400 text-lg">Sigue tu crecimiento académico y domina nuevas habilidades en tus cursos.</p>
                 </div>
+                <div id="progreso-busqueda-empty-anchor"></div>
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm">
+                    <div class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm" data-progreso-search="horas estudio estadisticas resumen">
                         <div class="flex justify-between items-start">
                             <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
                                 Horas totales de estudio</p>
@@ -95,7 +98,7 @@
                         </div>
                         <p class="text-slate-400 text-xs mt-1">{% if tiene_cursos %}Registra tiempo al estudiar{% else %}Asigna cursos para comenzar{% endif %}</p>
                     </div>
-                    <div class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm">
+                    <div class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm" data-progreso-search="lecciones completadas estadisticas">
                         <div class="flex justify-between items-start">
                             <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
                                 Lecciones completadas</p>
@@ -107,7 +110,7 @@
                         <p class="text-slate-400 text-xs mt-1">{% if tiene_cursos %}En tus cursos asignados{% else %}Sin lecciones completadas aún{% endif %}</p>
                     </div>
                     <div
-                        class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm border-orange-100 dark:border-orange-900/20">
+                        class="glass-card flex flex-col gap-3 rounded-xl p-6 shadow-sm border-orange-100 dark:border-orange-900/20" data-progreso-search="racha dias nivel record">
                         <div class="flex justify-between items-start">
                             <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
                                 Racha actual</p>
@@ -122,7 +125,7 @@
                 <!-- Main Performance Charts Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Line Chart: Performance Trend -->
-                    <div class="lg:col-span-2 glass-card rounded-xl p-8 shadow-sm">
+                    <div class="lg:col-span-2 glass-card rounded-xl p-8 shadow-sm" data-progreso-search="tendencia rendimiento precision grafico">
                         <div class="flex items-center justify-between mb-8">
                             <div>
                                 <h3 class="text-xl font-bold text-slate-900 dark:text-white">Tendencia de rendimiento</h3>
@@ -153,13 +156,13 @@
                         </div>
                     </div>
                     <!-- Skills Proficiency -->
-                    <div class="glass-card rounded-xl p-8 shadow-sm">
+                    <div class="glass-card rounded-xl p-8 shadow-sm" data-progreso-search="dominio competencias cursos materias">
                         <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">Dominio de competencias</h3>
                         <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">Dominio por área académica</p>
                         {% if tiene_cursos and cursos %}
                         <div class="space-y-6">
                             {% for curso in cursos %}
-                            <div class="space-y-2">
+                            <div class="space-y-2" data-progreso-search="{{ curso.titulo }} {{ curso.descripcion|default('') }} {{ curso.nivel|default('') }} curso progreso {{ curso.porcentaje|default(0) }}%">
                                 <div class="flex justify-between text-sm">
                                     <span class="text-slate-600 dark:text-slate-300 font-medium">{{ curso.titulo }}</span>
                                     <span class="text-primary font-bold">{{ curso.porcentaje|default(0) }}%</span>
@@ -177,6 +180,20 @@
                         {% endif %}
                     </div>
                 </div>
+                {% if items_busqueda_progreso %}
+                <div id="progreso-busqueda-extra-wrap" class="hidden mt-8">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Resultados de evaluaciones y lecciones</h3>
+                    <div id="progreso-busqueda-extra" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {% for item in items_busqueda_progreso %}
+                        <div class="glass-card rounded-xl p-4 text-sm" data-progreso-search="{{ item.titulo }} {{ item.detalle }} {{ item.texto }} {{ item.tipo }}">
+                            <p class="font-semibold text-slate-900 dark:text-white">{{ item.titulo }}</p>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">{{ item.detalle }}</p>
+                            <p class="text-primary text-xs font-bold uppercase mt-2">{{ item.tipo }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </main>
             <footer
                 class="mt-auto px-10 py-8 border-t border-primary/10 flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm gap-4">

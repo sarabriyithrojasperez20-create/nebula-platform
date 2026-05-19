@@ -2,7 +2,8 @@
     class="mis-cursos-card group flex flex-col h-full bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1"
     data-slug="{{ curso.slug }}"
     data-materia="{{ curso.materia }}"
-    data-nivel="{{ curso.nivel }}">
+    data-nivel="{{ curso.nivel }}"
+    data-search="{{ curso.titulo }} {{ curso.descripcion }} {{ curso.nivel }} {{ curso.materia }} {{ curso.categoria|default('') }} {% if curso.diagnostico_completado %}diagnostico completado{% else %}diagnostico pendiente{% endif %} progreso {{ curso.porcentaje }}%">
     <div class="relative aspect-[16/9] w-full shrink-0 overflow-hidden">
         <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             alt="{{ curso.titulo }}"

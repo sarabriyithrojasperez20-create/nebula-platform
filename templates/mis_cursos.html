@@ -42,8 +42,10 @@
                             <span class="material-symbols-outlined" >search</span>
                         </div>
                         <input
+                            id="mis-cursos-busqueda"
+                            type="search"
                             class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 placeholder:text-slate-400 dark:placeholder:text-primary/40 px-3 text-sm font-normal"
-                            placeholder="Buscar cursos, temas o recursos..." value="">
+                            placeholder="Buscar cursos, temas o recursos..." value="" autocomplete="off">
                     </div>
                 </label>
             </div>
@@ -132,6 +134,11 @@
                 <p class="text-slate-600 dark:text-slate-300 font-semibold">No hay cursos disponibles para esta selección</p>
                 <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Prueba con otro filtro de materia o dificultad.</p>
             </div>
+            <div id="mis-cursos-empty-search" class="hidden mb-8 rounded-lg border border-primary/20 bg-primary/5 px-6 py-10 text-center">
+                <span class="material-symbols-outlined text-4xl text-primary mb-3">search_off</span>
+                <p class="text-slate-600 dark:text-slate-300 font-semibold">No se encontraron cursos relacionados con tu búsqueda.</p>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Prueba con otro término o borra la búsqueda para ver todos tus cursos.</p>
+            </div>
             <div id="mis-cursos-grid" class="mis-cursos-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
                 {% for curso in cursos_catalogo %}
                 {% include 'partials/mis_cursos_tarjeta.html' %}
@@ -204,7 +211,9 @@
     </script>
     <script src="{{ url_for('static', filename='js/nebula-cursos-activos.js') }}"></script>
     <script src="{{ url_for('static', filename='js/nebula-progreso.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/nebula-search-utils.js') }}"></script>
     <script src="{{ url_for('static', filename='mis-cursos.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nebula-search.js') }}"></script>
     {% include 'partials/estudiante_shell_assets.html' %}
 </body>
 
